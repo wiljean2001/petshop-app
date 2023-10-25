@@ -1,0 +1,38 @@
+{
+  "site_name": "Pet Shop",
+  "title_landing": "¡Bienvenidos a Veterinaria PetShop!",
+  "description_landing": "Nos dedicamos a cuidar de tus mascotas con amor y profesionalismo, brindando una atención excepcional. ¡Visítanos nuestras redes!",
+
+  "title_testimonies": "Testimonios de nuestros clientes",
+  "title_our_service": "Nuestros servicios",
+  "testimonies": [
+    {
+      "comment": "La clínica veterinaria ha sido excelente en el cuidado de mi perro. Los recomiendo ampliamente.",
+      "person": "María López"
+    },
+    {
+      "comment": "Siempre llevo a mis mascotas aquí y el trato es fantástico. Son muy profesionales y amigables.",
+      "person": "Juan Pérez"
+    }
+  ],
+  "title_our_hours": "Nuestros Horarios",
+  "description_our_hours": "Estamos disponibles para atenderte en los siguientes horarios:",
+  "our_hours": [
+    {
+      "day": "Lunes a Viernes",
+      "hour": "8:00 AM - 6:00 PM"
+    },
+    {
+      "day": "Sábados",
+      "hour": "9:00 AM - 2:00 PM"
+    }
+  ],
+  "title_our_promotions": "¡Promoción Especial!",
+  "description_our_promotion": "Descuento del 20% en la primera consulta para nuevos clientes.",
+  "button_our_promotion": "Obtén tu descuento",
+  "title_find_us": "Encuéntranos",
+  "description_find_us_at": "Estamos ubicados en la siguiente dirección:",
+  "title_contact_us": "Contáctanos",
+  "description_contact_up": "Estamos disponibles para responder tus preguntas y agendar citas.",
+  "button_contact_up": "Llamar ahora"
+}

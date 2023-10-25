@@ -1,0 +1,68 @@
+/* background-pet.module.css */
+.hero {
+  text-align: center;
+  padding-top: 48px;
+  padding-bottom: 88px;
+}
+
+.heroCopy {
+  position: relative; /* To display elements above hero illustrations */
+}
+
+.heroParagraph {
+  margin-bottom: 32px;
+}
+
+.heroCta {
+  max-width: 400px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 80px;
+}
+
+.lightsToggle {
+  color: rgba(var(--color-typography, 2), 0.64);
+}
+
+.headerIllustration {
+  display: none;
+}
+.headerIllustration .img,
+.svg {
+  max-width: none;
+}
+
+.headerIllustrationImage {
+  display: none;
+}
+
+.heroMedia {
+  position: relative;
+}
+
+.heroMediaIllustration {
+  position: absolute;
+  top: -10%;
+  /* left: -15px; */
+  right: 0;
+}
+.heroMediaIllustration .img,
+.svg {
+  max-width: 136%;
+}
+
+.heroMediaContainer {
+  position: relative;
+}
+
+.heroMediaImage {
+  margin: 0 auto;
+  box-shadow: 48px 16px 48px rgba(var(--color-bg, 1i), 0.12);
+  border-radius: 4px;
+  transform: perspective(1000px) rotateY(16deg) rotateX(2deg) rotateZ(-7deg)
+    scaleY(0.95) translatex(2%);
+}
+
+.heroMediaImage .lightsOff & {
+  box-shadow: 48px 16px 48px rgba(darken(var(--color-bg, 1i), 35%), 0.2);
+}
