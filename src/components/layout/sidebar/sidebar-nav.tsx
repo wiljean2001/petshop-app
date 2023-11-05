@@ -66,7 +66,7 @@ export function DocsSidebarNavItems({
             rel={item.external ? 'noreferrer' : ''}
           >
             {item.icon &&
-              React.createElement(Icons[item.icon], { className: 'w-4' })}
+              React.createElement(Icons[item.icon], { className: 'w-4 mr-1' })}
             {item.iconClass && <i className={cn('mr-1', item.iconClass)}></i>}
             {item.title}
             {item.label && (
@@ -84,7 +84,7 @@ export function DocsSidebarNavItems({
             )}
           >
             {item.icon &&
-              React.createElement(Icons[item.icon], { className: 'w-4' })}
+              React.createElement(Icons[item.icon], { className: 'w-4 mr-1' })}
             {item.iconClass && <i className={cn('mr-1', item.iconClass)}></i>}
 
             {item.title}

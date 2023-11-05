@@ -9,12 +9,13 @@ import {
   minLength,
   nullable,
   boolean,
+  number,
 } from './valibot'
 
 // ! TODO: Add comments for all validations
 // email('Email invalido')
 export const LoginFormSchema = object({
-  email: string('Usuario invalido'),
+  email: string([email('Email invalido')]),
   password: string([minLength(8, 'Contraseña debe tener más de 8 caracteres')]),
   // remember: optional(boolean()),
 })
@@ -30,18 +31,27 @@ export const SignUpSchema = object({
  */
 export type ISingUpForm = Input<typeof SignUpSchema>
 
-export const RoleSchema = object({
-  id: optional(string()),
-  name: string(),
-  created_at: optional(date()),
-  updated_at: optional(date()),
-})
 export const PermissionSchema = object({
   id: optional(string()),
   name: string(),
   created_at: optional(date()),
   updated_at: optional(date()),
 })
+
+export const RoleSchema = object({
+  id: optional(string()),
+  name: string(),
+  created_at: optional(date()),
+  updated_at: optional(date()),
+})
+export type IRole = Input<typeof RoleSchema>
+
+export const RolePermission = object({
+  roleId: string(),
+  permissionId: string(),
+})
+
+//
 
 // User schemas for validations
 export const UserSchema = object({

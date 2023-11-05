@@ -22,12 +22,17 @@ export const SERVICES = [
       'Contamos con un equipo de profesionales que realiza cirugías seguras y efectivas.',
   },
 ]
+export const SERVICE_STATES = ['ACTIVO', 'INACTIVO', 'DESCONTINUADO']
 
 export const dateFormat: Intl.DateTimeFormatOptions = {
   weekday: 'short',
   year: 'numeric',
   month: '2-digit',
   day: '2-digit',
+  hour: '2-digit',
+  hour12: true,
+}
+export const hourFormat: Intl.DateTimeFormatOptions = {
   hour: '2-digit',
   hour12: true,
 }

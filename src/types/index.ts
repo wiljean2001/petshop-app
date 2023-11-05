@@ -35,3 +35,63 @@ export interface ButtonConfig {
   onClick?: () => void
   className?: string
 }
+
+export type TextFieldConfig = {
+  type: 'text' | 'email' | 'password' | 'tel' | 'time'
+  name: string
+  label: string
+  placeholder: string
+  description?: string
+}
+export type TextareaFieldConfig = {
+  type: 'area'
+  name: string
+  label: string
+  placeholder: string
+  description?: string
+}
+export type NumberFieldConfig = {
+  type: 'number'
+  name: string
+  min: string | number
+  max: string | number
+  step: string
+  label: string
+  placeholder: string
+  description?: string
+}
+
+export type DateFieldConfig = {
+  type: 'date'
+  name: string
+  label: string
+  description?: string
+  withTime?: boolean
+}
+export type TimeFieldConfig = {
+  type: 'time'
+  name: string
+  label: string
+  description?: string
+}
+
+export type SelectFieldConfig = {
+  type: 'select'
+  name: string
+  label: string
+  options: { label: string; value: string }[]
+  description?: string
+}
+export type DynamicFieldConfig = {
+  type: 'dynamic'
+  name: string
+  options: FieldConfig[]
+}
+
+export type FieldConfig =
+  | TextFieldConfig
+  | TextareaFieldConfig
+  | NumberFieldConfig
+  | DateFieldConfig
+  | SelectFieldConfig
+  | DynamicFieldConfig

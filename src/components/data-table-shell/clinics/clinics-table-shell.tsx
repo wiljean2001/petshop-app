@@ -13,7 +13,11 @@ import { OPTIONS_CRUD } from '@/config/const'
 import { ConfirmDeleteDialog, WithFormDialog } from '../config'
 import { useForm } from 'react-hook-form'
 import valibotResolver from '@/lib/valibotResolver'
-import { CustomOptionInput } from '@/components/forms/Form'
+import { deleteClinic } from '@/services/admin/clinics'
+import { showToast } from '@/helpers/toast'
+import { useRouter } from 'next/navigation'
+import { getDateToString } from '@/lib/times'
+import { FieldConfig } from '@/types'
 
 interface ClinicsTableShellProps {
   data: IClinic[]
@@ -21,6 +25,7 @@ interface ClinicsTableShellProps {
 }
 
 export function ClinicsTableShell({ data, pageCount }: ClinicsTableShellProps) {
+  const router = useRouter()
   const [isPending, startTransition] = React.useTransition()
   const [dialog, setDialog] = React.useState<{
     type: OPTIONS_CRUD | null
@@ -38,28 +43,31 @@ export function ClinicsTableShell({ data, pageCount }: ClinicsTableShellProps) {
     resolver: valibotResolver(ClinicSchema),
   })
 
-  const inputs: CustomOptionInput[] = React.useMemo(() => {
+  const inputs = React.useMemo((): FieldConfig[] => {
     return [
       {
         type: 'text',
         name: 'name',
-        autoComplete: 'name_clinic',
-        placeHolder: 'Nombre del local',
-        className: 'mb-1 col-span-3',
+        label: '',
+        // autoComplete: 'name_clinic',
+        placeholder: 'Nombre del local',
+        // className: 'mb-1 col-span-3',
       },
       {
         type: 'tel',
         name: 'phone',
-        autoComplete: 'phone_number',
-        placeHolder: 'Teléfono',
-        className: 'mb-1 col-span-1',
+        label: '',
+        // autoComplete: 'phone_number',
+        placeholder: 'Teléfono',
+        // className: 'mb-1 col-span-1',
       },
       {
         type: 'text',
         name: 'location',
-        autoComplete: 'location',
-        placeHolder: 'Ubicación',
-        className: 'mb-2 col-span-4',
+        label: '',
+        // autoComplete: 'location',
+        placeholder: 'Ubicación',
+        // className: 'mb-2 col-span-4',
       },
     ]
   }, [])
@@ -72,21 +80,26 @@ export function ClinicsTableShell({ data, pageCount }: ClinicsTableShellProps) {
     }))
   }
   const handleDialogConfirm = () => {
-    if (dialog.type === OPTIONS_CRUD.DELETE) deleteClinic(dialog.clinicId)
-    if (dialog.type === OPTIONS_CRUD.UPDATE) updateClinic(dialog.clinic)
+    if (dialog.type === OPTIONS_CRUD.DELETE) actionDelete(dialog.clinicId)
+    if (dialog.type === OPTIONS_CRUD.UPDATE) actionUpdate(dialog.clinic)
     handleDialogClose()
   }
 
-  const deleteClinic = (id?: string | null) => {
-    if (id) {
-      console.log(
-        '🚀 ~ file: clinics-table-shell.tsx:43 ~ deleteClinic ~ id:',
-        id
-      )
-      // delete clinic
-    }
+  const actionDelete = async (id?: string | null) => {
+    try {
+      if (id) {
+        const res = await deleteClinic({ id })
+        if (res) {
+          showToast('Clínica eliminada con éxito', 'success')
+          router.refresh()
+          return
+        }
+        // delete clinic
+      }
+    } catch (error) {}
+    return showToast('Error: clínica no eliminada', 'error')
   }
-  const updateClinic = (clinic?: IClinic | null) => {
+  const actionUpdate = (clinic?: IClinic | null) => {
     if (clinic) {
       // delete clinic
     }
@@ -183,7 +196,7 @@ export function ClinicsTableShell({ data, pageCount }: ClinicsTableShellProps) {
             <div className='flex space-x-2'>
               {/* {label && <Badge variant="outline">{label}</Badge>} */}
               <span className='max-w-[500px] truncate font-medium'>
-                {new Date(row.getValue('createdAt')).toDateString()}
+                {getDateToString({ date: row.getValue('createdAt') })}
               </span>
             </div>
           )
@@ -203,7 +216,7 @@ export function ClinicsTableShell({ data, pageCount }: ClinicsTableShellProps) {
             <div className='flex space-x-2'>
               {/* {label && <Badge variant="outline">{label}</Badge>} */}
               <span className='max-w-[500px] truncate font-medium'>
-                {new Date(row.getValue('updatedAt')).toDateString()}
+                {getDateToString({ date: row.getValue('updatedAt') })}
               </span>
             </div>
           )
@@ -218,6 +231,11 @@ export function ClinicsTableShell({ data, pageCount }: ClinicsTableShellProps) {
                 title: 'Editar',
                 onHandle: () => {
                   // Open de dialog box for editing the clinic
+                  form.setValue('name', row.getValue('name'))
+                  form.setValue('phone', row.getValue('phone'))
+                  form.setValue('location', row.getValue('location'))
+                  // form.setValue('image', row.getValue('image'))
+
                   setDialog({
                     type: OPTIONS_CRUD.UPDATE,
                     clinic: row.original,

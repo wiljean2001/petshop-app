@@ -1,27 +1,40 @@
 import { ErrorResponse, SuccessResponse } from '@/helpers/ResponseError'
 import { db } from '@/lib/prisma'
+import { RoleSchema } from '@/models/user'
+import { safeParse } from 'valibot'
 
-const getRoles = async () => {
-  // get all roles to db
-  return await db.role.findMany()
-}
-
-export const POST = async () => {
+// Get all roles
+export async function GET() {
   try {
-    const results = await getRoles()
-    console.log(results)
-    return SuccessResponse(results, 200)
+    const permissions = await db.role.findMany()
+    return SuccessResponse(permissions, 200)
   } catch (error: any) {
     return ErrorResponse('BAD_REQUEST')
   }
 }
 
-export async function GET() {
+// Create a new role
+export async function POST(req: Request) {
+  // const { name, permissions } = {
+  //   name: 'admin',
+  //   permissions: [],
+  // }
+  const input = await req.json()
+  const validated = safeParse(RoleSchema, input)
+  if (!validated.success) {
+    return ErrorResponse('BAD_USER_INPUT')
+  }
+
+  const { name } = validated.output
+
   try {
-    const results = await getRoles()
-    console.log(results)
-    return SuccessResponse(results, 200)
-  } catch (error: any) {
+    const role = await db.role.create({
+      data: {
+        name,
+      },
+    })
+    return SuccessResponse(role, 200)
+  } catch (error) {
     return ErrorResponse('BAD_REQUEST')
   }
 }

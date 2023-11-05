@@ -19,7 +19,7 @@ function validateClinic(clinic: IClinic) {
 
 export async function createClinic({ input }: Props) {
   validateClinic(input)
-  const res = await fetch(`${siteConfig.url}/api/admin/clinics/create`, {
+  const res = await fetch(`${siteConfig.url}/api/admin/clinics/`, {
     body: JSON.stringify(input),
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -30,6 +30,18 @@ export async function createClinic({ input }: Props) {
 
   const clinic: IClinic = await res.json()
   return clinic
+}
+export async function deleteClinic({ id }: { id: string }) {
+  const res = await fetch(`${siteConfig.url}/api/admin/clinics/${id}`, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+  })
+  if (!res.ok) {
+    throw new Error(`Failed to clinic deleted: ${res.statusText}`)
+  }
+
+  const ok: boolean = await res.json()
+  return ok
 }
 
 // export async function updateClinic({ input }: Props) {

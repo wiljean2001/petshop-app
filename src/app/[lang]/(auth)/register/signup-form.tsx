@@ -1,14 +1,14 @@
 'use client'
 import { useMemo } from 'react'
 import { useForm } from 'react-hook-form'
-import CustomForm, { CustomOptionInput } from '@/components/forms/Form'
 import { SignUpSchema, ISingUpForm } from '@/models/user'
 import valibotResolver from '@/lib/valibotResolver'
 import { showToast } from '@/helpers/toast'
 import { useRouter } from 'next/navigation'
-import { siteConfig } from '@/config/site'
 import { ERoutingPath } from '@/config/docs'
 import { signUp } from '@/services/public/auth'
+import { DynamicForm } from '@/components/forms/dynamic-form'
+import { FieldConfig } from '@/types'
 
 const SignUpForm = () => {
   const route = useRouter()
@@ -21,28 +21,31 @@ const SignUpForm = () => {
     },
   })
 
-  const inputsForm = useMemo((): CustomOptionInput[] => {
+  const inputsForm = useMemo((): FieldConfig[] => {
     return [
       {
         name: 'name',
-        type: 'name',
-        autoComplete: 'name',
-        placeHolder: 'Nombre',
-        className: 'mb-1 col-span-4',
+        type: 'text',
+        // autoComplete: 'name',
+        label: '',
+        placeholder: 'Nombre',
+        // className: 'mb-1 col-span-4',
       },
       {
         name: 'email',
         type: 'email',
-        autoComplete: 'email',
-        placeHolder: 'Email',
-        className: 'mb-1 col-span-4',
+        label: '',
+        // autoComplete: 'email',
+        placeholder: 'Email',
+        // className: 'mb-1 col-span-4',
       },
       {
         name: 'password',
         type: 'password',
-        autoComplete: 'password',
-        placeHolder: 'Contraseña',
-        className: 'col-span-4',
+        label: '',
+        // autoComplete: 'password',
+        placeholder: 'Contraseña',
+        // className: 'col-span-4',
       },
     ]
   }, [])
@@ -62,10 +65,10 @@ const SignUpForm = () => {
   }
 
   return (
-    <CustomForm
+    <DynamicForm
+      formConfig={inputsForm}
       form={form}
-      handleSubmit={onSubmit}
-      inputsForm={inputsForm}
+      onSubmit={onSubmit}
       buttons={[
         {
           title: 'Registrarse',

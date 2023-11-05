@@ -1,10 +1,11 @@
 import { toast } from '@/components/ui/use-toast'
 
-type variant = 'error' | 'success' | 'default' | 'warning' | 'destructive'
+type variants = 'error' | 'success' | 'warning'
+type variant = 'success' | 'warning' | 'destructive' | 'default'
 
-export const showToast = (message: string, type: variant) => {
-  let title = ''
-  let variant: variant = 'default'
+export const showToast = (message: string, type: variants) => {
+  let title
+  let variant: variant
 
   switch (type) {
     case 'error':
@@ -25,6 +26,6 @@ export const showToast = (message: string, type: variant) => {
     title,
     variant,
     description: message,
-    duration: 3000,
+    duration: 3500,
   })
 }

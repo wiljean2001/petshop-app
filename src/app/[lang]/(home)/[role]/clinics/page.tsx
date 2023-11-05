@@ -8,7 +8,7 @@ interface Props {
   }
 }
 
-export default async function Clinics({ searchParams }: Props) {
+export default async function ClinicsPage({ searchParams }: Props) {
   const { page, per_page, sort, title, status, priority } = searchParams
   console.log({
     title,
@@ -31,6 +31,7 @@ export default async function Clinics({ searchParams }: Props) {
       id: true,
       name: true,
       phone: true,
+      image: true,
       location: true,
       createdAt: true,
       updatedAt: true,
@@ -51,7 +52,6 @@ export default async function Clinics({ searchParams }: Props) {
   const pageCount = Math.ceil(result[1] / limit)
 
   return (
-    
     <>
       {/* Title and Buttons for add*/}
       <HeaderClinics />

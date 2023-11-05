@@ -16,9 +16,12 @@ import {
   ChevronLeft,
   ChevronRight,
   Dog,
+  PawPrintIcon,
   CreditCard,
   File,
   FileText,
+  Calendar,
+  CalendarCheck,
   HelpCircle,
   Image,
   Laptop,
@@ -67,6 +70,12 @@ import {
   StopCircleIcon,
   Download,
   LucideShieldQuestion,
+  Outdent,
+  Stethoscope,
+  Users,
+  Building2,
+  Activity,
+  Minus,
   type XIcon as LucideIcon,
 } from 'lucide-react'
 
@@ -74,8 +83,10 @@ export type Icon = typeof LucideIcon
 
 export const Icons = {
   logo: Dog,
+  pawPrintIcon: PawPrintIcon,
   close: X,
   spinner: Loader2,
+  calendar: Calendar,
   chevronLeft: ChevronLeft,
   chevronRight: ChevronRight,
   trash: Trash,
@@ -155,5 +166,12 @@ export const Icons = {
   checkCircle2Icon: CheckCircle2Icon,
   stopCircleIcon: StopCircleIcon,
   lucideShieldQuestion: LucideShieldQuestion,
-  download: Download
+  download: Download,
+  outdent: Outdent,
+  stethoscope: Stethoscope,
+  users: Users,
+  building2: Building2,
+  calendarCheck: CalendarCheck,
+  activity: Activity,
+  minus: Minus,
 }

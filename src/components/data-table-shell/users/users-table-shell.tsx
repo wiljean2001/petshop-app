@@ -22,6 +22,7 @@ import { DataTableColumnHeader } from '@/components/data-table/data-table-column
 import { MillionDataTable } from '@/components/data-table/million-data-table'
 import { Icons } from '@/components/icons'
 import { IUserRestrict } from '@/models/user'
+import { getDateToString } from '@/lib/times'
 
 // const labels: {
 //   value: User['roleId']
@@ -46,10 +47,7 @@ interface UsersTableShellProps {
   pageCount: number
 }
 
-export function UsersTableShell({
-  data,
-  pageCount,
-}: UsersTableShellProps) {
+export function UsersTableShell({ data, pageCount }: UsersTableShellProps) {
   const [isPending, startTransition] = React.useTransition()
 
   // Memoize the columns so they don't re-render on every render
@@ -144,7 +142,7 @@ export function UsersTableShell({
             <div className='flex space-x-2'>
               {/* {label && <Badge variant="outline">{label}</Badge>} */}
               <span className='max-w-[500px] truncate font-medium'>
-                {new Date(row.getValue('createdAt')).toDateString()}
+                {getDateToString({ date: row.getValue('createdAt') })}
               </span>
             </div>
           )
@@ -164,7 +162,7 @@ export function UsersTableShell({
             <div className='flex space-x-2'>
               {/* {label && <Badge variant="outline">{label}</Badge>} */}
               <span className='max-w-[500px] truncate font-medium'>
-                {new Date(row.getValue('updatedAt')).toDateString()}
+                {getDateToString({ date: row.getValue('updatedAt') })}
               </span>
             </div>
           )

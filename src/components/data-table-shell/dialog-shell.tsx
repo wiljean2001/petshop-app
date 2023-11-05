@@ -1,9 +1,16 @@
 import { UseFormReturn } from 'react-hook-form'
-import CustomForm, { CustomOptionInput } from '../forms/Form'
-import { AlertDialog, AlertDialogContent } from '../ui/alert-dialog'
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogTitle,
+  AlertDialogHeader,
+  AlertDialogDescription,
+} from '../ui/alert-dialog'
 import { Button } from '../ui/button'
 import { Separator } from '../ui/separator'
-import { ButtonConfig } from '@/types'
+import { ButtonConfig, FieldConfig } from '@/types'
+import { DynamicForm } from '../forms/dynamic-form'
+import { ScrollArea } from '../ui/scroll-area'
 
 type CommonProps = {
   isOpen: boolean
@@ -13,7 +20,7 @@ type DialogShellProps =
   | (CommonProps & {
       onlyButtons: false
       title: string
-      inputs: CustomOptionInput[]
+      inputs: FieldConfig[]
       form: UseFormReturn<any>
       buttons: ButtonConfig[]
       handleSubmit: (value: any) => void
@@ -28,17 +35,18 @@ export const DialogShell: React.FC<DialogShellProps> = (props) => {
   return (
     <AlertDialog open={props.isOpen} onOpenChange={() => props.onClose()}>
       <AlertDialogContent>
-        {/* Dialog content to add clinic */}
-        <h3>{props.title}</h3>
+        <AlertDialogHeader>
+          <AlertDialogTitle>{props.title}</AlertDialogTitle>
+        </AlertDialogHeader>
         {!props.onlyButtons && (
-          <>
-            <CustomForm
+          <ScrollArea className='sm:max-h-[520px] px-4'>
+            <DynamicForm
               form={props.form}
-              handleSubmit={props.handleSubmit}
-              inputsForm={props.inputs}
+              formConfig={props.inputs}
+              onSubmit={props.handleSubmit}
               buttons={props.buttons}
             />
-          </>
+          </ScrollArea>
         )}
         {props.onlyButtons && (
           <>

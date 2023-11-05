@@ -7,14 +7,13 @@ import { Checkbox } from '@/components/ui/checkbox'
 
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header'
 import { MillionDataTable } from '@/components/data-table/million-data-table'
-import { VeterinarianSchema, IVeterinarian } from '@/models/schemas'
+import { IVeterinarian } from '@/models/schemas'
 import { DropdownMenuShell } from '../drop-down-menu-shell'
 import { OPTIONS_CRUD } from '@/config/const'
-import { ConfirmDeleteDialog, WithFormDialog } from '../config'
-import { useForm } from 'react-hook-form'
-import valibotResolver from '@/lib/valibotResolver'
-import { CustomOptionInput } from '@/components/forms/Form'
+import { ConfirmDeleteDialog } from '../config'
+
 import { getDateToString } from '@/lib/times'
+import { FormVeterinarian } from './form'
 
 interface ClinicsTableShellProps {
   data: IVeterinarian[]
@@ -30,49 +29,20 @@ export function VeterinariansTableShell({
     type: OPTIONS_CRUD | null
     isOpen: boolean
     veterinarianId?: string
-    veterinarian?: IVeterinarian | null
+    veterinarian?: IVeterinarian
   }>({
     type: null,
     isOpen: false,
     veterinarianId: '',
-    veterinarian: null,
+    veterinarian: undefined,
   })
 
-  const form = useForm<IVeterinarian>({
-    resolver: valibotResolver(VeterinarianSchema),
-  })
-
-  const inputs: CustomOptionInput[] = React.useMemo(() => {
-    return [
-      {
-        type: 'text',
-        name: 'name',
-        autoComplete: 'name_clinic',
-        placeHolder: 'Nombre del local',
-        className: 'mb-1 col-span-3',
-      },
-      {
-        type: 'tel',
-        name: 'phone',
-        autoComplete: 'phone_number',
-        placeHolder: 'Teléfono',
-        className: 'mb-1 col-span-1',
-      },
-      {
-        type: 'text',
-        name: 'location',
-        autoComplete: 'location',
-        placeHolder: 'Ubicación',
-        className: 'mb-2 col-span-4',
-      },
-    ]
-  }, [])
   const handleDialogClose = () => {
     setDialog((prevState) => ({
       ...prevState,
       isOpen: false,
       veterinarianId: '',
-      veterinarian: null,
+      veterinarian: undefined,
     }))
   }
   const handleDialogConfirm = () => {
@@ -310,9 +280,9 @@ export function VeterinariansTableShell({
       )}
       {/* For edit veterinarian */}
       {dialog.type === OPTIONS_CRUD.UPDATE && (
-        <WithFormDialog
+        <FormVeterinarian
           title='Editar local:'
-          form={{ form, inputs }}
+          initialValues={dialog.veterinarian}
           isOpen={dialog.isOpen}
           onClose={() => handleDialogClose()}
           onConfirm={() => handleDialogConfirm()}

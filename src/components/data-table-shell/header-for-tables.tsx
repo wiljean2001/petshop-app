@@ -24,7 +24,7 @@ const AddItem = ({ title, options }: AddItemProps) => {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
-        //   variant='outline'
+          //   variant='outline'
           size='sm'
           className='ml-auto h-8'
         >
@@ -59,7 +59,7 @@ export const HeaderWithButton = ({
       </h3>
       <div className='flex gap-2'>
         {/* Dropdown for select options: "add clinic", "import clinics" */}
-        <AddItem options={options} title={title} />
+        <AddItem options={options} title={options[0].title} />
         <Button variant={'outline'} size={'icon'} onClick={onHandledDownload}>
           <Icons.download className='w-4' />
         </Button>

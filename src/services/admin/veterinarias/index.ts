@@ -19,7 +19,7 @@ function validateVeterinarian(veterinarian: IVeterinarian) {
 
 export async function createVeterinarian({ input }: Props) {
   validateVeterinarian(input)
-  const res = await fetch(`${siteConfig.url}/api/admin/veterinarians/create`, {
+  const res = await fetch(`${siteConfig.url}/api/admin/veterinarians`, {
     body: JSON.stringify(input),
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

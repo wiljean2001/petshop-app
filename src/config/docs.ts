@@ -33,15 +33,18 @@ export const enum EUserRoutingPath {
 export const enum EAdminRoutingPath {
   ADMIN_APPOINTMENTS = '/appointments',
   ADMIN_MEDICAL_RECORDS = '/medical-records',
+  ADMIN_SERVICES = '/services',
   ADMIN_OWNERS = '/owners',
   ADMIN_PETS = '/pets',
   ADMIN_BREEDS = '/breeds',
   ADMIN_SPECIES = '/species',
   ADMIN_PRESCRIPTIONS = '/prescriptions',
   ADMIN_USERS = '/users',
+  ADMIN_VETERINARIANS = '/veterinarians',
   ADMIN_NOTES = '/notes',
   ADMIN_REMINDERS = '/reminders',
   ADMIN_CLINICS = '/clinics',
+  ADMIN_SCHEDULES = '/schedules',
   ADMIN_DASHBOARD = '/dashboard',
   ADMIN_ROLES = '/roles',
   ADMIN_PERMISSIONS = '/permissions',
@@ -157,12 +160,18 @@ const adminOptions: SidebarNavItem[] = [
       {
         title: 'Atenciones',
         href: EAdminRoutingPath.ADMIN_PERMISSIONS,
-        iconClass: 'bx bxs-shield-alt',
+        icon: 'activity',
         items: [],
       },
       {
         title: 'Historial Médico',
         href: EAdminRoutingPath.ADMIN_MEDICAL_RECORDS,
+        iconClass: 'bx bx-clipboard',
+        items: [],
+      },
+      {
+        title: 'Servicios',
+        href: EAdminRoutingPath.ADMIN_SERVICES,
         iconClass: 'bx bx-clipboard',
         items: [],
       },
@@ -185,20 +194,20 @@ const adminOptions: SidebarNavItem[] = [
       {
         title: 'Mascotas',
         href: EAdminRoutingPath.ADMIN_PETS,
-        iconClass: 'bx bxs-paw',
+        icon: 'pawPrintIcon',
         items: [],
       },
       {
         title: 'Razas',
         href: EAdminRoutingPath.ADMIN_BREEDS,
-        icon: 'facebook',
+        icon: 'outdent',
         // iconClass: 'bx bx-vial',
         items: [],
       },
       {
         title: 'Especies',
         href: EAdminRoutingPath.ADMIN_SPECIES,
-        iconClass: 'bx bx-vial',
+        icon: 'outdent',
         items: [],
       },
     ],
@@ -209,7 +218,13 @@ const adminOptions: SidebarNavItem[] = [
       {
         title: 'Clinicas',
         href: EAdminRoutingPath.ADMIN_CLINICS,
-        iconClass: 'bx bxs-contact',
+        icon: 'building2',
+        items: [],
+      },
+      {
+        title: 'Horarios',
+        href: EAdminRoutingPath.ADMIN_SCHEDULES,
+        icon: 'calendarCheck',
         items: [],
       },
     ],
@@ -220,7 +235,13 @@ const adminOptions: SidebarNavItem[] = [
       {
         title: 'Usuarios',
         href: EAdminRoutingPath.ADMIN_USERS,
-        iconClass: 'bx bxs-contact',
+        icon: 'users',
+        items: [],
+      },
+      {
+        title: 'Veterinarios',
+        href: EAdminRoutingPath.ADMIN_VETERINARIANS,
+        icon: 'stethoscope',
         items: [],
       },
     ],
@@ -253,101 +274,5 @@ const adminOptions: SidebarNavItem[] = [
         items: [],
       },
     ],
-  },
-]
-
-export interface CardStats {
-  statSubtitle: string
-  statTitle: string
-  statArrow: string
-  statPercent: string
-  statPercentColor: string
-  statDescripiron: string
-  statIconName: string
-  statIconColor: string
-}
-
-export const CardStatsOptionsUser: CardStats[] = [
-  {
-    statSubtitle: 'CITAS PENDIENTES',
-    statTitle: '2',
-    statArrow: 'up',
-    statPercent: '1',
-    statPercentColor: 'text-emerald-500',
-    statDescripiron: 'Hace 3 días',
-    statIconName: 'far fa-chart-bar',
-    statIconColor: 'bg-red-500',
-  },
-  {
-    statSubtitle: 'MASCOTAS',
-    statTitle: '3',
-    statArrow: 'down',
-    statPercent: '1',
-    statPercentColor: 'text-red-500',
-    statDescripiron: 'Hace 1 día',
-    statIconName: 'fas fa-dog',
-    statIconColor: 'bg-orange-500',
-  },
-  {
-    statSubtitle: 'VISITAS',
-    statTitle: '10',
-    statArrow: 'down',
-    statPercent: '1',
-    statPercentColor: 'text-orange-500',
-    statDescripiron: 'Ayer',
-    statIconName: 'fas fa-users',
-    statIconColor: 'bg-pink-500',
-  },
-  {
-    statSubtitle: 'NOTAS',
-    statTitle: '2',
-    statArrow: 'up',
-    statPercent: '1',
-    statPercentColor: 'text-emerald-500',
-    statDescripiron: 'Hoy',
-    statIconName: 'fas fa-percent',
-    statIconColor: 'bg-blue-500',
-  },
-]
-export const CardStatsOptionsAdmin: CardStats[] = [
-  {
-    statSubtitle: 'TRAFFIC',
-    statTitle: '350,897',
-    statArrow: 'up',
-    statPercent: '3.48',
-    statPercentColor: 'text-emerald-500',
-    statDescripiron: 'Since last month',
-    statIconName: 'far fa-chart-bar',
-    statIconColor: 'bg-red-500',
-  },
-  {
-    statSubtitle: 'NEW USERS',
-    statTitle: '2,356',
-    statArrow: 'down',
-    statPercent: '3.48',
-    statPercentColor: 'text-red-500',
-    statDescripiron: 'Since last week',
-    statIconName: 'fas fa-chart-pie',
-    statIconColor: 'bg-orange-500',
-  },
-  {
-    statSubtitle: 'SALES',
-    statTitle: '924',
-    statArrow: 'down',
-    statPercent: '1.10',
-    statPercentColor: 'text-orange-500',
-    statDescripiron: 'Since yesterday',
-    statIconName: 'fas fa-users',
-    statIconColor: 'bg-pink-500',
-  },
-  {
-    statSubtitle: 'PERFORMANCE',
-    statTitle: '49,65%',
-    statArrow: 'up',
-    statPercent: '12',
-    statPercentColor: 'text-emerald-500',
-    statDescripiron: 'Since last month',
-    statIconName: 'fas fa-percent',
-    statIconColor: 'bg-blue-500',
   },
 ]
