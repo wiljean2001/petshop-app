@@ -1,5 +1,5 @@
 import plugin from 'tailwindcss/plugin'
-import { fontFamily } from 'tailwindcss/defaultTheme'
+// import { fontFamily } from 'tailwindcss/defaultTheme'
 
 export const shadcnPlugin = plugin(
   // 1. Add css variable definittions to the base layer
@@ -85,7 +85,7 @@ export const shadcnPlugin = plugin(
         '--warning': '47.9 95.8% 53.1%',
         '--warning-foreground': '26 83.3% 14.1%',
 
-        '--destructive': '0 62.8% 30.6%',
+        '--destructive': '0 62.8% 55.6%',
         '--destructive-foreground': '0 85.7% 97.3%',
 
         '--border': '240 3.7% 15.9%',
@@ -177,9 +177,9 @@ export const shadcnPlugin = plugin(
           md: 'calc(var(--radius) - 2px)',
           sm: 'calc(var(--radius) - 4px)',
         },
-        fontFamily: {
-          sans: ['var(--font-sans)', ...fontFamily.sans],
-        },
+        // fontFamily: {
+        //   sans: ['var(--font-sans)', ...fontFamily.sans],
+        // },
         keyframes: {
           'accordion-down': {
             from: { height: '0' },

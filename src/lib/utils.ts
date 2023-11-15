@@ -7,7 +7,7 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function constructMetadata({
-  title = 'Petshop - dueños y mascotas',
+  title = 'Petshop',
   description = 'Petshop is software to manage the attention of your pets.',
   image = '/thumbnail.png',
   icons = '/favicon.ico',
@@ -40,12 +40,13 @@ export function constructMetadata({
     },
     icons,
     metadataBase: new URL('https://quill-jet.vercel.app'),
-    themeColor: '#FFF',
+    // themeColor: '#FFF',
     ...(noIndex && {
       robots: {
         index: false,
         follow: false,
       },
     }),
+    
   }
 }
