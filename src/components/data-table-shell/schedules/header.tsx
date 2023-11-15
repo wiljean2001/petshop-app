@@ -1,13 +1,13 @@
 'use client'
 
-import { HeaderWithButton } from '../header-for-tables'
+import { DashboardOptions } from '../header-for-tables'
 import { useMemo, useState } from 'react'
-import { AddSchedule } from './add-schedule'
+import { AddSchedule } from './add'
 
 export const HeaderSchedule = () => {
   const [isDialogOpen, setDialogOpen] = useState(false)
 
-  const optionsClinics = useMemo(() => {
+  const options = useMemo(() => {
     return [
       {
         title: 'Agregar horario',
@@ -21,8 +21,12 @@ export const HeaderSchedule = () => {
 
   return (
     <>
-      <HeaderWithButton options={optionsClinics} title='Horarios' />
-      <AddSchedule isOpen={isDialogOpen} onClose={() => setDialogOpen(false)} />
+      <DashboardOptions options={options} onHandledDownload=''>
+        <AddSchedule
+          isOpen={isDialogOpen}
+          onClose={() => setDialogOpen(false)}
+        />
+      </DashboardOptions>
     </>
   )
 }

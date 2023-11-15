@@ -1,6 +1,7 @@
 'use client'
+import Link from 'next/link'
 import { Icons } from '../icons'
-import { Button } from '../ui/button'
+import { Button, buttonVariants } from '../ui/button'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -47,23 +48,32 @@ const AddItem = ({ title, options }: AddItemProps) => {
   )
 }
 
-export const HeaderWithButton = ({
-  title,
+interface DashboardOptionsProps {
+  options?: {
+    title: string
+    onHandled: () => void
+  }[]
+  onHandledDownload: string
+  children: React.ReactNode
+}
+export const DashboardOptions = ({
   options,
   onHandledDownload,
-}: AddItemProps) => {
+  children,
+}: DashboardOptionsProps) => {
   return (
-    <div className='flex justify-between'>
-      <h3 className='text-2xl font-semibold leading-none tracking-tight'>
-        {title}
-      </h3>
+    <>
       <div className='flex gap-2'>
         {/* Dropdown for select options: "add clinic", "import clinics" */}
-        <AddItem options={options} title={options[0].title} />
-        <Button variant={'outline'} size={'icon'} onClick={onHandledDownload}>
+        {options && <AddItem options={options} title={options[0].title} />}
+        <Link
+          href={onHandledDownload}
+          className={buttonVariants({ variant: 'outline', size: 'icon' })}
+        >
           <Icons.download className='w-4' />
-        </Button>
+        </Link>
       </div>
-    </div>
+      {children}
+    </>
   )
 }

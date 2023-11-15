@@ -1,28 +1,27 @@
 'use client'
 
 import { DashboardOptions } from '../header-for-tables'
-import { Suspense, useMemo, useState } from 'react'
-import { AddBreed } from './add'
-
-export const HeaderBreed = () => {
+import { useMemo, useState } from 'react'
+import { AddClinic } from './add'
+export const HeaderClinics = () => {
   const [isDialogOpen, setDialogOpen] = useState(false)
 
   const options = useMemo(() => {
     return [
       {
-        title: 'Agregar raza',
+        title: 'Agregar clinica',
         onHandled: async () => {
           setDialogOpen(true)
         },
       },
-      // { title: 'Importar horarios', onHandled: async () => {} },
+      { title: 'Importar clinicas', onHandled: async () => {} },
     ]
   }, [])
 
   return (
     <>
       <DashboardOptions options={options} onHandledDownload=''>
-        <AddBreed isOpen={isDialogOpen} onClose={() => setDialogOpen(false)} />
+        <AddClinic isOpen={isDialogOpen} onClose={() => setDialogOpen(false)} />
       </DashboardOptions>
     </>
   )

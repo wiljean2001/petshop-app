@@ -11,11 +11,11 @@ import { IPet, IBreed, IOwner } from '@/models/schemas'
 import { DropdownMenuShell } from '../drop-down-menu-shell'
 import { OPTIONS_CRUD } from '@/config/const'
 import { ConfirmDeleteDialog } from '../config'
-import { deletePet } from '@/services/admin/pets'
+import { deletePet, updatePet } from '@/services/admin/pets'
 import { showToast } from '@/helpers/toast'
-import { useRouter } from 'next/navigation'
 import { getDateToString } from '@/lib/times'
 import { FormPet } from './form'
+import { useRouter } from 'next/navigation'
 
 interface PetsTableShellProps {
   data: IPet[]
@@ -23,7 +23,8 @@ interface PetsTableShellProps {
 }
 
 export function PetsTableShell({ data, pageCount }: PetsTableShellProps) {
-  const router = useRouter()
+  const route = useRouter()
+
   const [isPending, startTransition] = React.useTransition()
   const [dialog, setDialog] = React.useState<{
     type: OPTIONS_CRUD | null
@@ -45,28 +46,49 @@ export function PetsTableShell({ data, pageCount }: PetsTableShellProps) {
       pet: undefined,
     }))
   }
-  const handleDialogConfirm = () => {
-    if (dialog.type === OPTIONS_CRUD.DELETE) deleteClinic(dialog.petId)
-    if (dialog.type === OPTIONS_CRUD.UPDATE) updateClinic(dialog.pet)
-    handleDialogClose()
-  }
-
-  const deleteClinic = async (id?: string | null) => {
+  const handleDeletePet = async (id?: string) => {
+    if (!id) return false
     try {
-      if (!id) return
       // delete pet
       const res = await deletePet({ id })
       if (res) {
-        showToast('Horario eliminado con éxito', 'success')
-        return router.refresh()
+        showToast(
+          '¡Éxito! La mascota ha sido eliminado satisfactoriamente.',
+          'success'
+        )
+        route.refresh()
+        handleDialogClose()
+        return true
       }
-    } catch (error) {}
-    return showToast('Error: raza no eliminada', 'error')
-  }
-  const updateClinic = (pet?: IPet | null) => {
-    if (pet) {
-      // delete pet
+      showToast(
+        'Advertencia: La eliminación no se completó. Por favor, completa todos los campos requeridos.',
+        'warning'
+      )
+    } catch (error) {
+      showToast(
+        'Error: No se pudo realizar la acción. Por favor, inténtalo de nuevo.',
+        'error'
+      )
     }
+    return false
+  }
+  const handleUpdatePet = async (pet?: IPet) => {
+    if (!pet) return false
+    const res = await updatePet({ input: pet })
+    if (res) {
+      showToast(
+        '¡Éxito! La mascota ha sido actualizado satisfactoriamente.',
+        'success'
+      )
+      route.refresh()
+      return true
+    }
+
+    showToast(
+      'Advertencia: La actualización no se completó. Por favor, completa todos los campos requeridos.',
+      'warning'
+    )
+    return false
   }
 
   // Memoize the columns so they don't re-render on every render
@@ -119,9 +141,36 @@ export function PetsTableShell({ data, pageCount }: PetsTableShellProps) {
           <DataTableColumnHeader column={column} title='F. nacimiento' />
         ),
         cell: ({ row }) => (
-          <div className='w-[150px] max-w-[200px]'>
+          <div className='min-w-[150px] max-w-[200px]'>
             {getDateToString({ date: row.getValue('birthdate') })}
           </div>
+        ),
+      },
+      {
+        accessorKey: 'color',
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title='Color' />
+        ),
+        cell: ({ row }) => (
+          <div className='max-w-[200px]'>{row.getValue('color')}</div>
+        ),
+      },
+      {
+        accessorKey: 'medicalNotes',
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title='Notas:' />
+        ),
+        cell: ({ row }) => (
+          <div className='max-w-[200px]'>{row.getValue('medicalNotes')}</div>
+        ),
+      },
+      {
+        accessorKey: 'derivedFrom',
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title='Derivado:' />
+        ),
+        cell: ({ row }) => (
+          <div className='max-w-[200px]'>{row.getValue('derivedFrom')}</div>
         ),
       },
       {
@@ -130,7 +179,7 @@ export function PetsTableShell({ data, pageCount }: PetsTableShellProps) {
           <DataTableColumnHeader column={column} title='Dueño' />
         ),
         cell: ({ row }) => (
-          <div className='w-[200px] max-w-[200px]'>
+          <div className='min-w-[200px] max-w-[200px]'>
             {(row.getValue('owner') as IOwner).name}{' '}
             {(row.getValue('owner') as IOwner).surname}
           </div>
@@ -142,7 +191,7 @@ export function PetsTableShell({ data, pageCount }: PetsTableShellProps) {
           <DataTableColumnHeader column={column} title='Raza' />
         ),
         cell: ({ row }) => (
-          <div className='w-[100px] max-w-[200px]'>
+          <div className='min-w-[100px] max-w-[200px]'>
             {(row.getValue('breed') as IBreed).name}
           </div>
         ),
@@ -210,7 +259,7 @@ export function PetsTableShell({ data, pageCount }: PetsTableShellProps) {
                 title: 'Eliminar',
                 onHandle: () => {
                   // Open de dialog box for deleting the pet
-                  // setClinicIdToDelete(row.original.id!) // Asume que `row.id` es el id de la clínica
+                  // setPetIdToDelete(row.original.id!) // Asume que `row.id` es el id de la clínica
                   // setDialogOpen(true)
                   setDialog({
                     type: OPTIONS_CRUD.DELETE,
@@ -251,16 +300,16 @@ export function PetsTableShell({ data, pageCount }: PetsTableShellProps) {
         <ConfirmDeleteDialog
           isOpen={dialog.isOpen}
           onClose={() => handleDialogClose()}
-          onConfirm={() => handleDialogConfirm()}
+          onConfirm={() => handleDeletePet(dialog.petId)}
         />
       )}
       {/* For edit pet */}
       {dialog.type === OPTIONS_CRUD.UPDATE && (
         <FormPet
-          title='Editar raza:'
+          title='Editar mascota:'
           isOpen={dialog.isOpen}
           onClose={() => handleDialogClose()}
-          onConfirm={() => handleDialogConfirm()}
+          onConfirm={handleUpdatePet}
           initialValues={dialog.pet}
         />
       )}

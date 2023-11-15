@@ -1,12 +1,12 @@
 'use client'
 
-import { HeaderWithButton } from '../header-for-tables'
+import { DashboardOptions } from '../header-for-tables'
 import { useMemo, useState } from 'react'
-import { AddVeterinarian } from './add-veterinarias'
+import { AddVeterinarian } from './add'
 export const HeaderVeterinarian = () => {
   const [isDialogOpen, setDialogOpen] = useState(false)
 
-  const optionsClinics = useMemo(() => {
+  const options = useMemo(() => {
     return [
       {
         title: 'Agregar veterinario',
@@ -20,11 +20,12 @@ export const HeaderVeterinarian = () => {
 
   return (
     <>
-      <HeaderWithButton options={optionsClinics} title='Veterinarios' />
-      <AddVeterinarian
-        isOpen={isDialogOpen}
-        onClose={() => setDialogOpen(false)}
-      />
+      <DashboardOptions options={options} onHandledDownload=''>
+        <AddVeterinarian
+          isOpen={isDialogOpen}
+          onClose={() => setDialogOpen(false)}
+        />
+      </DashboardOptions>
     </>
   )
 }

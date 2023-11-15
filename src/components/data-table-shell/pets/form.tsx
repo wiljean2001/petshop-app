@@ -7,11 +7,12 @@ import { FieldConfig } from '@/types'
 import { getBreeds } from '@/services/admin/breeds'
 import { getOwners } from '@/services/admin/owners'
 import { useRouter } from 'next/navigation'
+import { showToast } from '@/helpers/toast'
 
 interface Props {
   isOpen: boolean
   onClose: () => void
-  onConfirm: (input: IPet) => void
+  onConfirm: (input: IPet) => Promise<boolean>
   title: string
   initialValues?: Partial<IPet>
 }
@@ -24,8 +25,6 @@ export const FormPet = ({
 }: Props) => {
   const [breeds, setBreeds] = useState<IBreed[]>([]) // Asumiendo que IBreeds es tu tipo para eBreeds
   const [owners, setOwners] = useState<IOwner[]>([]) // Asumiendo que IBreeds es tu tipo para eBreeds
-
-  const route = useRouter()
   // form
   const form = useForm<IPet>({
     resolver: valibotResolver(PetSchema),
@@ -62,10 +61,17 @@ export const FormPet = ({
     }
   }, [isOpen, initialValues, form])
 
-  const onHandle = (input: IPet) => {
-    onConfirm(input)
-    route.refresh()
-    form.reset()
+  const onHandle = async (input: IPet) => {
+    try {
+      if (!(await onConfirm(input))) return
+      form.reset()
+      onClose()
+    } catch (error) {
+      showToast(
+        'Error: No se pudo realizar la acción. Por favor, inténtalo de nuevo.',
+        'error'
+      )
+    }
   }
 
   // inputs
@@ -90,8 +96,15 @@ export const FormPet = ({
         placeholder: 'Macho / hembra',
       },
       {
+        type: 'text',
+        name: 'color',
+        label: 'Color:',
+        placeholder: 'Color de la mascota',
+      },
+      {
         type: 'select',
         name: 'ownerId',
+        isMultiple: false,
         label: 'Dueño:',
         options: owners.map((o) => ({
           value: o.id!,
@@ -101,8 +114,21 @@ export const FormPet = ({
       {
         type: 'select',
         name: 'breedId',
+        isMultiple: false,
         label: 'Raza:',
         options: breeds.map((r) => ({ value: r.id!, label: r.name })),
+      },
+      {
+        type: 'area',
+        name: 'medicalNotes',
+        label: 'Notas médicas: (opc.)',
+        placeholder: 'Notas médicas',
+      },
+      {
+        type: 'text',
+        name: 'derivedFrom',
+        label: 'Derivado de: (opc.)',
+        placeholder: 'Lugar de derivación',
       },
     ]
   }, [breeds, owners])

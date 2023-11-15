@@ -2,64 +2,66 @@
 
 import * as React from 'react'
 import { type ColumnDef } from '@tanstack/react-table'
+
 import { Checkbox } from '@/components/ui/checkbox'
+
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header'
 import { MillionDataTable } from '@/components/data-table/million-data-table'
-import { IBreed, ISpecie } from '@/models/schemas'
+import { IClinic, IClinicScheduleSchema, ISchedule } from '@/models/schemas'
 import { DropdownMenuShell } from '../drop-down-menu-shell'
 import { OPTIONS_CRUD } from '@/config/const'
 import { ConfirmDeleteDialog } from '../config'
-import { deleteBreed, updateBreed } from '@/services/admin/breeds'
-import { showToast } from '@/helpers/toast'
 import { getDateToString } from '@/lib/times'
-import { FormBreed } from './form'
+import { FormClinic } from './form'
+import { deleteClinic, updateClinic } from '@/services/admin/clinics'
+import { showToast } from '@/helpers/toast'
 import { useRouter } from 'next/navigation'
 
-interface BreedsTableShellProps {
-  data: IBreed[]
+interface ClinicsTableShellProps {
+  data: IClinic[]
   pageCount: number
 }
 
-export function BreedsTableShell({ data, pageCount }: BreedsTableShellProps) {
+export function ClinicsTableShell({ data, pageCount }: ClinicsTableShellProps) {
   const route = useRouter()
+
   const [isPending, startTransition] = React.useTransition()
   const [dialog, setDialog] = React.useState<{
     type: OPTIONS_CRUD | null
     isOpen: boolean
-    breedId?: string
-    breed?: IBreed
+    clinicId?: string
+    clinic?: IClinic
   }>({
     type: null,
     isOpen: false,
-    breedId: '',
-    breed: undefined,
+    clinicId: '',
+    clinic: undefined,
   })
 
   const handleDialogClose = () => {
     setDialog((prevState) => ({
       ...prevState,
       isOpen: false,
-      breedId: '',
-      breed: undefined,
+      clinicId: '',
+      clinic: undefined,
     }))
   }
 
-  const handleDeleteBreed = async (id?: string | null): Promise<boolean> => {
+  const handleDeleteClinic = async (id?: string): Promise<boolean> => {
     if (!id) return false
-
     try {
-      const res = await deleteBreed({ id })
+      const res = await deleteClinic({ id })
       if (res) {
         showToast(
-          '¡Éxito! La raza ha sido eliminado satisfactoriamente.',
+          '¡Éxito! La clinica ha sido elimina satisfactoriamente.',
           'success'
         )
-        handleDialogClose()
         route.refresh()
+        handleDialogClose()
         return true
       }
       showToast(
-        'Advertencia: La raza no se ha eliminado completamente. Por favor, completa todos los campos requeridos.',
+        'Advertencia: La clinica no se ha eliminado completamente. Por favor, completa todos los campos requeridos.',
         'warning'
       )
     } catch (error) {
@@ -69,12 +71,11 @@ export function BreedsTableShell({ data, pageCount }: BreedsTableShellProps) {
       )
     }
     return false
+    // delete clinic
   }
-
-  const handleUpdateBreed = async (breed?: IBreed): Promise<boolean> => {
-    if (!breed) return false
-
-    const res = await updateBreed({ input: breed })
+  const handleUpdateClinic = async (clinic?: IClinic): Promise<boolean> => {
+    if (!clinic) return false
+    const res = await updateClinic({ input: clinic })
     if (res) {
       showToast(
         '¡Éxito! La raza ha sido actualizada satisfactoriamente.',
@@ -91,7 +92,7 @@ export function BreedsTableShell({ data, pageCount }: BreedsTableShellProps) {
   }
 
   // Memoize the columns so they don't re-render on every render
-  const columns = React.useMemo<ColumnDef<IBreed, unknown>[]>(
+  const columns = React.useMemo<ColumnDef<IClinic, unknown>[]>(
     () => [
       {
         id: 'select',
@@ -118,25 +119,91 @@ export function BreedsTableShell({ data, pageCount }: BreedsTableShellProps) {
       },
       {
         accessorKey: 'name',
-        header: ({ column }) => {
-          return <DataTableColumnHeader column={column} title='Raza' />
-        },
-        cell: ({ row }) => (
-          <div className='min-w-[200px] max-w-[200px]'>
-            {row.getValue('name')}
-          </div>
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title='Nombre' />
         ),
+        cell: ({ row }) => (
+          <div className='max-w-[200px]'>{row.getValue('name')}</div>
+        ),
+        enableSorting: false,
+        enableHiding: false,
       },
       {
-        accessorKey: 'specie',
+        accessorKey: 'location',
         header: ({ column }) => (
-          <DataTableColumnHeader column={column} title='Especie' />
+          <DataTableColumnHeader column={column} title='Ubicación' />
         ),
-        cell: ({ row }) => (
-          <div className='min-w-[200px] max-w-[200px]'>
-            {(row.getValue('specie') as ISpecie).name}
-          </div>
+        cell: ({ row }) => {
+          // const label = tasks.label.enumValues.find(
+          //   (label) => label === row.original.label
+          // )
+
+          return (
+            <div className='flex space-x-2'>
+              {/* {label && <Badge variant="outline">{label}</Badge>} */}
+              <span className='min-w-[200px] max-w-[500px] truncate font-medium'>
+                {row.getValue('location')}
+              </span>
+            </div>
+          )
+        },
+      },
+      {
+        accessorKey: 'phone',
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title='Telf.' />
         ),
+        cell: ({ row }) => {
+          // const label = tasks.label.enumValues.find(
+          //   (label) => label === row.original.label
+          // )
+
+          return (
+            <div className='flex space-x-2'>
+              {/* {label && <Badge variant="outline">{label}</Badge>} */}
+              <span className='max-w-[500px] truncate font-medium'>
+                {row.getValue('phone')}
+              </span>
+            </div>
+          )
+        },
+      },
+      {
+        accessorKey: 'ClinicSchedule',
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title='Horarios' />
+        ),
+        cell: ({ row }) => {
+          // const label = tasks.label.enumValues.find(
+          //   (label) => label === row.original.label
+          // )
+
+          const ClinicSchedule = row.getValue(
+            'ClinicSchedule'
+          ) as IClinicScheduleSchema[]
+
+          return (
+            <div className='flex space-x-2'>
+              {/* {label && <Badge variant="outline">{label}</Badge>} */}
+              <div className='max-w-[500px] truncate font-medium'>
+                {ClinicSchedule.length > 0 ? (
+                  ClinicSchedule.map((schedule, index) => {
+                    const { day_week, openingHour, closingHour } =
+                      schedule.schedule
+                    return (
+                      <span key={index}>
+                        {`${day_week} | ${openingHour} - ${closingHour}`}
+                        <br />
+                      </span>
+                    )
+                  })
+                ) : (
+                  <span>No hay horarios disponibles</span>
+                )}
+              </div>
+            </div>
+          )
+        },
       },
       {
         accessorKey: 'createdAt',
@@ -186,10 +253,11 @@ export function BreedsTableShell({ data, pageCount }: BreedsTableShellProps) {
               {
                 title: 'Editar',
                 onHandle: () => {
-                  // Open de dialog box for editing the breed
+                  // Open de dialog box for editing the clinic
+
                   setDialog({
                     type: OPTIONS_CRUD.UPDATE,
-                    breed: row.original,
+                    clinic: row.original,
                     isOpen: true,
                   })
                 },
@@ -197,12 +265,12 @@ export function BreedsTableShell({ data, pageCount }: BreedsTableShellProps) {
               {
                 title: 'Eliminar',
                 onHandle: () => {
-                  // Open de dialog box for deleting the breed
-                  // setbreedIdToDelete(row.original.id!) // Asume que `row.id` es el id de la clínica
+                  // Open de dialog box for deleting the clinic
+                  // setClinicIdToDelete(row.original.id!) // Asume que `row.id` es el id de la clínica
                   // setDialogOpen(true)
                   setDialog({
                     type: OPTIONS_CRUD.DELETE,
-                    breedId: row.original.id!,
+                    clinicId: row.original.id!,
                     isOpen: true,
                   })
                 },
@@ -230,26 +298,30 @@ export function BreedsTableShell({ data, pageCount }: BreedsTableShellProps) {
         searchableColumns={[
           {
             id: 'name',
-            title: 'raza',
+            title: 'por nombre',
+          },
+          {
+            id: 'location',
+            title: 'por ubicación',
           },
         ]}
       />
-      {/* For delete breed */}
+      {/* For delete clinic */}
       {dialog.type === OPTIONS_CRUD.DELETE && (
         <ConfirmDeleteDialog
           isOpen={dialog.isOpen}
           onClose={() => handleDialogClose()}
-          onConfirm={() => handleDeleteBreed(dialog.breedId)}
+          onConfirm={() => handleDeleteClinic(dialog.clinicId)}
         />
       )}
-      {/* For edit breed */}
+      {/* For edit clinic */}
       {dialog.type === OPTIONS_CRUD.UPDATE && (
-        <FormBreed
-          title='Editar raza:'
+        <FormClinic
+          title='Editar local:'
           isOpen={dialog.isOpen}
           onClose={() => handleDialogClose()}
-          onConfirm={handleUpdateBreed}
-          initialValues={dialog.breed}
+          onConfirm={handleUpdateClinic}
+          initialValues={dialog.clinic}
         />
       )}
     </>

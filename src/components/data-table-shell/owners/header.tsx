@@ -1,13 +1,13 @@
 'use client'
 
-import { HeaderWithButton } from '../header-for-tables'
+import { DashboardOptions } from '../header-for-tables'
 import { useMemo, useState } from 'react'
 import { AddOwner } from './add'
 
 export const HeaderOwner = () => {
   const [isDialogOpen, setDialogOpen] = useState(false)
 
-  const optionsOwners = useMemo(() => {
+  const options = useMemo(() => {
     return [
       {
         title: 'Agregar dueño',
@@ -21,8 +21,9 @@ export const HeaderOwner = () => {
 
   return (
     <>
-      <HeaderWithButton options={optionsOwners} title='Dueños' />
-      <AddOwner isOpen={isDialogOpen} onClose={() => setDialogOpen(false)} />
+      <DashboardOptions options={options} onHandledDownload=''>
+        <AddOwner isOpen={isDialogOpen} onClose={() => setDialogOpen(false)} />
+      </DashboardOptions>
     </>
   )
 }

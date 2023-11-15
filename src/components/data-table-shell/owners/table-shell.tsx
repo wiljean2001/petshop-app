@@ -2,22 +2,18 @@
 
 import * as React from 'react'
 import { type ColumnDef } from '@tanstack/react-table'
-
 import { Checkbox } from '@/components/ui/checkbox'
-
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header'
 import { MillionDataTable } from '@/components/data-table/million-data-table'
-import { OwnerSchema, IOwner } from '@/models/schemas'
+import { IOwner } from '@/models/schemas'
 import { DropdownMenuShell } from '../drop-down-menu-shell'
-import { OPTIONS_CRUD, hourFormat } from '@/config/const'
-import { ConfirmDeleteDialog, WithFormDialog } from '../config'
-import { useForm } from 'react-hook-form'
-import valibotResolver from '@/lib/valibotResolver'
-import { FieldConfig } from '@/types'
-import { deleteOwner } from '@/services/admin/owners'
+import { OPTIONS_CRUD } from '@/config/const'
+import { ConfirmDeleteDialog } from '../config'
+import { deleteOwner, updateOwner } from '@/services/admin/owners'
 import { showToast } from '@/helpers/toast'
-import { useRouter } from 'next/navigation'
 import { getDateToString } from '@/lib/times'
+import { FormOwner } from './form'
+import { useRouter } from 'next/navigation'
 
 interface OwnersTableShellProps {
   data: IOwner[]
@@ -25,94 +21,71 @@ interface OwnersTableShellProps {
 }
 
 export function OwnersTableShell({ data, pageCount }: OwnersTableShellProps) {
-  const router = useRouter()
+  const route = useRouter()
   const [isPending, startTransition] = React.useTransition()
   const [dialog, setDialog] = React.useState<{
     type: OPTIONS_CRUD | null
     isOpen: boolean
-    clinicId?: string
-    clinic?: IOwner | null
+    ownerId?: string
+    owner?: IOwner
   }>({
     type: null,
     isOpen: false,
-    clinicId: '',
-    clinic: null,
+    ownerId: '',
+    owner: undefined,
   })
-
-  const form = useForm<IOwner>({
-    resolver: valibotResolver(OwnerSchema),
-  })
-  const inputs = React.useMemo((): FieldConfig[] => {
-    return [
-      {
-        type: 'text',
-        name: 'name',
-        label: 'Nombres:',
-        placeholder: 'Nombres',
-      },
-      {
-        type: 'text',
-        name: 'surname',
-        label: 'Apellidos:',
-        placeholder: 'Apellidos',
-      },
-      {
-        type: 'text',
-        name: 'city',
-        label: 'Ciudad:',
-        placeholder: 'Ciudad',
-      },
-      {
-        type: 'text',
-        name: 'address',
-        label: 'Dirección:',
-        placeholder: 'Dirección',
-      },
-      {
-        type: 'text',
-        name: 'phone',
-        label: 'Número de Teléfono:',
-        placeholder: 'Teléfono',
-      },
-      {
-        type: 'text',
-        name: 'email',
-        label: 'Correo electrónico:',
-        placeholder: 'Correo electrónico',
-      },
-    ]
-  }, [])
 
   const handleDialogClose = () => {
     setDialog((prevState) => ({
       ...prevState,
       isOpen: false,
-      clinicId: '',
-      clinic: null,
+      ownerId: '',
+      owner: undefined,
     }))
   }
-  const handleDialogConfirm = () => {
-    if (dialog.type === OPTIONS_CRUD.DELETE) deleteClinic(dialog.clinicId)
-    if (dialog.type === OPTIONS_CRUD.UPDATE) updateClinic(dialog.clinic)
-    handleDialogClose()
-  }
 
-  const deleteClinic = async (id?: string | null) => {
+  const handleDeleteOwner = async (id?: string) => {
+    if (!id) return false
     try {
-      if (!id) return
-      // delete clinic
+      // delete owner
       const res = await deleteOwner({ id })
       if (res) {
-        showToast('Horario eliminado con éxito', 'success')
-        return router.refresh()
+        showToast(
+          '¡Éxito! El propietario ha sido eliminado satisfactoriamente.',
+          'success'
+        )
+        route.refresh()
+        handleDialogClose()
+        return true
       }
-    } catch (error) {}
-    return showToast('Error: raza no eliminada', 'error')
-  }
-  const updateClinic = (clinic?: IOwner | null) => {
-    if (clinic) {
-      // delete clinic
+      showToast(
+        'Advertencia: La eliminación no se completó. Por favor, completa todos los campos requeridos.',
+        'warning'
+      )
+    } catch (error) {
+      showToast(
+        'Error: No se pudo realizar la acción. Por favor, inténtalo de nuevo.',
+        'error'
+      )
     }
+    return false
+  }
+  const handleUpdateOwner = async (owner?: IOwner): Promise<boolean> => {
+    if (!owner) return false
+    const res = await updateOwner({ input: owner })
+    if (res) {
+      showToast(
+        '¡Éxito! El propietario ha sido actualizada satisfactoriamente.',
+        'success'
+      )
+      route.refresh()
+      return true
+    }
+    showToast(
+      'Advertencia: La actualización no se completó. Por favor, completa todos los campos requeridos.',
+      'warning'
+    )
+    return false
   }
 
   // Memoize the columns so they don't re-render on every render
@@ -147,7 +120,9 @@ export function OwnersTableShell({ data, pageCount }: OwnersTableShellProps) {
           <DataTableColumnHeader column={column} title='Nombres' />
         ),
         cell: ({ row }) => (
-          <div className='w-[200px] max-w-[200px]'>{row.getValue('name')}</div>
+          <div className='min-w-[200px] max-w-[200px]'>
+            {row.getValue('name')}
+          </div>
         ),
       },
       {
@@ -156,7 +131,7 @@ export function OwnersTableShell({ data, pageCount }: OwnersTableShellProps) {
           <DataTableColumnHeader column={column} title='Apellidos' />
         ),
         cell: ({ row }) => (
-          <div className='w-[200px] max-w-[200px]'>
+          <div className='min-w-[200px] max-w-[200px]'>
             {row.getValue('surname')}
           </div>
         ),
@@ -167,7 +142,9 @@ export function OwnersTableShell({ data, pageCount }: OwnersTableShellProps) {
           <DataTableColumnHeader column={column} title='Correo e.' />
         ),
         cell: ({ row }) => (
-          <div className='w-[200px] max-w-[200px]'>{row.getValue('email')}</div>
+          <div className='min-w-[200px] max-w-[200px]'>
+            {row.getValue('email')}
+          </div>
         ),
       },
       {
@@ -176,7 +153,9 @@ export function OwnersTableShell({ data, pageCount }: OwnersTableShellProps) {
           <DataTableColumnHeader column={column} title='Telf.' />
         ),
         cell: ({ row }) => (
-          <div className='w-[200px] max-w-[200px]'>{row.getValue('phone')}</div>
+          <div className='min-w-[200px] max-w-[200px]'>
+            {row.getValue('phone')}
+          </div>
         ),
       },
       {
@@ -213,7 +192,7 @@ export function OwnersTableShell({ data, pageCount }: OwnersTableShellProps) {
             <div className='flex space-x-2'>
               {/* {label && <Badge variant="outline">{label}</Badge>} */}
               <span className='max-w-[500px] truncate font-medium'>
-                {getDateToString({ date: row.getValue('updatedAt') })}
+                {getDateToString({ date: row.getValue('createdAt') })}
               </span>
             </div>
           )
@@ -247,11 +226,10 @@ export function OwnersTableShell({ data, pageCount }: OwnersTableShellProps) {
               {
                 title: 'Editar',
                 onHandle: () => {
-                  // Open de dialog box for editing the clinic
-                  form.setValue('name', row.getValue('name'))
+                  // Open de dialog box for editing the owner
                   setDialog({
                     type: OPTIONS_CRUD.UPDATE,
-                    clinic: row.original,
+                    owner: row.original,
                     isOpen: true,
                   })
                 },
@@ -259,12 +237,12 @@ export function OwnersTableShell({ data, pageCount }: OwnersTableShellProps) {
               {
                 title: 'Eliminar',
                 onHandle: () => {
-                  // Open de dialog box for deleting the clinic
-                  // setClinicIdToDelete(row.original.id!) // Asume que `row.id` es el id de la clínica
+                  // Open de dialog box for deleting the owner
+                  // setownerIdToDelete(row.original.id!) // Asume que `row.id` es el id de la clínica
                   // setDialogOpen(true)
                   setDialog({
                     type: OPTIONS_CRUD.DELETE,
-                    clinicId: row.original.id!,
+                    ownerId: row.original.id!,
                     isOpen: true,
                   })
                 },
@@ -292,26 +270,34 @@ export function OwnersTableShell({ data, pageCount }: OwnersTableShellProps) {
         searchableColumns={[
           {
             id: 'name',
-            title: 'raza',
+            title: 'por nombres',
+          },
+          {
+            id: 'surname',
+            title: 'por apellidos',
+          },
+          {
+            id: 'email',
+            title: 'por correo e',
           },
         ]}
       />
-      {/* For delete clinic */}
+      {/* For delete owner */}
       {dialog.type === OPTIONS_CRUD.DELETE && (
         <ConfirmDeleteDialog
           isOpen={dialog.isOpen}
           onClose={() => handleDialogClose()}
-          onConfirm={() => handleDialogConfirm()}
+          onConfirm={() => handleDeleteOwner(dialog.ownerId)}
         />
       )}
-      {/* For edit clinic */}
+      {/* For edit owner */}
       {dialog.type === OPTIONS_CRUD.UPDATE && (
-        <WithFormDialog
-          title='Editar raza:'
-          form={{ form, inputs }}
+        <FormOwner
+          title='Editar propietario:'
           isOpen={dialog.isOpen}
-          onClose={() => handleDialogClose()}
-          onConfirm={() => handleDialogConfirm()}
+          onClose={handleDialogClose}
+          onConfirm={handleUpdateOwner}
+          initialValues={dialog.owner}
         />
       )}
     </>

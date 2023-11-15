@@ -7,112 +7,99 @@ import { Checkbox } from '@/components/ui/checkbox'
 
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header'
 import { MillionDataTable } from '@/components/data-table/million-data-table'
-import { ScheduleSchema, ISchedule } from '@/models/schemas'
+import { IVeterinarian } from '@/models/schemas'
 import { DropdownMenuShell } from '../drop-down-menu-shell'
-import { OPTIONS_CRUD, hourFormat } from '@/config/const'
-import { ConfirmDeleteDialog, WithFormDialog } from '../config'
-import { useForm } from 'react-hook-form'
-import valibotResolver from '@/lib/valibotResolver'
-import { FieldConfig } from '@/types'
-import { deleteSchedule } from '@/services/admin/schedules'
+import { OPTIONS_CRUD } from '@/config/const'
+import { ConfirmDeleteDialog } from '../config'
+
+import { getDateToString } from '@/lib/times'
+import { FormVeterinarian } from './form'
 import { showToast } from '@/helpers/toast'
 import { useRouter } from 'next/navigation'
-import { getDateToString } from '@/lib/times'
+import {
+  deleteVeterinarian,
+  updateVeterinarian,
+} from '@/services/admin/veterinarias'
 
-interface ScheduleTableShellProps {
-  data: ISchedule[]
+interface ClinicsTableShellProps {
+  data: IVeterinarian[]
   pageCount: number
 }
 
-export function ScheduleTableShell({
+export function VeterinariansTableShell({
   data,
   pageCount,
-}: ScheduleTableShellProps) {
-  const router = useRouter()
+}: ClinicsTableShellProps) {
+  const route = useRouter()
   const [isPending, startTransition] = React.useTransition()
   const [dialog, setDialog] = React.useState<{
     type: OPTIONS_CRUD | null
     isOpen: boolean
-    clinicId?: string
-    clinic?: ISchedule | null
+    veterinarianId?: string
+    veterinarian?: IVeterinarian
   }>({
     type: null,
     isOpen: false,
-    clinicId: '',
-    clinic: null,
+    veterinarianId: '',
+    veterinarian: undefined,
   })
-
-  const form = useForm<ISchedule>({
-    resolver: valibotResolver(ScheduleSchema),
-  })
-
-  const inputs = React.useMemo((): FieldConfig[] => {
-    return [
-      {
-        type: 'text',
-        name: 'day_week',
-        // autoComplete: 'name_schedule',
-        label: 'Días:',
-        placeholder: 'Días',
-        // className: 'mb-1 col-span-3',
-      },
-      {
-        type: 'time',
-        name: 'openingHour',
-        placeholder: 'Abre',
-        label: 'Abierto:',
-        description: '',
-        // withTime: true,
-
-        // autoComplete: 'phone_number',
-        // className: 'mb-1 col-span-1',
-      },
-      {
-        type: 'time',
-        name: 'closingHour',
-        label: 'Cerrado:',
-        description: '',
-        placeholder: 'Cierra',
-        // autoComplete: 'phone_number',
-        // className: 'mb-1 col-span-1',
-      },
-    ]
-  }, [])
 
   const handleDialogClose = () => {
     setDialog((prevState) => ({
       ...prevState,
       isOpen: false,
-      clinicId: '',
-      clinic: null,
+      veterinarianId: '',
+      veterinarian: undefined,
     }))
   }
-  const handleDialogConfirm = () => {
-    if (dialog.type === OPTIONS_CRUD.DELETE) deleteClinic(dialog.clinicId)
-    if (dialog.type === OPTIONS_CRUD.UPDATE) updateClinic(dialog.clinic)
-    handleDialogClose()
-  }
 
-  const deleteClinic = async (id?: string | null) => {
+  const handleDeleteVeterinarian = async (id?: string) => {
+    if (!id) return false
     try {
-      if (!id) return
-      // delete clinic
-      const res = await deleteSchedule({ id })
+      // delete veterinarian
+      const res = await deleteVeterinarian({ id })
       if (res) {
-        showToast('Horario eliminado con éxito', 'success')
-        return router.refresh()
+        showToast(
+          '¡Éxito! El veterinario ha sido eliminado satisfactoriamente.',
+          'success'
+        )
+        route.refresh()
+        handleDialogClose()
+        return true
       }
-    } catch (error) {}
-    return showToast('Error: horario no eliminada', 'error')
-  }
-  const updateClinic = (clinic?: ISchedule | null) => {
-    if (clinic) {
-      // delete clinic
+      showToast(
+        'Advertencia: La eliminación no se completó. Por favor, completa todos los campos requeridos.',
+        'warning'
+      )
+    } catch (error) {
+      showToast(
+        'Error: No se pudo realizar la acción. Por favor, inténtalo de nuevo.',
+        'error'
+      )
     }
+    return false
+  }
+  const handleUpdateVeterinarian = async (veterinarian?: IVeterinarian) => {
+    if (!veterinarian) return false
+    const res = await updateVeterinarian({ input: veterinarian })
+    if (res) {
+      showToast(
+        '¡Éxito! El veterinario ha sido actualizado satisfactoriamente.',
+        'success'
+      )
+      route.refresh()
+      return true
+    }
+
+    showToast(
+      'Advertencia: La actualización no se completó. Por favor, completa todos los campos requeridos.',
+      'warning'
+    )
+    return false
   }
 
   // Memoize the columns so they don't re-render on every render
-  const columns = React.useMemo<ColumnDef<ISchedule, unknown>[]>(
+  const columns = React.useMemo<ColumnDef<IVeterinarian, unknown>[]>(
     () => [
       {
         id: 'select',
@@ -138,22 +125,31 @@ export function ScheduleTableShell({
         enableHiding: false,
       },
       {
-        accessorKey: 'day_week',
+        accessorKey: 'name',
         header: ({ column }) => (
-          <DataTableColumnHeader column={column} title='Días' />
+          <DataTableColumnHeader column={column} title='Nombre' />
         ),
         cell: ({ row }) => (
-          <div className='w-[200px] max-w-[200px]'>
-            {row.getValue('day_week')}
+          <div className='min-w-[100px] max-w-[200px]'>
+            {row.getValue('name')}
           </div>
         ),
-        enableSorting: false,
-        enableHiding: false,
       },
       {
-        accessorKey: 'openingHour',
+        accessorKey: 'surname',
         header: ({ column }) => (
-          <DataTableColumnHeader column={column} title='Hora inicio' />
+          <DataTableColumnHeader column={column} title='Apellidos' />
+        ),
+        cell: ({ row }) => (
+          <div className='min-w-[100px] max-w-[200px]'>
+            {row.getValue('surname')}
+          </div>
+        ),
+      },
+      {
+        accessorKey: 'email',
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title='Email' />
         ),
         cell: ({ row }) => {
           // const label = tasks.label.enumValues.find(
@@ -164,20 +160,16 @@ export function ScheduleTableShell({
             <div className='flex space-x-2'>
               {/* {label && <Badge variant="outline">{label}</Badge>} */}
               <span className='max-w-[500px] truncate font-medium'>
-                {row.getValue('openingHour')}
-                {/* {getDateToString({
-                  date: row.getValue('openingHour'),
-                  dateFormate: hourFormat,
-                })} */}
+                {row.getValue('email')}
               </span>
             </div>
           )
         },
       },
       {
-        accessorKey: 'closingHour',
+        accessorKey: 'specialty',
         header: ({ column }) => (
-          <DataTableColumnHeader column={column} title='Hora fin' />
+          <DataTableColumnHeader column={column} title='Especialidad.' />
         ),
         cell: ({ row }) => {
           // const label = tasks.label.enumValues.find(
@@ -188,11 +180,27 @@ export function ScheduleTableShell({
             <div className='flex space-x-2'>
               {/* {label && <Badge variant="outline">{label}</Badge>} */}
               <span className='max-w-[500px] truncate font-medium'>
-                {row.getValue('closingHour')}
-                {/* {getDateToString({
-                  date: row.getValue('closingHour'),
-                  dateFormate: hourFormat,
-                })} */}
+                {row.getValue('specialty')}
+              </span>
+            </div>
+          )
+        },
+      },
+      {
+        accessorKey: 'phone',
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title='Telf.' />
+        ),
+        cell: ({ row }) => {
+          // const label = tasks.label.enumValues.find(
+          //   (label) => label === row.original.label
+          // )
+
+          return (
+            <div className='flex space-x-2'>
+              {/* {label && <Badge variant="outline">{label}</Badge>} */}
+              <span className='max-w-[500px] truncate font-medium'>
+                {row.getValue('phone')}
               </span>
             </div>
           )
@@ -246,13 +254,10 @@ export function ScheduleTableShell({
               {
                 title: 'Editar',
                 onHandle: () => {
-                  // Open de dialog box for editing the clinic
-                  form.setValue('day_week', row.getValue('day_week'))
-                  form.setValue('openingHour', row.getValue('openingHour'))
-                  form.setValue('closingHour', row.getValue('closingHour'))
+                  // Open de dialog box for editing the veterinarian
                   setDialog({
                     type: OPTIONS_CRUD.UPDATE,
-                    clinic: row.original,
+                    veterinarian: row.original,
                     isOpen: true,
                   })
                 },
@@ -260,12 +265,12 @@ export function ScheduleTableShell({
               {
                 title: 'Eliminar',
                 onHandle: () => {
-                  // Open de dialog box for deleting the clinic
+                  // Open de dialog box for deleting the veterinarian
                   // setClinicIdToDelete(row.original.id!) // Asume que `row.id` es el id de la clínica
                   // setDialogOpen(true)
                   setDialog({
                     type: OPTIONS_CRUD.DELETE,
-                    clinicId: row.original.id!,
+                    veterinarianId: row.original.id!,
                     isOpen: true,
                   })
                 },
@@ -292,27 +297,27 @@ export function ScheduleTableShell({
         filterableColumns={[]}
         searchableColumns={[
           {
-            id: 'day_week',
-            title: 'día',
+            id: 'surname',
+            title: 'por apellido',
           },
         ]}
       />
-      {/* For delete clinic */}
+      {/* For delete veterinarian */}
       {dialog.type === OPTIONS_CRUD.DELETE && (
         <ConfirmDeleteDialog
           isOpen={dialog.isOpen}
-          onClose={() => handleDialogClose()}
-          onConfirm={() => handleDialogConfirm()}
+          onClose={handleDialogClose}
+          onConfirm={() => handleDeleteVeterinarian(dialog.veterinarianId)}
         />
       )}
-      {/* For edit clinic */}
+      {/* For edit veterinarian */}
       {dialog.type === OPTIONS_CRUD.UPDATE && (
-        <WithFormDialog
-          title='Editar horario:'
-          form={{ form, inputs }}
+        <FormVeterinarian
+          title='Editar veterinario:'
           isOpen={dialog.isOpen}
-          onClose={() => handleDialogClose()}
-          onConfirm={() => handleDialogConfirm()}
+          onClose={handleDialogClose}
+          onConfirm={handleUpdateVeterinarian}
+          initialValues={dialog.veterinarian}
         />
       )}
     </>

@@ -1,13 +1,13 @@
 'use client'
 
-import { HeaderWithButton } from '../header-for-tables'
+import { DashboardOptions } from '../header-for-tables'
 import { useMemo, useState } from 'react'
 import { AddService } from './add'
 
 export const HeaderService = () => {
   const [isDialogOpen, setDialogOpen] = useState(false)
 
-  const optionsServices = useMemo(() => {
+  const options = useMemo(() => {
     return [
       {
         title: 'Agregar servicio',
@@ -21,8 +21,12 @@ export const HeaderService = () => {
 
   return (
     <>
-      <HeaderWithButton options={optionsServices} title='Servicios' />
-      <AddService isOpen={isDialogOpen} onClose={() => setDialogOpen(false)} />
+      <DashboardOptions options={options} onHandledDownload=''>
+        <AddService
+          isOpen={isDialogOpen}
+          onClose={() => setDialogOpen(false)}
+        />
+      </DashboardOptions>
     </>
   )
 }

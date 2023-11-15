@@ -7,17 +7,20 @@ import { Checkbox } from '@/components/ui/checkbox'
 
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header'
 import { MillionDataTable } from '@/components/data-table/million-data-table'
-import { ServiceSchema, IService } from '@/models/schemas'
+import { IService, IServiceDetail } from '@/models/schemas'
 import { DropdownMenuShell } from '../drop-down-menu-shell'
-import { OPTIONS_CRUD, hourFormat } from '@/config/const'
-import { ConfirmDeleteDialog, WithFormDialog } from '../config'
-import { useForm } from 'react-hook-form'
-import valibotResolver from '@/lib/valibotResolver'
-import { FieldConfig } from '@/types'
-import { deleteService } from '@/services/admin/services'
+import {
+  OPTIONS_CRUD,
+  SERVICESTATUSTRANSLATIONS,
+  ServiceStatusKey,
+} from '@/config/const'
+import { ConfirmDeleteDialog } from '../config'
+import { deleteService, updateService } from '@/services/admin/services'
 import { showToast } from '@/helpers/toast'
 import { useRouter } from 'next/navigation'
 import { getDateToString } from '@/lib/times'
+import { FormService } from './form'
+import { Badge } from '@/components/ui/badge'
 
 interface ServicesTableShellProps {
   data: IService[]
@@ -28,94 +31,72 @@ export function ServicesTableShell({
   data,
   pageCount,
 }: ServicesTableShellProps) {
-  const router = useRouter()
+  const route = useRouter()
   const [isPending, startTransition] = React.useTransition()
   const [dialog, setDialog] = React.useState<{
     type: OPTIONS_CRUD | null
     isOpen: boolean
-    clinicId?: string
-    clinic?: IService | null
+    serviceId?: string
+    service?: IService
   }>({
     type: null,
     isOpen: false,
-    clinicId: '',
-    clinic: null,
+    serviceId: '',
+    service: undefined,
   })
-
-  const form = useForm<IService>({
-    resolver: valibotResolver(ServiceSchema),
-  })
-  const inputs = React.useMemo((): FieldConfig[] => {
-    return [
-      {
-        type: 'text',
-        name: 'name',
-        label: 'Nombres:',
-        placeholder: 'Nombres',
-      },
-      {
-        type: 'text',
-        name: 'surname',
-        label: 'Apellidos:',
-        placeholder: 'Apellidos',
-      },
-      {
-        type: 'text',
-        name: 'city',
-        label: 'Ciudad:',
-        placeholder: 'Ciudad',
-      },
-      {
-        type: 'text',
-        name: 'address',
-        label: 'Dirección:',
-        placeholder: 'Dirección',
-      },
-      {
-        type: 'text',
-        name: 'phone',
-        label: 'Número de Teléfono:',
-        placeholder: 'Teléfono',
-      },
-      {
-        type: 'text',
-        name: 'email',
-        label: 'Correo electrónico:',
-        placeholder: 'Correo electrónico',
-      },
-    ]
-  }, [])
 
   const handleDialogClose = () => {
     setDialog((prevState) => ({
       ...prevState,
       isOpen: false,
-      clinicId: '',
-      clinic: null,
+      serviceId: '',
+      service: undefined,
     }))
   }
-  const handleDialogConfirm = () => {
-    if (dialog.type === OPTIONS_CRUD.DELETE) deleteClinic(dialog.clinicId)
-    if (dialog.type === OPTIONS_CRUD.UPDATE) updateClinic(dialog.clinic)
-    handleDialogClose()
-  }
 
-  const deleteClinic = async (id?: string | null) => {
-    if (!id) return
-    // delete clinic
+  const handleDeleteService = async (id?: string) => {
+    if (!id) return false
     try {
+      // delete service
       const res = await deleteService({ id })
       if (res) {
-        showToast('Horario eliminado con éxito', 'success')
-        return router.refresh()
+        showToast(
+          '¡Éxito! El servicio ha sido eliminado satisfactoriamente.',
+          'success'
+        )
+        route.refresh()
+        handleDialogClose()
+        return true
       }
-    } catch (error) {}
-    return showToast('Error: servicio no eliminada', 'error')
-  }
-  const updateClinic = (clinic?: IService | null) => {
-    if (clinic) {
-      // delete clinic
+      showToast(
+        'Advertencia: La eliminación no se completó. Por favor, completa todos los campos requeridos.',
+        'warning'
+      )
+    } catch (error) {
+      showToast(
+        'Error: No se pudo realizar la acción. Por favor, inténtalo de nuevo.',
+        'error'
+      )
     }
+    return false
+  }
+  const handleUpdateService = async (service?: IService) => {
+    if (!service) return false
+    const res = await updateService({ input: service })
+    if (res) {
+      showToast(
+        '¡Éxito! El servicio ha sido actualizado satisfactoriamente.',
+        'success'
+      )
+      route.refresh()
+      return true
+    }
+
+    showToast(
+      'Advertencia: La actualización no se completó. Por favor, completa todos los campos requeridos.',
+      'warning'
+    )
+    return false
   }
 
   // Memoize the columns so they don't re-render on every render
@@ -150,57 +131,93 @@ export function ServicesTableShell({
           <DataTableColumnHeader column={column} title='Nombres' />
         ),
         cell: ({ row }) => (
-          <div className='w-[200px] max-w-[200px]'>{row.getValue('name')}</div>
-        ),
-      },
-      {
-        accessorKey: 'surname',
-        header: ({ column }) => (
-          <DataTableColumnHeader column={column} title='Apellidos' />
-        ),
-        cell: ({ row }) => (
-          <div className='w-[200px] max-w-[200px]'>
-            {row.getValue('surname')}
+          <div className='min-w-[100px] max-w-[200px]'>
+            {row.getValue('name')}
           </div>
         ),
       },
       {
-        accessorKey: 'email',
+        accessorKey: 'description',
         header: ({ column }) => (
-          <DataTableColumnHeader column={column} title='Correo e.' />
+          <DataTableColumnHeader column={column} title='Descripción' />
         ),
         cell: ({ row }) => (
-          <div className='w-[200px] max-w-[200px]'>{row.getValue('email')}</div>
-        ),
-      },
-      {
-        accessorKey: 'phone',
-        header: ({ column }) => (
-          <DataTableColumnHeader column={column} title='Telf.' />
-        ),
-        cell: ({ row }) => (
-          <div className='w-[200px] max-w-[200px]'>{row.getValue('phone')}</div>
-        ),
-      },
-      {
-        accessorKey: 'address',
-        header: ({ column }) => (
-          <DataTableColumnHeader column={column} title='Dirección' />
-        ),
-        cell: ({ row }) => (
-          <div className='w-[200px] max-w-[200px]'>
-            {row.getValue('address')}
+          <div className='min-w-[300px] max-w-[200px]'>
+            {row.getValue('description')}
           </div>
         ),
       },
       {
-        accessorKey: 'city',
+        accessorKey: 'cost',
         header: ({ column }) => (
-          <DataTableColumnHeader column={column} title='Ciudad' />
+          <DataTableColumnHeader column={column} title='Precio est.' />
         ),
         cell: ({ row }) => (
-          <div className='w-[200px] max-w-[200px]'>{row.getValue('city')}</div>
+          <div className='max-w-[200px]'>{row.getValue('cost')}</div>
         ),
+      },
+      {
+        accessorKey: 'duration',
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title='Duración' />
+        ),
+        cell: ({ row }) => (
+          <div className=' max-w-[200px]'>{row.getValue('duration')}</div>
+        ),
+      },
+      {
+        accessorKey: 'state',
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title='Estado' />
+        ),
+        cell: ({ row }) => (
+          <div className='max-w-[200px]'>
+            {
+              SERVICESTATUSTRANSLATIONS[
+                row.getValue('state') as ServiceStatusKey
+              ]
+            }
+          </div>
+        ),
+      },
+      {
+        accessorKey: 'ServiceDetails',
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title='Detalles' />
+        ),
+        cell: ({ row }) => {
+          const details = row.getValue('ServiceDetails') as IServiceDetail[]
+          console.log('🚀 ~ file: table-shell.tsx:179 ~ details:', details)
+
+          // Crear un objeto para agrupar los detalles por tipo
+          const groupedDetails = details.reduce((acc, detail) => {
+            // Inicializa el grupo si aún no existe
+            if (!acc[detail.detailType]) {
+              acc[detail.detailType] = []
+            }
+            // Agrega el detalle al grupo correspondiente
+            acc[detail.detailType].push(detail)
+            return acc
+          }, {} as Record<string, IServiceDetail[]>)
+
+          return (
+            <div className='min-w-[300px] max-w-[200px]'>
+              {Object.entries(groupedDetails).map(([type, typeDetails]) => (
+                <div key={type}>
+                  {/* Muestra el tipo como un Badge */}
+                  <Badge variant='outline'>{type}</Badge>
+
+                  {/* Lista de detalles para este tipo */}
+                  {typeDetails.map((detail, index) => (
+                    <div key={index} className=''>
+                      {detail.value}
+                    </div>
+                  ))}
+                </div>
+              ))}
+            </div>
+          )
+        },
       },
       {
         accessorKey: 'createdAt',
@@ -250,11 +267,10 @@ export function ServicesTableShell({
               {
                 title: 'Editar',
                 onHandle: () => {
-                  // Open de dialog box for editing the clinic
-                  form.setValue('name', row.getValue('name'))
+                  // Open de dialog box for editing the service
                   setDialog({
                     type: OPTIONS_CRUD.UPDATE,
-                    clinic: row.original,
+                    service: row.original,
                     isOpen: true,
                   })
                 },
@@ -262,12 +278,12 @@ export function ServicesTableShell({
               {
                 title: 'Eliminar',
                 onHandle: () => {
-                  // Open de dialog box for deleting the clinic
-                  // setClinicIdToDelete(row.original.id!) // Asume que `row.id` es el id de la clínica
+                  // Open de dialog box for deleting the service
+                  // setserviceIdToDelete(row.original.id!) // Asume que `row.id` es el id de la clínica
                   // setDialogOpen(true)
                   setDialog({
                     type: OPTIONS_CRUD.DELETE,
-                    clinicId: row.original.id!,
+                    serviceId: row.original.id!,
                     isOpen: true,
                   })
                 },
@@ -291,7 +307,18 @@ export function ServicesTableShell({
         columns={columns}
         data={data}
         pageCount={pageCount}
-        filterableColumns={[]}
+        filterableColumns={[
+          {
+            id: 'state',
+            options: (
+              Object.keys(SERVICESTATUSTRANSLATIONS) as ServiceStatusKey[]
+            ).map((key) => ({
+              value: key,
+              label: SERVICESTATUSTRANSLATIONS[key] as string,
+            })),
+            title: 'Filtrar estado',
+          },
+        ]}
         searchableColumns={[
           {
             id: 'name',
@@ -299,22 +326,22 @@ export function ServicesTableShell({
           },
         ]}
       />
-      {/* For delete clinic */}
+      {/* For delete service */}
       {dialog.type === OPTIONS_CRUD.DELETE && (
         <ConfirmDeleteDialog
           isOpen={dialog.isOpen}
           onClose={() => handleDialogClose()}
-          onConfirm={() => handleDialogConfirm()}
+          onConfirm={() => handleDeleteService(dialog.serviceId)}
         />
       )}
-      {/* For edit clinic */}
+      {/* For edit service */}
       {dialog.type === OPTIONS_CRUD.UPDATE && (
-        <WithFormDialog
+        <FormService
           title='Editar servicio:'
-          form={{ form, inputs }}
           isOpen={dialog.isOpen}
-          onClose={() => handleDialogClose()}
-          onConfirm={() => handleDialogConfirm()}
+          onClose={handleDialogClose}
+          onConfirm={handleUpdateService}
+          initialValues={dialog.service}
         />
       )}
     </>

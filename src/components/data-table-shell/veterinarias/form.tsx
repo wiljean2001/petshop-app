@@ -1,17 +1,17 @@
 import { useForm } from 'react-hook-form'
-import { IVeterinarian, VeterinarianSchema } from '@/models/schemas'
+import { IClinic, IVeterinarian, VeterinarianSchema } from '@/models/schemas'
 import valibotResolver from '@/lib/valibotResolver'
 import { useRouter } from 'next/navigation'
 import { useEffect, useMemo, useState } from 'react'
 import { WithFormDialog } from '../config'
-import { createVeterinarian } from '@/services/admin/veterinarias'
-import { FieldConfig, Option } from '@/types'
-import { getClinics } from '@/services/user/clinics'
+import { FieldConfig } from '@/types'
+import { getClinics } from '@/services/public/clinics/'
+import { showToast } from '@/helpers/toast'
 
 interface Props {
   isOpen: boolean
   onClose: () => void
-  onConfirm: (input: IVeterinarian) => void
+  onConfirm: (input: IVeterinarian) => Promise<boolean>
   title: string
   initialValues?: Partial<IVeterinarian>
 }
@@ -22,29 +22,34 @@ export const FormVeterinarian = ({
   title,
   initialValues,
 }: Props) => {
-  const route = useRouter()
   const form = useForm<IVeterinarian>({
     resolver: valibotResolver(VeterinarianSchema),
     defaultValues: {},
   })
 
-  const [clinics, setClinics] = useState<Option[]>([])
+  const [clinics, setClinics] = useState<IClinic[]>([])
   useEffect(() => {
-    const fetchClinics = async () => {
-      try {
-        const input = await getClinics()
-        const output = input.map((item) => ({
-          label: item.name,
-          value: item.id ?? '',
-        }))
-        setClinics(output)
-      } catch (error) {
-        console.error('Error fetching clinics:', error)
-      }
+    if (initialValues && form) {
+      Object.keys(initialValues).forEach((key) => {
+        form.setValue(
+          key as keyof IVeterinarian,
+          initialValues[key as keyof IVeterinarian]
+        )
+      })
     }
 
-    fetchClinics()
-  }, []) // Este efecto se ejecutará una vez, similar a componentDidMount
+    const loadClinics = async () => {
+      try {
+        const res = await getClinics() // Asume que getBreeds es una función que obtiene las eBreeds
+        setClinics(res)
+      } catch (error) {
+        console.error('Error al cargar las clinicas', error)
+      }
+    }
+    if (isOpen) {
+      loadClinics()
+    }
+  }, [form, initialValues, isOpen]) // Este efecto se ejecutará una vez, similar a componentDidMount
 
   const inputs = useMemo((): FieldConfig[] => {
     return [
@@ -81,21 +86,23 @@ export const FormVeterinarian = ({
       {
         type: 'select',
         name: 'clinicId',
+        isMultiple: false,
         label: 'Clinica',
-        options: clinics,
+        options: clinics.map((c) => ({ value: c.id!, label: c.name })),
       },
     ]
   }, [clinics])
 
   const onHandle = async (input: IVeterinarian) => {
     try {
-      const res = await createVeterinarian({ input })
-      if (res) {
-        route.refresh()
-        onClose()
-      }
+      if (!(await onConfirm(input))) return
+      form.reset()
+      onClose()
     } catch (error) {
-      console.log('🚀 ~ add clinic ~ onHandle ~ error:', error)
+      showToast(
+        'Error: No se pudo realizar la acción. Por favor, inténtalo de nuevo.',
+        'error'
+      )
     }
   }
 
@@ -104,7 +111,10 @@ export const FormVeterinarian = ({
       title={title}
       form={{ inputs, form }}
       isOpen={isOpen}
-      onClose={() => onClose()}
+      onClose={() => {
+        form.reset()
+        onClose()
+      }}
       onConfirm={onHandle}
     />
   )

@@ -3,30 +3,48 @@ import { ScheduleSchema, ISchedule } from '@/models/schemas'
 import valibotResolver from '@/lib/valibotResolver'
 import { createSchedule } from '@/services/admin/schedules'
 import { useRouter } from 'next/navigation'
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import { WithFormDialog } from '../config'
 import { FieldConfig } from '@/types'
+import { showToast } from '@/helpers/toast'
 
 interface Props {
   isOpen: boolean
   onClose: () => void
+  onConfirm: (input: ISchedule) => Promise<boolean>
+  title: string
+  initialValues?: Partial<ISchedule>
 }
-export const AddSchedule = ({ isOpen, onClose }: Props) => {
-  const route = useRouter()
+export const FormSchedule = ({
+  isOpen,
+  onClose,
+  onConfirm,
+  title,
+  initialValues,
+}: Props) => {
   const form = useForm<ISchedule>({
     resolver: valibotResolver(ScheduleSchema),
     // defaultValues: {},
   })
+
+  useEffect(() => {
+    if (initialValues && form) {
+      Object.keys(initialValues).forEach((key) => {
+        form.setValue(
+          key as keyof ISchedule,
+          initialValues[key as keyof ISchedule]
+        )
+      })
+    }
+  }, [form, initialValues])
 
   const inputs = useMemo((): FieldConfig[] => {
     return [
       {
         type: 'text',
         name: 'day_week',
-        // autoComplete: 'name_schedule',
         label: 'Días:',
         placeholder: 'Días',
-        // className: 'mb-1 col-span-3',
       },
       {
         type: 'time',
@@ -34,10 +52,6 @@ export const AddSchedule = ({ isOpen, onClose }: Props) => {
         placeholder: 'Abre',
         label: 'Abierto:',
         description: '',
-        // withTime: true,
-
-        // autoComplete: 'phone_number',
-        // className: 'mb-1 col-span-1',
       },
       {
         type: 'time',
@@ -45,33 +59,33 @@ export const AddSchedule = ({ isOpen, onClose }: Props) => {
         label: 'Cerrado:',
         description: '',
         placeholder: 'Cierra',
-        // autoComplete: 'phone_number',
-        // className: 'mb-1 col-span-1',
       },
     ]
   }, [])
 
   const onHandle = async (input: ISchedule) => {
     try {
-      const res = await createSchedule({ input })
-      console.log('🚀 ~ file: add-schedule.tsx:58 ~ onHandle ~ res:', res)
-      if (res) {
-        route.refresh()
-        form.reset()
-        onClose()
-      }
+      if (!(await onConfirm(input))) return
+      form.reset()
+      onClose()
     } catch (error) {
-      console.log('🚀 ~ add Schedule ~ onHandle ~ error:', error)
+      showToast(
+        'Error: No se pudo realizar la acción. Por favor, inténtalo de nuevo.',
+        'error'
+      )
     }
   }
 
   return (
     <>
       <WithFormDialog
-        title='Registar horario:'
+        title={title}
         form={{ inputs, form }}
         isOpen={isOpen}
-        onClose={() => onClose()}
+        onClose={() => {
+          form.reset()
+          onClose()
+        }}
         onConfirm={onHandle}
       />
     </>

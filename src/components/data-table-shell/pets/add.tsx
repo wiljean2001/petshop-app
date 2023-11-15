@@ -2,34 +2,30 @@ import { IPet } from '@/models/schemas'
 import { createPet } from '@/services/admin/pets'
 import { showToast } from '@/helpers/toast'
 import { FormPet } from './form'
+import { useRouter } from 'next/navigation'
 
 interface Props {
   isOpen: boolean
   onClose: () => void
 }
 export const AddPet = ({ isOpen, onClose }: Props) => {
+  const route = useRouter()
   const onHandle = async (input: IPet) => {
-    console.log('🚀 ~ file: add.tsx:90 ~ onHandle ~ input:', input)
-    try {
-      const res = await createPet({ input })
-      if (res) {
-        onClose()
-        showToast(
-          '¡Éxito! La mascota ha sido registrada satisfactoriamente.',
-          'success'
-        )
-        return
-      }
+    console.log('🚀 ~ file: add.tsx:14 ~ onHandle ~ input:', input)
+    const res = await createPet({ input })
+    if (res) {
       showToast(
-        'Advertencia: La mascota no se ha registrada completamente. Por favor, completa todos los campos requeridos.',
+        '¡Éxito! La mascota ha sido registrada satisfactoriamente.',
         'success'
       )
-    } catch (error) {
-      showToast(
-        'Error: No se pudo registrar la mascota. Por favor, inténtalo de nuevo.',
-        'error'
-      )
+      route.refresh()
+      return true
     }
+    showToast(
+      'Advertencia: La mascota no se ha registrada completamente. Por favor, completa todos los campos requeridos.',
+      'warning'
+    )
+    return false
   }
 
   return (
@@ -37,7 +33,7 @@ export const AddPet = ({ isOpen, onClose }: Props) => {
       <FormPet
         title='Registar mascota:'
         isOpen={isOpen}
-        onClose={() => onClose()}
+        onClose={onClose}
         onConfirm={onHandle}
       />
     </>

@@ -3,6 +3,7 @@ import { DialogShell } from './dialog-shell'
 import { buttonVariants } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 import { FieldConfig } from '@/types'
+import { showToast } from '@/helpers/toast'
 
 export const ConfirmDeleteDialog = ({
   isOpen,

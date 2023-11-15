@@ -14,10 +14,11 @@ import { ConfirmDeleteDialog, WithFormDialog } from '../config'
 import { useForm } from 'react-hook-form'
 import valibotResolver from '@/lib/valibotResolver'
 import { FieldConfig } from '@/types'
-import { deleteSpecie } from '@/services/admin/species'
+import { deleteSpecie, updateSpecie } from '@/services/admin/species'
 import { showToast } from '@/helpers/toast'
 import { useRouter } from 'next/navigation'
 import { getDateToString } from '@/lib/times'
+import { FormSpecie } from './form'
 
 interface SpeciesTableShellProps {
   data: ISpecie[]
@@ -25,65 +26,71 @@ interface SpeciesTableShellProps {
 }
 
 export function SpeciesTableShell({ data, pageCount }: SpeciesTableShellProps) {
-  const router = useRouter()
+  const route = useRouter()
   const [isPending, startTransition] = React.useTransition()
   const [dialog, setDialog] = React.useState<{
     type: OPTIONS_CRUD | null
     isOpen: boolean
-    clinicId?: string
-    clinic?: ISpecie | null
+    specieId?: string
+    specie?: ISpecie
   }>({
     type: null,
     isOpen: false,
-    clinicId: '',
-    clinic: null,
+    specieId: '',
+    specie: undefined,
   })
-
-  const form = useForm<ISpecie>({
-    resolver: valibotResolver(SpecieSchema),
-  })
-
-  const inputs = React.useMemo((): FieldConfig[] => {
-    return [
-      {
-        type: 'text',
-        name: 'name',
-        label: 'Especie:',
-        placeholder: 'Especie',
-      },
-    ]
-  }, [])
 
   const handleDialogClose = () => {
     setDialog((prevState) => ({
       ...prevState,
       isOpen: false,
-      clinicId: '',
-      clinic: null,
+      specieId: '',
+      specie: undefined,
     }))
   }
-  const handleDialogConfirm = () => {
-    if (dialog.type === OPTIONS_CRUD.DELETE) deleteClinic(dialog.clinicId)
-    if (dialog.type === OPTIONS_CRUD.UPDATE) updateClinic(dialog.clinic)
-    handleDialogClose()
-  }
-
-  const deleteClinic = async (id?: string | null) => {
+  const handleDeleteSpecie = async (id?: string) => {
+    if (!id) return false
     try {
-      if (!id) return
-      // delete clinic
+      // delete specie
       const res = await deleteSpecie({ id })
       if (res) {
-        showToast('Horario eliminado con éxito', 'success')
-        return router.refresh()
+        showToast(
+          '¡Éxito! La especie ha sido eliminado satisfactoriamente.',
+          'success'
+        )
+        route.refresh()
+        handleDialogClose()
+        return true
       }
-    } catch (error) {}
-    return showToast('Error: raza no eliminada', 'error')
-  }
-  const updateClinic = (clinic?: ISpecie | null) => {
-    if (clinic) {
-      // delete clinic
+      showToast(
+        'Advertencia: La eliminación no se completó. Por favor, completa todos los campos requeridos.',
+        'warning'
+      )
+    } catch (error) {
+      showToast(
+        'Error: No se pudo realizar la acción. Por favor, inténtalo de nuevo.',
+        'error'
+      )
     }
+    return false
+  }
+  const handleUpdateSpecie = async (specie?: ISpecie) => {
+    if (!specie) return false
+    const res = await updateSpecie({ input: specie })
+    if (res) {
+      showToast(
+        '¡Éxito! La especie ha sido actualizado satisfactoriamente.',
+        'success'
+      )
+      route.refresh()
+      return true
+    }
+
+    showToast(
+      'Advertencia: La actualización no se completó. Por favor, completa todos los campos requeridos.',
+      'warning'
+    )
+    return false
   }
 
   // Memoize the columns so they don't re-render on every render
@@ -170,11 +177,10 @@ export function SpeciesTableShell({ data, pageCount }: SpeciesTableShellProps) {
               {
                 title: 'Editar',
                 onHandle: () => {
-                  // Open de dialog box for editing the clinic
-                  form.setValue('name', row.getValue('name'))
+                  // Open de dialog box for editing the specie
                   setDialog({
                     type: OPTIONS_CRUD.UPDATE,
-                    clinic: row.original,
+                    specie: row.original,
                     isOpen: true,
                   })
                 },
@@ -182,12 +188,12 @@ export function SpeciesTableShell({ data, pageCount }: SpeciesTableShellProps) {
               {
                 title: 'Eliminar',
                 onHandle: () => {
-                  // Open de dialog box for deleting the clinic
-                  // setClinicIdToDelete(row.original.id!) // Asume que `row.id` es el id de la clínica
+                  // Open de dialog box for deleting the specie
+                  // setspecieIdToDelete(row.original.id!) // Asume que `row.id` es el id de la clínica
                   // setDialogOpen(true)
                   setDialog({
                     type: OPTIONS_CRUD.DELETE,
-                    clinicId: row.original.id!,
+                    specieId: row.original.id!,
                     isOpen: true,
                   })
                 },
@@ -219,22 +225,22 @@ export function SpeciesTableShell({ data, pageCount }: SpeciesTableShellProps) {
           },
         ]}
       />
-      {/* For delete clinic */}
+      {/* For delete specie */}
       {dialog.type === OPTIONS_CRUD.DELETE && (
         <ConfirmDeleteDialog
           isOpen={dialog.isOpen}
-          onClose={() => handleDialogClose()}
-          onConfirm={() => handleDialogConfirm()}
+          onClose={handleDialogClose}
+          onConfirm={() => handleDeleteSpecie(dialog.specieId)}
         />
       )}
-      {/* For edit clinic */}
+      {/* For edit specie */}
       {dialog.type === OPTIONS_CRUD.UPDATE && (
-        <WithFormDialog
+        <FormSpecie
           title='Editar raza:'
-          form={{ form, inputs }}
           isOpen={dialog.isOpen}
-          onClose={() => handleDialogClose()}
-          onConfirm={() => handleDialogConfirm()}
+          onClose={handleDialogClose}
+          onConfirm={handleUpdateSpecie}
+          initialValues={dialog.specie}
         />
       )}
     </>

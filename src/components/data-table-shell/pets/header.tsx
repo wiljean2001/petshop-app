@@ -1,13 +1,13 @@
 'use client'
 
-import { HeaderWithButton } from '../header-for-tables'
+import { DashboardOptions } from '../header-for-tables'
 import { useMemo, useState } from 'react'
 import { AddPet } from './add'
 
 export const HeaderPet = () => {
   const [isDialogOpen, setDialogOpen] = useState(false)
 
-  const optionsPets = useMemo(() => {
+  const options = useMemo(() => {
     return [
       {
         title: 'Agregar mascota',
@@ -21,8 +21,9 @@ export const HeaderPet = () => {
 
   return (
     <>
-      <HeaderWithButton options={optionsPets} title='Mascotas' />
+    <DashboardOptions options={options} onHandledDownload=''>
       <AddPet isOpen={isDialogOpen} onClose={() => setDialogOpen(false)} />
+    </DashboardOptions>
     </>
   )
 }

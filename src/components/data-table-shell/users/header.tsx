@@ -1,16 +1,16 @@
 'use client'
 
 import { DashboardOptions } from '../header-for-tables'
-import { Suspense, useMemo, useState } from 'react'
-import { AddBreed } from './add'
+import { useMemo, useState } from 'react'
+import { AddUser } from './add'
 
-export const HeaderBreed = () => {
+export const HeaderUser = () => {
   const [isDialogOpen, setDialogOpen] = useState(false)
 
   const options = useMemo(() => {
     return [
       {
-        title: 'Agregar raza',
+        title: 'Agregar usuario',
         onHandled: async () => {
           setDialogOpen(true)
         },
@@ -22,7 +22,7 @@ export const HeaderBreed = () => {
   return (
     <>
       <DashboardOptions options={options} onHandledDownload=''>
-        <AddBreed isOpen={isDialogOpen} onClose={() => setDialogOpen(false)} />
+        <AddUser isOpen={isDialogOpen} onClose={() => setDialogOpen(false)} />
       </DashboardOptions>
     </>
   )

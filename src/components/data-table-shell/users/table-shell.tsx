@@ -7,106 +7,90 @@ import { Checkbox } from '@/components/ui/checkbox'
 
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header'
 import { MillionDataTable } from '@/components/data-table/million-data-table'
-import { ClinicSchema, IClinic } from '@/models/schemas'
 import { DropdownMenuShell } from '../drop-down-menu-shell'
 import { OPTIONS_CRUD } from '@/config/const'
-import { ConfirmDeleteDialog, WithFormDialog } from '../config'
-import { useForm } from 'react-hook-form'
-import valibotResolver from '@/lib/valibotResolver'
-import { deleteClinic } from '@/services/admin/clinics'
+import { ConfirmDeleteDialog } from '../config'
+// import { deleteUser, updateUser } from '@/services/admin/user'
 import { showToast } from '@/helpers/toast'
 import { useRouter } from 'next/navigation'
 import { getDateToString } from '@/lib/times'
-import { FieldConfig } from '@/types'
+import { ISingUpForm } from '@/models/user'
+import { FormUser } from './form'
 
-interface ClinicsTableShellProps {
-  data: IClinic[]
+interface UserTableShellProps {
+  data: ISingUpForm[]
   pageCount: number
 }
-
-export function ClinicsTableShell({ data, pageCount }: ClinicsTableShellProps) {
-  const router = useRouter()
+export function UserTableShell({ data, pageCount }: UserTableShellProps) {
+  const route = useRouter()
   const [isPending, startTransition] = React.useTransition()
   const [dialog, setDialog] = React.useState<{
     type: OPTIONS_CRUD | null
     isOpen: boolean
-    clinicId?: string
-    clinic?: IClinic | null
+    userId?: string
+    user?: ISingUpForm
   }>({
     type: null,
     isOpen: false,
-    clinicId: '',
-    clinic: null,
+    userId: '',
+    user: undefined,
   })
 
-  const form = useForm<IClinic>({
-    resolver: valibotResolver(ClinicSchema),
-  })
-
-  const inputs = React.useMemo((): FieldConfig[] => {
-    return [
-      {
-        type: 'text',
-        name: 'name',
-        label: '',
-        // autoComplete: 'name_clinic',
-        placeholder: 'Nombre del local',
-        // className: 'mb-1 col-span-3',
-      },
-      {
-        type: 'tel',
-        name: 'phone',
-        label: '',
-        // autoComplete: 'phone_number',
-        placeholder: 'Teléfono',
-        // className: 'mb-1 col-span-1',
-      },
-      {
-        type: 'text',
-        name: 'location',
-        label: '',
-        // autoComplete: 'location',
-        placeholder: 'Ubicación',
-        // className: 'mb-2 col-span-4',
-      },
-    ]
-  }, [])
   const handleDialogClose = () => {
     setDialog((prevState) => ({
       ...prevState,
       isOpen: false,
-      clinicId: '',
-      clinic: null,
+      userId: '',
+      user: undefined,
     }))
   }
-  const handleDialogConfirm = () => {
-    if (dialog.type === OPTIONS_CRUD.DELETE) actionDelete(dialog.clinicId)
-    if (dialog.type === OPTIONS_CRUD.UPDATE) actionUpdate(dialog.clinic)
-    handleDialogClose()
-  }
-
-  const actionDelete = async (id?: string | null) => {
+  const handleDeleteUser = async (id?: string) => {
+    if (!id) return false
     try {
-      if (id) {
-        const res = await deleteClinic({ id })
-        if (res) {
-          showToast('Clínica eliminada con éxito', 'success')
-          router.refresh()
-          return
-        }
-        // delete clinic
-      }
-    } catch (error) {}
-    return showToast('Error: clínica no eliminada', 'error')
-  }
-  const actionUpdate = (clinic?: IClinic | null) => {
-    if (clinic) {
-      // delete clinic
+      // delete user
+      // const res = await deleteUser({ id })
+      // if (res) {
+      //   showToast(
+      //     '¡Éxito! La eUser ha sido eliminado satisfactoriamente.',
+      //     'success'
+      //   )
+      //   route.refresh()
+      //   handleDialogClose()
+      //   return true
+      // }
+      showToast(
+        'Advertencia: La eliminación no se completó. Por favor, completa todos los campos requeridos.',
+        'warning'
+      )
+    } catch (error) {
+      showToast(
+        'Error: No se pudo realizar la acción. Por favor, inténtalo de nuevo.',
+        'error'
+      )
     }
+    return false
+  }
+  const handleUpdateUser = async (user?: ISingUpForm) => {
+    if (!user) return false
+    // const res = await updateUser({ input: user })
+    // if (res) {
+    //   showToast(
+    //     '¡Éxito! La eUser ha sido actualizado satisfactoriamente.',
+    //     'success'
+    //   )
+    //   route.refresh()
+    //   return true
+    // }
+
+    showToast(
+      'Advertencia: La actualización no se completó. Por favor, completa todos los campos requeridos.',
+      'warning'
+    )
+    return false
   }
 
   // Memoize the columns so they don't re-render on every render
-  const columns = React.useMemo<ColumnDef<IClinic, unknown>[]>(
+  const columns = React.useMemo<ColumnDef<ISingUpForm, unknown>[]>(
     () => [
       {
         id: 'select',
@@ -139,49 +123,17 @@ export function ClinicsTableShell({ data, pageCount }: ClinicsTableShellProps) {
         cell: ({ row }) => (
           <div className='w-[200px] max-w-[200px]'>{row.getValue('name')}</div>
         ),
-        enableSorting: false,
-        enableHiding: false,
       },
       {
-        accessorKey: 'location',
+        accessorKey: 'email',
         header: ({ column }) => (
-          <DataTableColumnHeader column={column} title='Ubicación' />
+          <DataTableColumnHeader column={column} title='Correo e.' />
         ),
-        cell: ({ row }) => {
-          // const label = tasks.label.enumValues.find(
-          //   (label) => label === row.original.label
-          // )
-
-          return (
-            <div className='flex space-x-2'>
-              {/* {label && <Badge variant="outline">{label}</Badge>} */}
-              <span className='max-w-[500px] truncate font-medium'>
-                {row.getValue('location')}
-              </span>
-            </div>
-          )
-        },
-      },
-      {
-        accessorKey: 'phone',
-        header: ({ column }) => (
-          <DataTableColumnHeader column={column} title='Telf.' />
+        cell: ({ row }) => (
+          <div className='w-[200px] max-w-[200px]'>{row.getValue('email')}</div>
         ),
-        cell: ({ row }) => {
-          // const label = tasks.label.enumValues.find(
-          //   (label) => label === row.original.label
-          // )
-
-          return (
-            <div className='flex space-x-2'>
-              {/* {label && <Badge variant="outline">{label}</Badge>} */}
-              <span className='max-w-[500px] truncate font-medium'>
-                {row.getValue('phone')}
-              </span>
-            </div>
-          )
-        },
       },
+
       {
         accessorKey: 'createdAt',
         header: ({ column }) => (
@@ -196,7 +148,7 @@ export function ClinicsTableShell({ data, pageCount }: ClinicsTableShellProps) {
             <div className='flex space-x-2'>
               {/* {label && <Badge variant="outline">{label}</Badge>} */}
               <span className='max-w-[500px] truncate font-medium'>
-                {getDateToString({ date: row.getValue('createdAt') })}
+                {getDateToString({ date: row.getValue('updatedAt') })}
               </span>
             </div>
           )
@@ -230,15 +182,10 @@ export function ClinicsTableShell({ data, pageCount }: ClinicsTableShellProps) {
               {
                 title: 'Editar',
                 onHandle: () => {
-                  // Open de dialog box for editing the clinic
-                  form.setValue('name', row.getValue('name'))
-                  form.setValue('phone', row.getValue('phone'))
-                  form.setValue('location', row.getValue('location'))
-                  // form.setValue('image', row.getValue('image'))
-
+                  // Open de dialog box for editing the user
                   setDialog({
                     type: OPTIONS_CRUD.UPDATE,
-                    clinic: row.original,
+                    user: row.original,
                     isOpen: true,
                   })
                 },
@@ -246,14 +193,14 @@ export function ClinicsTableShell({ data, pageCount }: ClinicsTableShellProps) {
               {
                 title: 'Eliminar',
                 onHandle: () => {
-                  // Open de dialog box for deleting the clinic
-                  // setClinicIdToDelete(row.original.id!) // Asume que `row.id` es el id de la clínica
+                  // Open de dialog box for deleting the user
+                  // setUserIdToDelete(row.original.id!) // Asume que `row.id` es el id de la clínica
                   // setDialogOpen(true)
-                  setDialog({
-                    type: OPTIONS_CRUD.DELETE,
-                    clinicId: row.original.id!,
-                    isOpen: true,
-                  })
+                  // setDialog({
+                  //   type: OPTIONS_CRUD.DELETE,
+                  //   userId: row.original.id!,
+                  //   isOpen: true,
+                  // })
                 },
               },
               {
@@ -279,26 +226,26 @@ export function ClinicsTableShell({ data, pageCount }: ClinicsTableShellProps) {
         searchableColumns={[
           {
             id: 'name',
-            title: 'Ubicación',
+            title: 'raza',
           },
         ]}
       />
-      {/* For delete clinic */}
+      {/* For delete user */}
       {dialog.type === OPTIONS_CRUD.DELETE && (
         <ConfirmDeleteDialog
           isOpen={dialog.isOpen}
-          onClose={() => handleDialogClose()}
-          onConfirm={() => handleDialogConfirm()}
+          onClose={handleDialogClose}
+          onConfirm={() => handleDeleteUser(dialog.userId)}
         />
       )}
-      {/* For edit clinic */}
+      {/* For edit user */}
       {dialog.type === OPTIONS_CRUD.UPDATE && (
-        <WithFormDialog
-          title='Editar local:'
-          form={{ form, inputs }}
+        <FormUser
+          title='Editar raza:'
           isOpen={dialog.isOpen}
-          onClose={() => handleDialogClose()}
-          onConfirm={() => handleDialogConfirm()}
+          onClose={handleDialogClose}
+          onConfirm={handleUpdateUser}
+          initialValues={dialog.user}
         />
       )}
     </>
