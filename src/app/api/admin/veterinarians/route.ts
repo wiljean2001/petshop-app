@@ -15,15 +15,16 @@ export async function GET() {
 
 // Create a new veterinarian
 export async function POST(req: Request) {
-  const input = await req.json()
-  const validated = safeParse(VeterinarianSchema, input)
-  if (!validated.success) {
-    return ErrorResponse('BAD_USER_INPUT')
-  }
-
-  const { email, name, phone, surname, specialty, clinicId } = validated.output
-
   try {
+    const input = await req.json()
+    const validated = safeParse(VeterinarianSchema, input)
+    if (!validated.success) {
+      return ErrorResponse('BAD_USER_INPUT')
+    }
+
+    const { email, name, phone, surname, specialty, clinicId } =
+      validated.output
+
     const veterinarian = await db.veterinarian.create({
       data: {
         email,
@@ -31,7 +32,11 @@ export async function POST(req: Request) {
         phone,
         surname,
         specialty,
-        clinicId,
+        clinic: {
+          connect: {
+            id: clinicId!,
+          },
+        },
       },
     })
     return SuccessResponse(veterinarian, 200)

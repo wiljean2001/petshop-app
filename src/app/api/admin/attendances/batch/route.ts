@@ -13,7 +13,7 @@ export async function DELETE(req: Request) {
       Array.isArray(ids) &&
       ids.every((item) => typeof item === 'string')
     ) {
-      const clinics = await db.permission.deleteMany({
+      const clinics = await db.appointments.deleteMany({
         where: {
           id: { in: ids },
         },

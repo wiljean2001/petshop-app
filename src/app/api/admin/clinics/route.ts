@@ -9,30 +9,57 @@ export async function GET() {
   return SuccessResponse(clinics, 200)
 }
 
-// Create a nuew clinic
+// Create a new clinic
 export async function POST(req: Request) {
-  const input = await req.json()
-  console.log('🚀 ~ file: route.ts:15 ~ POST ~ input:', input)
-  const validated = safeParse(ClinicSchema, input)
-  if (!validated.success) {
-    console.log(
-      '🚀 ~ file: route.ts:17 ~ POST ~ validated.success:',
-      validated.success
-    )
-    return ErrorResponse('BAD_USER_INPUT')
-  }
-
-  const { name, location, image, phone } = validated.output
-
   try {
-    const clinic = await db.clinic.create({
-      data: {
-        name,
-        location,
-        image,
-        phone,
-      },
+    const input = await req.json()
+    const validated = safeParse(ClinicSchema, input)
+    if (!validated.success) {
+      return ErrorResponse('BAD_USER_INPUT')
+    }
+
+    const { name, location, image, phone, scheduleIds } = validated.output
+    // Se utiliza $transaction para garantizar la atomicidad de la operación
+    const clinic = await db.$transaction(async (prisma) => {
+      const newClinic = await prisma.clinic.create({
+        data: {
+          name,
+          location,
+          image,
+          phone,
+        },
+      })
+
+      // Crear las asociaciones de horarios solo si hay scheduleIds
+      if (scheduleIds && scheduleIds.length > 0) {
+        await prisma.clinicSchedule.createMany({
+          data: scheduleIds.map((scheduleId) => ({
+            clinicId: newClinic.id,
+            scheduleId: scheduleId,
+          })),
+        })
+      }
+
+      return newClinic
     })
+
+    // const clinic = await db.clinic.create({
+    //   data: {
+    //     name,
+    //     location,
+    //     image,
+    //     phone,
+    //   },
+    // })
+
+    // if (scheduleIds) {
+    //   await db.clinicSchedule.createMany({
+    //     data: scheduleIds.map((scheduleId) => ({
+    //       clinicId: clinic.id,
+    //       scheduleId: scheduleId,
+    //     })),
+    //   })
+    // }
 
     return SuccessResponse(clinic, 200)
   } catch (error) {

@@ -15,29 +15,13 @@ export async function GET() {
 
 // Create a new schedule
 export async function POST(req: Request) {
-  // const { name, permissions } = {
-  //   name: 'admin',
-  //   permissions: [],
-  // }
-
   const input = await req.json()
-  console.log('🚀 ~ file: route.ts:24 ~ POST ~ input:', input)
   const validated = safeParse(ScheduleSchema, input)
   if (!validated.success) {
-    console.log(
-      '🚀 ~ file: route.ts:27 ~ POST ~ validated.success:',
-      validated.success
-    )
     return ErrorResponse('BAD_USER_INPUT')
   }
 
   const { day_week, openingHour, closingHour } = validated.output
-  console.log(
-    '🚀 ~ file: route.ts:32 ~ POST ~ day_week, openingHour, closingHour:',
-    day_week,
-    openingHour,
-    closingHour
-  )
 
   try {
     const schedule = await db.schedule.create({

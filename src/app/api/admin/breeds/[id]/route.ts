@@ -1,4 +1,5 @@
 import { ErrorResponse, SuccessResponse } from '@/helpers/ResponseError'
+import { exclude } from '@/lib/exclude'
 import { db } from '@/lib/prisma'
 import { BreedSchema } from '@/models/schemas'
 import { safeParse } from 'valibot'
@@ -48,7 +49,14 @@ export async function PUT(
 ) {
   try {
     const input = await request.json()
-    const validated = safeParse(BreedSchema, input)
+    const newInput = exclude(input, [
+      'specie.createdAt',
+      'specie.updatedAt',
+      'createdAt',
+      'updatedAt',
+    ])
+    console.log('🚀 ~ file: route.ts:58 ~ newInput:', newInput)
+    const validated = safeParse(BreedSchema, newInput)
 
     if (!validated.success) {
       return ErrorResponse('BAD_USER_INPUT')
@@ -56,14 +64,13 @@ export async function PUT(
 
     const { name, specieId } = validated.output
 
-    
-  let specie
+    let specie
 
-  if (specieId) {
-    specie = {
-      connect: { id: specieId },
+    if (specieId) {
+      specie = {
+        connect: { id: specieId },
+      }
     }
-  }
 
     const breed = await db.breed.update({
       where: { id: params.id },

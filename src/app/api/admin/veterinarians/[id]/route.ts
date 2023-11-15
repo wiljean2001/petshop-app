@@ -1,4 +1,5 @@
 import { ErrorResponse, SuccessResponse } from '@/helpers/ResponseError'
+import { exclude } from '@/lib/exclude'
 import { db } from '@/lib/prisma'
 import { VeterinarianSchema } from '@/models/schemas'
 import { safeParse } from 'valibot'
@@ -47,7 +48,8 @@ export async function PUT(
   { params }: { params: { id: string } }
 ) {
   const input = await request.json()
-  const validated = safeParse(VeterinarianSchema, input)
+  const newInput = exclude(input, ['createdAt', 'updatedAt', 'clinic'])
+  const validated = safeParse(VeterinarianSchema, newInput)
 
   if (!validated.success) {
     return ErrorResponse('BAD_USER_INPUT')
@@ -55,10 +57,24 @@ export async function PUT(
 
   const { name, email, phone, specialty, surname, clinicId } = validated.output
 
+  let clinic: {} | undefined
+  if (clinicId) {
+    clinic = {
+      connect: { id: clinicId! },
+    }
+  }
+
   try {
     const veterinarian = await db.veterinarian.update({
       where: { id: params.id },
-      data: { name, email, phone, specialty, surname, clinicId },
+      data: {
+        name,
+        email,
+        phone,
+        specialty,
+        surname,
+        clinic,
+      },
     })
 
     return SuccessResponse(veterinarian, 200)

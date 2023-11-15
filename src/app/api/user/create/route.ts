@@ -4,12 +4,12 @@ import { db } from '@/lib/prisma'
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library'
 import { NextResponse, NextRequest } from 'next/server'
 
-async function getRoleId(roleName: string): Promise<string | null> {
-  const role = await db.role.findUnique({
-    where: { name: roleName },
-  })
-  return role?.id ?? null
-}
+// async function getRoleId(roleName: string): Promise<string | null> {
+//   const role = await db.role.findUnique({
+//     where: { name: roleName },
+//   })
+//   return role?.id ?? null
+// }
 
 export async function POST(req: Request) {
   let errors = []
@@ -23,11 +23,11 @@ export async function POST(req: Request) {
 
   try {
     // Find the user role
-    const role = await getRoleId(ROLES.USER)
-    if (!role) {
-      errors.push('Internal error')
-      return NextResponse.json({ errors }, { status: 400 })
-    }
+    // const role = await getRoleId(ROLES.USER)
+    // if (!role) {
+    //   errors.push('Internal error')
+    //   return NextResponse.json({ errors }, { status: 400 })
+    // }
 
     // Create new user
     const user = await db.user.create({
@@ -35,13 +35,11 @@ export async function POST(req: Request) {
         name,
         email,
         password: hashPassword(password),
-        role: {
-          connect: {
-            id: role,
-          },
-        },
+        role: 'user'
       },
     })
+
+    
     return NextResponse.json({ user }, { status: 201 })
   } catch (error) {
     if (error instanceof PrismaClientKnownRequestError) {

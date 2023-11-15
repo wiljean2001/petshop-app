@@ -24,13 +24,25 @@ export async function POST(req: Request) {
     return ErrorResponse('BAD_USER_INPUT')
   }
 
-  const { name, gender, ownerId, birthdate, breedId } = validated.output
+  const {
+    name,
+    gender,
+    ownerId,
+    birthdate,
+    breedId,
+    color,
+    derivedFrom,
+    medicalNotes,
+  } = validated.output
 
   try {
     const pet = await db.pet.create({
       data: {
         name,
         gender,
+        color,
+        derivedFrom,
+        medicalNotes,
         birthdate,
         owner: {
           connect: { id: ownerId },

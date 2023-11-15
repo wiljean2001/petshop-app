@@ -1,19 +1,20 @@
 import { ErrorResponse, SuccessResponse } from '@/helpers/ResponseError'
+import { exclude } from '@/lib/exclude'
 import { db } from '@/lib/prisma'
-import { RoleSchema } from '@/models/user'
+import { AttendanceSchema } from '@/models/schemas'
 import { safeParse } from 'valibot'
 
-// Delete a role
+// Delete a attendance
 export async function DELETE(
   req: Request,
   { params }: { params: { id: string } }
 ) {
   try {
-    const role = await db.role.delete({
+    const attendance = await db.attendances.delete({
       where: { id: params.id },
     })
 
-    if (!role) return ErrorResponse('NOT_FOUND')
+    if (!attendance) return ErrorResponse('NOT_FOUND')
 
     return SuccessResponse(true, 200)
   } catch (error) {
@@ -22,46 +23,55 @@ export async function DELETE(
   }
 }
 
-// Find a role
+// Find a attendance
 export async function GET(
   request: Request,
   { params }: { params: { id: string } }
 ) {
   try {
-    const role = await db.role.findFirst({
+    const attendance = await db.attendances.findFirst({
       where: { id: params.id },
     })
 
-    if (!role) return ErrorResponse('NOT_FOUND')
+    if (!attendance) return ErrorResponse('NOT_FOUND')
 
-    return SuccessResponse(role, 200)
+    return SuccessResponse(attendance, 200)
   } catch (error) {
     console.error(error) // log the error for debugging
     return ErrorResponse('INTERNAL_SERVER_ERROR')
   }
 }
 
-// Update a role
+// Update a attendances
 export async function PUT(
   request: Request,
   { params }: { params: { id: string } }
 ) {
   try {
     const input = await request.json()
-    const validated = safeParse(RoleSchema, input)
+    const newInput = exclude(input, ['appointment', 'createdAt', 'updatedAt'])
+    if (newInput.date) {
+      newInput.date = new Date(newInput.date)
+    }
+    const validated = safeParse(AttendanceSchema, newInput)
 
     if (!validated.success) {
       return ErrorResponse('BAD_USER_INPUT')
     }
 
-    const { name } = validated.output
+    const { date, appointmentId } = validated.output
 
-    const role = await db.role.update({
+    const attendances = await db.attendances.update({
       where: { id: params.id },
-      data: { name,  },
+      data: {
+        date,
+        appointment: {
+          connect: { id: appointmentId },
+        },
+      },
     })
 
-    return SuccessResponse(role, 200)
+    return SuccessResponse(attendances, 200)
   } catch (err) {
     return ErrorResponse('INTERNAL_SERVER_ERROR')
   }

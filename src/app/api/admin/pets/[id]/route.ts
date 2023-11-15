@@ -1,4 +1,5 @@
 import { ErrorResponse, SuccessResponse } from '@/helpers/ResponseError'
+import { exclude } from '@/lib/exclude'
 import { db } from '@/lib/prisma'
 import { PetSchema } from '@/models/schemas'
 import { safeParse } from 'valibot'
@@ -48,7 +49,16 @@ export async function PUT(
 ) {
   try {
     const input = await request.json()
-    const validated = safeParse(PetSchema, input)
+    if (input.birthdate) {
+      input.birthdate = new Date(input.birthdate)
+    }
+    const newInput = exclude(input, [
+      'createdAt',
+      'updatedAt',
+      'owner',
+      'breed',
+    ])
+    const validated = safeParse(PetSchema, newInput)
 
     if (!validated.success) {
       return ErrorResponse('BAD_USER_INPUT')

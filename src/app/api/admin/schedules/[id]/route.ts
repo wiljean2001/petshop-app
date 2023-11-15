@@ -1,4 +1,5 @@
 import { ErrorResponse, SuccessResponse } from '@/helpers/ResponseError'
+import { exclude } from '@/lib/exclude'
 import { db } from '@/lib/prisma'
 import { ScheduleSchema } from '@/models/schemas'
 import { safeParse } from 'valibot'
@@ -48,7 +49,8 @@ export async function PUT(
 ) {
   try {
     const input = await request.json()
-    const validated = safeParse(ScheduleSchema, input)
+    const newInput = exclude(input, ['createdAt', 'updatedAt'])
+    const validated = safeParse(ScheduleSchema, newInput)
 
     if (!validated.success) {
       return ErrorResponse('BAD_USER_INPUT')
