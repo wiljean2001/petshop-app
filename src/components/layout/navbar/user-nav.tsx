@@ -31,7 +31,7 @@ export const UserNav = ({ user }: Props) => {
   if (!mounted) return
 
   const onHandleSignOut = () => {
-    signOut()
+    signOut({ callbackUrl: '/login' })
   }
 
   return (

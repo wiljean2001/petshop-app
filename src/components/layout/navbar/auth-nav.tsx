@@ -4,14 +4,14 @@ import { cn } from '@/lib/utils'
 import { buttonVariants } from '@/components/ui/button'
 import { Icons } from '@/components/icons'
 import { ERoutingPath } from '@/config/docs'
-import { getSSession } from '@/helpers/get-server-session'
+import { getCurrentUser } from '@/helpers/get-server-session'
 
 export const AuthNav = async () => {
-  const session = await getSSession()
+  const user = await getCurrentUser()
   
   return (
     <>
-      {!session?.user ? (
+      {!user ? (
         <>
           <Link href={ERoutingPath.LOGIN}>
             <div
@@ -42,7 +42,7 @@ export const AuthNav = async () => {
         </>
       ) : (
         <>
-          <UserNav user={session.user} />
+          <UserNav user={user} />
         </>
       )}
     </>

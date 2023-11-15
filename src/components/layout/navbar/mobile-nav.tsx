@@ -19,11 +19,11 @@ export function MobileNav({
   sidebarNav: SidebarNavItem[]
 }) {
   const [open, setOpen] = React.useState(false)
-  const pathname = usePathname()
+  // const pathname = usePathname()
 
-  const [_, lang, role, ...rest] = pathname.split('/')
+  // const [_, lang, role, ...rest] = pathname.split('/')
 
-  const langAndRolePathname = `/${lang}/${role}`
+  // const langAndRolePathname = `/${lang}/${role}`
 
   return (
     <Sheet open={open} onOpenChange={setOpen}>
@@ -70,7 +70,7 @@ export function MobileNav({
                       {!item.disabled &&
                         (item.href ? (
                           <MobileLink
-                            href={langAndRolePathname + item.href}
+                            href={item.href}
                             onOpenChange={setOpen}
                             className='text-muted-foreground'
                           >

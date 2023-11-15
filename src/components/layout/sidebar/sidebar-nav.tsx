@@ -15,9 +15,9 @@ export interface DocsSidebarNavProps {
 export function DocsSidebarNav({ items }: DocsSidebarNavProps) {
   const pathname = usePathname()
 
-  const [_, lang, role, ...rest] = pathname.split('/')
+  const [_, lang, ...rest] = pathname.split('/')
 
-  const langAndRolePathname = `/${lang}/${role}`
+  // const langAndRolePathname = `/${lang}/${role}`
 
   return items.length ? (
     <div className='w-full'>
@@ -28,7 +28,8 @@ export function DocsSidebarNav({ items }: DocsSidebarNavProps) {
             <DocsSidebarNavItems
               items={item.items}
               pathname={pathname}
-              initialPathname={langAndRolePathname}
+              lang={'/' + lang}
+              // initialPathname={langAndRolePathname}
             />
           )}
         </div>
@@ -40,25 +41,27 @@ export function DocsSidebarNav({ items }: DocsSidebarNavProps) {
 interface DocsSidebarNavItemsProps {
   items: SidebarNavItem[]
   pathname: string | null
-  initialPathname: string
+  lang: string
 }
 
 export function DocsSidebarNavItems({
   items,
   pathname,
-  initialPathname,
-}: DocsSidebarNavItemsProps) {
+  lang,
+}: // initialPathname,
+DocsSidebarNavItemsProps) {
   return items?.length ? (
     <div className='grid grid-flow-row auto-rows-max text-sm'>
       {items.map((item, index) =>
         item.href && !item.disabled ? (
           <Link
             key={index}
-            href={`${initialPathname}${item.href}`}
+            href={`${item.href}`}
+            // href={`${initialPathname}${item.href}`}
             className={cn(
               'group flex w-full items-center rounded-md border border-transparent px-2 py-1 hover:underline',
               item.disabled && 'cursor-not-allowed opacity-60',
-              pathname === initialPathname + item.href
+              pathname === lang + item.href
                 ? 'font-medium text-foreground'
                 : 'text-muted-foreground'
             )}
