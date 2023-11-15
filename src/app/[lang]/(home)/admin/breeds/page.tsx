@@ -1,6 +1,9 @@
-import { HeaderSpecie } from '@/components/data-table-shell/species/header'
-import { SpeciesTableShell } from '@/components/data-table-shell/species/table-shell'
 import { db } from '@/lib/prisma'
+import { HeaderBreed } from '@/components/data-table-shell/breeds/header'
+import { BreedsTableShell } from '@/components/data-table-shell/breeds/table-shell'
+import { Suspense } from 'react'
+import { DataTableLoading } from '@/components/data-table/data-table-loading'
+import { DashboardHeader } from '@/components/layout/auth/header'
 
 interface Props {
   searchParams: {
@@ -8,7 +11,7 @@ interface Props {
   }
 }
 
-export default async function Specie({ searchParams }: Props) {
+export default async function BreedsPage({ searchParams }: Props) {
   const { page, per_page, sort, name } = searchParams
   console.log({
     name,
@@ -24,10 +27,12 @@ export default async function Specie({ searchParams }: Props) {
     name: typeof name === 'string' ? { contains: name } : undefined,
   }
 
-  const allSpecie = db.specie.findMany({
+  const allBreeds = db.breed.findMany({
     select: {
       id: true,
       name: true,
+      specieId: true,
+      specie: true,
       createdAt: true,
       updatedAt: true,
     },
@@ -40,19 +45,21 @@ export default async function Specie({ searchParams }: Props) {
     where,
   })
 
-  const totalSpecie = db.specie.count({ where })
+  const totalClinics = db.breed.count({ where })
 
-  const result = await db.$transaction([allSpecie, totalSpecie])
+  const result = await db.$transaction([allBreeds, totalClinics])
 
   const pageCount = Math.ceil(result[1] / limit)
 
   return (
     <>
       {/* Title and Buttons for add*/}
-      <HeaderSpecie />
+      <DashboardHeader heading='Razas'>
+        <HeaderBreed />
+      </DashboardHeader>
 
-      {/* Table for show the Specie */}
-      <SpeciesTableShell data={result[0]} pageCount={pageCount} />
+      {/* Table for show the clinics */}
+      <BreedsTableShell data={result[0]} pageCount={pageCount} />
     </>
   )
 }

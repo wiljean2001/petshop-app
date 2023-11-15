@@ -1,5 +1,6 @@
-import { HeaderClinics } from '@/components/data-table-shell/clinics/header-clinics'
-import { ClinicsTableShell } from '@/components/data-table-shell/clinics/clinics-table-shell'
+import { HeaderVeterinarian } from '@/components/data-table-shell/veterinarias/header'
+import { VeterinariansTableShell } from '@/components/data-table-shell/veterinarias/table-shell'
+import { DashboardHeader } from '@/components/layout/auth/header'
 import { db } from '@/lib/prisma'
 
 interface Props {
@@ -7,8 +8,7 @@ interface Props {
     [key: string]: string | string[] | undefined
   }
 }
-
-export default async function ClinicsPage({ searchParams }: Props) {
+export default async function VeterinariansPage({ searchParams }: Props) {
   const { page, per_page, sort, title, status, priority } = searchParams
   console.log({
     title,
@@ -26,13 +26,16 @@ export default async function ClinicsPage({ searchParams }: Props) {
     name: typeof title === 'string' ? { contains: title } : undefined,
   }
 
-  const allClinic = db.clinic.findMany({
+  const allClinic = db.veterinarian.findMany({
     select: {
       id: true,
       name: true,
+      surname: true,
+      clinicId: true,
+      clinic: true,
       phone: true,
-      image: true,
-      location: true,
+      email: true,
+      specialty: true,
       createdAt: true,
       updatedAt: true,
     },
@@ -54,12 +57,12 @@ export default async function ClinicsPage({ searchParams }: Props) {
   return (
     <>
       {/* Title and Buttons for add*/}
-      <HeaderClinics />
+      <DashboardHeader heading='Veterinarios'>
+        <HeaderVeterinarian />
+      </DashboardHeader>
 
       {/* Table for show the clinics */}
-      <ClinicsTableShell data={result[0]} pageCount={pageCount} />
+      <VeterinariansTableShell data={result[0]} pageCount={pageCount} />
     </>
   )
 }
-
-// toolkit.fymconsulting

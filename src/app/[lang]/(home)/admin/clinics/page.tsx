@@ -1,5 +1,6 @@
-import { HeaderOwner } from '@/components/data-table-shell/owners/header'
-import { OwnersTableShell } from '@/components/data-table-shell/owners/table-shell'
+import { HeaderClinics } from '@/components/data-table-shell/clinics/header'
+import { ClinicsTableShell } from '@/components/data-table-shell/clinics/table-shell'
+import { DashboardHeader } from '@/components/layout/auth/header'
 import { db } from '@/lib/prisma'
 
 interface Props {
@@ -8,10 +9,11 @@ interface Props {
   }
 }
 
-export default async function OwnerPage({ searchParams }: Props) {
-  const { page, per_page, sort, name } = searchParams
+export default async function ClinicsPage({ searchParams }: Props) {
+  const { page, per_page, sort, name, location } = searchParams
   console.log({
     name,
+    location,
   })
 
   // limit the number of pages to be returned
@@ -22,18 +24,19 @@ export default async function OwnerPage({ searchParams }: Props) {
 
   const where = {
     name: typeof name === 'string' ? { contains: name } : undefined,
+    location: typeof location === 'string' ? { contains: location } : undefined,
   }
 
-  const allOwner = db.owner.findMany({
+  const allClinic = db.clinic.findMany({
     select: {
       id: true,
       name: true,
-      surname: true,
-      city: true,
       phone: true,
-      address: true,
-      email: true,
-      // Pet: true,
+      image: true,
+      location: true,
+      ClinicSchedule: {
+        select: { schedule: true },
+      },
       createdAt: true,
       updatedAt: true,
     },
@@ -46,19 +49,21 @@ export default async function OwnerPage({ searchParams }: Props) {
     where,
   })
 
-  const totalOwner = db.owner.count({ where })
+  const totalClinics = db.clinic.count({ where })
 
-  const result = await db.$transaction([allOwner, totalOwner])
+  const result = await db.$transaction([allClinic, totalClinics])
 
   const pageCount = Math.ceil(result[1] / limit)
 
   return (
     <>
       {/* Title and Buttons for add*/}
-      <HeaderOwner />
+      <DashboardHeader heading='Clínicas'>
+        <HeaderClinics />
+      </DashboardHeader>
 
-      {/* Table for show the Owner */}
-      <OwnersTableShell data={result[0]} pageCount={pageCount} />
+      {/* Table for show the clinics */}
+      <ClinicsTableShell data={result[0]} pageCount={pageCount} />
     </>
   )
 }

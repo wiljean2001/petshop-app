@@ -1,5 +1,6 @@
-import { HeaderPet } from '@/components/data-table-shell/pets/header'
-import { PetsTableShell } from '@/components/data-table-shell/pets/table-shell'
+import { HeaderOwner } from '@/components/data-table-shell/owners/header'
+import { OwnersTableShell } from '@/components/data-table-shell/owners/table-shell'
+import { DashboardHeader } from '@/components/layout/auth/header'
 import { db } from '@/lib/prisma'
 
 interface Props {
@@ -8,7 +9,7 @@ interface Props {
   }
 }
 
-export default async function PetPage({ searchParams }: Props) {
+export default async function OwnerPage({ searchParams }: Props) {
   const { page, per_page, sort, name } = searchParams
   console.log({
     name,
@@ -24,17 +25,16 @@ export default async function PetPage({ searchParams }: Props) {
     name: typeof name === 'string' ? { contains: name } : undefined,
   }
 
-  const allPet = db.pet.findMany({
+  const allOwner = db.owner.findMany({
     select: {
       id: true,
       name: true,
-      birthdate: true,
-      gender: true,
-      breedId: true,
-      ownerId: true,
-      owner: true,
-      breed: true,
-      Appointments: true,
+      surname: true,
+      city: true,
+      phone: true,
+      address: true,
+      email: true,
+      // Pet: true,
       createdAt: true,
       updatedAt: true,
     },
@@ -47,18 +47,21 @@ export default async function PetPage({ searchParams }: Props) {
     where,
   })
 
-  const totalPet = db.pet.count({ where })
+  const totalOwner = db.owner.count({ where })
 
-  const result = await db.$transaction([allPet, totalPet])
+  const result = await db.$transaction([allOwner, totalOwner])
 
   const pageCount = Math.ceil(result[1] / limit)
 
   return (
     <>
       {/* Title and Buttons for add*/}
-      <HeaderPet />
-      {/* Table for show the pet */}
-      <PetsTableShell data={result[0]} pageCount={pageCount} />
+      <DashboardHeader heading='Propietarios'>
+        <HeaderOwner />
+      </DashboardHeader>
+
+      {/* Table for show the Owner */}
+      <OwnersTableShell data={result[0]} pageCount={pageCount} />
     </>
   )
 }

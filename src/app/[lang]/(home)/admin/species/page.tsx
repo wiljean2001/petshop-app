@@ -1,5 +1,6 @@
-import { HeaderSchedule } from '@/components/data-table-shell/schedules/header-schedule'
-import { ScheduleTableShell } from '@/components/data-table-shell/schedules/schedules-table-shell'
+import { HeaderSpecie } from '@/components/data-table-shell/species/header'
+import { SpeciesTableShell } from '@/components/data-table-shell/species/table-shell'
+import { DashboardHeader } from '@/components/layout/auth/header'
 import { db } from '@/lib/prisma'
 
 interface Props {
@@ -8,12 +9,10 @@ interface Props {
   }
 }
 
-export default async function SchedulesPage({ searchParams }: Props) {
-  const { page, per_page, sort, title, status, priority } = searchParams
+export default async function Specie({ searchParams }: Props) {
+  const { page, per_page, sort, name } = searchParams
   console.log({
-    title,
-    status,
-    priority,
+    name,
   })
 
   // limit the number of pages to be returned
@@ -23,15 +22,13 @@ export default async function SchedulesPage({ searchParams }: Props) {
   const take = typeof per_page === 'string' ? parseInt(per_page) : 10
 
   const where = {
-    day_week: typeof title === 'string' ? { contains: title } : undefined,
+    name: typeof name === 'string' ? { contains: name } : undefined,
   }
 
-  const allSchedule = db.schedule.findMany({
+  const allSpecie = db.specie.findMany({
     select: {
       id: true,
-      day_week: true,
-      closingHour: true,
-      openingHour: true,
+      name: true,
       createdAt: true,
       updatedAt: true,
     },
@@ -44,18 +41,20 @@ export default async function SchedulesPage({ searchParams }: Props) {
     where,
   })
 
-  const totalClinics = db.schedule.count({ where })
+  const totalSpecie = db.specie.count({ where })
 
-  const result = await db.$transaction([allSchedule, totalClinics])
+  const result = await db.$transaction([allSpecie, totalSpecie])
 
   const pageCount = Math.ceil(result[1] / limit)
 
   return (
     <>
       {/* Title and Buttons for add*/}
-      <HeaderSchedule />
-      {/* Table for show the schedules */}
-      <ScheduleTableShell data={result[0]} pageCount={pageCount} />
+      <DashboardHeader heading='Especies'>
+      <HeaderSpecie />
+      </DashboardHeader>
+      {/* Table for show the Specie */}
+      <SpeciesTableShell data={result[0]} pageCount={pageCount} />
     </>
   )
 }

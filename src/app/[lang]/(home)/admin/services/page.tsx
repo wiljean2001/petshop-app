@@ -1,6 +1,8 @@
 import { HeaderService } from '@/components/data-table-shell/services/header'
 import { ServicesTableShell } from '@/components/data-table-shell/services/table-shell'
+import { DashboardHeader } from '@/components/layout/auth/header'
 import { db } from '@/lib/prisma'
+import { States_services } from '@prisma/client'
 
 interface Props {
   searchParams: {
@@ -9,9 +11,10 @@ interface Props {
 }
 
 export default async function ServicePage({ searchParams }: Props) {
-  const { page, per_page, sort, name } = searchParams
+  const { page, per_page, sort, name, state } = searchParams
   console.log({
     name,
+    state,
   })
 
   // limit the number of pages to be returned
@@ -20,8 +23,14 @@ export default async function ServicePage({ searchParams }: Props) {
   const skip = (typeof page === 'string' ? parseInt(page) - 1 : 0) * limit
   const take = typeof per_page === 'string' ? parseInt(per_page) : 10
 
+  const statuses =
+    typeof state === 'string'
+      ? (state?.split('.') as States_services[]) ?? []
+      : undefined
+
   const where = {
     name: typeof name === 'string' ? { contains: name } : undefined,
+    state: typeof state === 'string' ? { in: statuses } : undefined,
   }
 
   const allService = db.service.findMany({
@@ -56,7 +65,9 @@ export default async function ServicePage({ searchParams }: Props) {
   return (
     <>
       {/* Title and Buttons for add*/}
-      <HeaderService />
+      <DashboardHeader heading='Servicios'>
+        <HeaderService />
+      </DashboardHeader>
       {/* Table for show the service */}
       <ServicesTableShell data={result[0]} pageCount={pageCount} />
     </>

@@ -3,17 +3,17 @@ import { Card } from '@/components/ui/card'
 import logo_login from '@/img/dog_shaking.webp'
 import { MotionDiv } from '@/components/layout/auth/motion-div'
 import { redirect } from 'next/navigation'
-import { getSSession } from '@/helpers/get-server-session'
+import { getCurrentUser } from '@/helpers/get-server-session'
 
 export default async function AuthLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
-  const session = await getSSession()
-  if (session) {
-    const role = session.user.role
-    redirect(`/${role}`)
+  const user = await getCurrentUser()
+  if (user) {
+    const role = user.role
+    redirect(role === 'admin' ? 'admin' : 'user')
   }
   return (
     <main className='bg-gradient-to-b from-white to-blue-200 dark:bg-background dark:from-background/60'>

@@ -1,5 +1,6 @@
-import { HeaderVeterinarian } from '@/components/data-table-shell/veterinarias/header-veterinarias'
-import { VeterinariansTableShell } from '@/components/data-table-shell/veterinarias/veterinarias-table-shell'
+import { HeaderSchedule } from '@/components/data-table-shell/schedules/header'
+import { ScheduleTableShell } from '@/components/data-table-shell/schedules/table-shell'
+import { DashboardHeader } from '@/components/layout/auth/header'
 import { db } from '@/lib/prisma'
 
 interface Props {
@@ -7,7 +8,8 @@ interface Props {
     [key: string]: string | string[] | undefined
   }
 }
-export default async function VeterinariansPage({ searchParams }: Props) {
+
+export default async function SchedulesPage({ searchParams }: Props) {
   const { page, per_page, sort, title, status, priority } = searchParams
   console.log({
     title,
@@ -22,19 +24,15 @@ export default async function VeterinariansPage({ searchParams }: Props) {
   const take = typeof per_page === 'string' ? parseInt(per_page) : 10
 
   const where = {
-    name: typeof title === 'string' ? { contains: title } : undefined,
+    day_week: typeof title === 'string' ? { contains: title } : undefined,
   }
 
-  const allClinic = db.veterinarian.findMany({
+  const allSchedule = db.schedule.findMany({
     select: {
       id: true,
-      name: true,
-      surname: true,
-      clinicId: true,
-      clinic: true,
-      phone: true,
-      email: true,
-      specialty: true,
+      day_week: true,
+      closingHour: true,
+      openingHour: true,
       createdAt: true,
       updatedAt: true,
     },
@@ -47,19 +45,22 @@ export default async function VeterinariansPage({ searchParams }: Props) {
     where,
   })
 
-  const totalClinics = db.clinic.count({ where })
+  const totalClinics = db.schedule.count({ where })
 
-  const result = await db.$transaction([allClinic, totalClinics])
+  const result = await db.$transaction([allSchedule, totalClinics])
 
   const pageCount = Math.ceil(result[1] / limit)
 
   return (
     <>
       {/* Title and Buttons for add*/}
-      <HeaderVeterinarian />
-
-      {/* Table for show the clinics */}
-      <VeterinariansTableShell data={result[0]} pageCount={pageCount} />
+      <DashboardHeader heading='Horarios'>
+        <HeaderSchedule />
+      </DashboardHeader>
+      {/* Table for show the schedules */}
+      <ScheduleTableShell data={result[0]} pageCount={pageCount} />
     </>
   )
 }
+
+// toolkit.fymconsulting

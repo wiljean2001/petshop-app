@@ -1,6 +1,7 @@
+import { HeaderPet } from '@/components/data-table-shell/pets/header'
+import { PetsTableShell } from '@/components/data-table-shell/pets/table-shell'
+import { DashboardHeader } from '@/components/layout/auth/header'
 import { db } from '@/lib/prisma'
-import { HeaderBreed } from '@/components/data-table-shell/breeds/header'
-import { BreedsTableShell } from '@/components/data-table-shell/breeds/table-shell'
 
 interface Props {
   searchParams: {
@@ -8,7 +9,7 @@ interface Props {
   }
 }
 
-export default async function BreedsPage({ searchParams }: Props) {
+export default async function PetPage({ searchParams }: Props) {
   const { page, per_page, sort, name } = searchParams
   console.log({
     name,
@@ -24,12 +25,20 @@ export default async function BreedsPage({ searchParams }: Props) {
     name: typeof name === 'string' ? { contains: name } : undefined,
   }
 
-  const allBreeds = db.breed.findMany({
+  const allPet = db.pet.findMany({
     select: {
       id: true,
       name: true,
-      specieId: true,
-      specie: true,
+      birthdate: true,
+      gender: true,
+      color: true,
+      derivedFrom: true,
+      medicalNotes: true,
+      breedId: true,
+      ownerId: true,
+      owner: true,
+      breed: true,
+      Appointments: true,
       createdAt: true,
       updatedAt: true,
     },
@@ -42,19 +51,20 @@ export default async function BreedsPage({ searchParams }: Props) {
     where,
   })
 
-  const totalClinics = db.breed.count({ where })
+  const totalPet = db.pet.count({ where })
 
-  const result = await db.$transaction([allBreeds, totalClinics])
+  const result = await db.$transaction([allPet, totalPet])
 
   const pageCount = Math.ceil(result[1] / limit)
 
   return (
     <>
       {/* Title and Buttons for add*/}
-      <HeaderBreed />
-
-      {/* Table for show the clinics */}
-      <BreedsTableShell data={result[0]} pageCount={pageCount} />
+      <DashboardHeader heading='Mascotas'>
+        <HeaderPet />
+      </DashboardHeader>
+      {/* Table for show the pet */}
+      <PetsTableShell data={result[0]} pageCount={pageCount} />
     </>
   )
 }

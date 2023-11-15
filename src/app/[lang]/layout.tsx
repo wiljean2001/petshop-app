@@ -4,7 +4,8 @@ import '@/styles/globals.css'
 import type { Metadata } from 'next'
 import { Locale, i18n } from '@/config/i18n.config'
 import { TailwindIndicator } from '@/components/tailwind-indicator'
-import { constructMetadata } from '@/lib/utils'
+import { cn, constructMetadata } from '@/lib/utils'
+import { montserrat } from '@/components/fonts'
 // const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = constructMetadata()
@@ -23,7 +24,8 @@ export default function RootLayout({
   // inter.className
   return (
     <html lang={params.lang}>
-      <body className='flex flex-col min-h-screen'>
+      <body className={cn(montserrat.className,
+        'antialiased flex flex-col min-h-screen')}>
         <Provider>{children}</Provider>
         <TailwindIndicator />
       </body>

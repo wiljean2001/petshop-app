@@ -1,6 +1,7 @@
-import SimpleCard from '@/components/cards/simple-card'
-import { UsersTableShell } from '@/components/data-table-shell/users/users-table-shell'
+import { UserTableShell } from '@/components/data-table-shell/users/table-shell'
+import { DashboardHeader } from '@/components/layout/auth/header'
 import { db } from '@/lib/prisma'
+import { ISingUpForm } from '@/models/user'
 
 interface MillionPageProps {
   searchParams: {
@@ -33,6 +34,9 @@ export default async function UsersPage({ searchParams }: MillionPageProps) {
       name: true,
       email: true,
       role: true,
+      password: true,
+      image: true,
+      emailVerified: true,
       createdAt: true,
       updatedAt: true,
     },
@@ -53,13 +57,14 @@ export default async function UsersPage({ searchParams }: MillionPageProps) {
   console.log('🚀 ~ file: page.tsx:43 ~ UsersPage ~ result:', result)
 
   return (
-    <div>
-      <h3 className='text-2xl font-semibold leading-none tracking-tight'>
-        Usuarios
-      </h3>
+    <>
+      <DashboardHeader heading='Usuarios'>
+        {/* <HeaderUser /> */}
+      </DashboardHeader>
+
       {/* Buttons for add, edit, delete a clinic */}
       {/* <HeaderClinics /> */}
-      <UsersTableShell data={result[0]} pageCount={pageCount} />
-    </div>
+      <UserTableShell data={result[0] as ISingUpForm[]} pageCount={pageCount} />
+    </>
   )
 }

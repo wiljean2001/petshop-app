@@ -2,7 +2,7 @@ import { DocsSidebarNav } from '@/components/layout/sidebar/sidebar-nav'
 import { SiteHeader } from '@/components/layout/sidebar/site-header'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { docsConfig } from '@/config/docs'
-import { getSSession } from '@/helpers/get-server-session'
+import { getCurrentUser } from '@/helpers/get-server-session'
 // import Footer from '@/components/layout/footer/footer'
 
 export default async function HomeLayout({
@@ -10,14 +10,16 @@ export default async function HomeLayout({
 }: {
   children: React.ReactNode
 }) {
-  const session = await getSSession()
-  const role = session?.user.role
-  const { mainNav, sidebarNav } = docsConfig(role)
+  const user = await getCurrentUser()
+
+  const { mainNav, sidebarNav } = docsConfig(
+    user?.role === 'admin' ? 'admin' : 'user'
+  )
 
   return (
     <>
       <SiteHeader mainNav={mainNav} sidebarNav={sidebarNav} />
-      {!session ? (
+      {!user ? (
         <main>{children}</main>
       ) : (
         <div className='container flex-1 items-start md:grid md:grid-cols-[220px_minmax(0,1fr)] md:gap-6 lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-10'>
