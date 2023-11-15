@@ -1,9 +1,8 @@
-// export { default } from "next-auth/middleware";
 import { i18n } from '@/config/i18n.config'
 import getLocale from '@/lib/i18n/locale'
-import { withAuth } from 'next-auth/middleware'
 import { NextRequest, NextResponse } from 'next/server'
-import { ROLES } from './config/auth'
+import { auth } from './lib/next-auth/options'
+import { NextApiRequest } from 'next'
 
 const publicPages = ['/', '/login', '/register']
 
@@ -59,81 +58,70 @@ function setCORSHeaders(req: NextRequest) {
   response.headers.set('Access-Control-Max-Age', maxAge?.toString() ?? '')
 }
 
-export function middleware(request: NextRequest) {
-  // const { pathname } = request.nextUrl;
-  // const locale = getLocale(request);
+// export function middleware(request: NextRequest) {
+//   // const { pathname } = request.nextUrl;
 
-  const pathname = request.nextUrl.pathname
-  const locale = getLocale(request)
+//     return (authMiddleware as any)(request)
+// }
 
-  const pathnameIsMissingLocale = i18n.locales.every(
-    (locale) => !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`
-  )
-  if (pathnameIsMissingLocale) {
-    // Redirect if there is no locale
-    return NextResponse.redirect(
-      new URL(
-        `/${locale}${pathname.startsWith('/') ? '' : '/'}${pathname}`,
-        request.url
-      )
-    )
-  }
+// `withAuth` augments your `Request` with the user's token.
+// export default auth((req) => {
+//   // req.auth
+// })
 
-  if (!isPublicPage(pathname, locale!)) {
-    return (authMiddleware as any)(request)
-  }
-}
-
-const authMiddleware = withAuth(
-  // `withAuth` augments your `Request` with the user's token.
-  function middleware(req) {
-    setCORSHeaders(req)
+export default auth(
+  (req) => {
     const pathname = req.nextUrl.pathname
-    const token = req.nextauth.token
-
     const [_, lang, role, ...rest] = pathname.split('/')
+    const locale = getLocale(req)
 
-    if (token?.role !== role) {
+    const pathnameIsMissingLocale = i18n.locales.every(
+      (locale) =>
+        !pathname.startsWith(`/${locale}/`) && pathname !== `/${locale}`
+    )
+    if (pathnameIsMissingLocale) {
+      // Redirect if there is no locale
       return NextResponse.redirect(
-        new URL(`/${lang}/${token?.role}/${rest}`, req.url)
+        new URL(
+          `/${locale}${pathname.startsWith('/') ? '' : '/'}${pathname}`,
+          req.url
+        )
       )
     }
-  },
-  {
-    callbacks: {
-      authorized: ({ token }) => !!token,
-    },
-    pages: {
-      signIn: '/login',
-      signOut: '/login',
-      // error: '/login',
-    },
+
+    setCORSHeaders(req)
+
+    const session = req.auth
+    if (!isPublicPage(pathname, locale!)) {
+      if (
+        pathname.startsWith(`/${lang}/${role}`) &&
+        session?.user.role !== role
+      ) {
+        return NextResponse.rewrite(new URL('/', req.url))
+      }
+    }
+    // const regexAdmin = new RegExp('/api/admin/*')
+    // const regexUser = new RegExp('/api/user/*')
+    // if (regexAdmin.test(req.url) && req.token?.role !== 'admin') {
+    //   return NextResponse.rewrite(new URL('/', req.url))
+    // }
+    // if (regexUser.test(req.url) && req.nextauth.token?.role !== 'user') {
+    //   return NextResponse.rewrite(new URL('/', req.url))
+    // }
   }
+  // {
+  //   callbacks: {
+  //     authorized: ({ token }) => !!token,
+  //   },
+  //   pages: {
+  //     signIn: '/login',
+  //     signOut: '/login',
+  //     // error: '/login',
+  //   },
+  // }
 )
 
 // Pages protected
 export const config = {
   matcher: ['/((?!api|_next|.*\\..*).*)'],
 }
-
-// '/admin/:path*',
-// '/user/:path*',
-// '/((?!api|_next/static|_next/image|favicon.ico).*)',
-// '/api/graphql/', // :path*
-// '/api/user/:path*',
-// , "/api/admin/:path*", "/api/user/:path*"
-
-// const regexAdmin = new RegExp("/api/admin/*");
-// const regexUser = new RegExp("/api/user/*");
-// if (regexAdmin.test(req.url) && token.role !== "admin") {
-//   console.log(
-//     "\n ------------------- TEST REGIX ADMIN ------------------- \n"
-//   );
-//   return NextResponse.rewrite(new URL("/", req.url));
-// }
-// if (regexUser.test(req.url) && token.role !== "user") {
-//   console.log(
-//     "\n ------------------- TEST REGIX USER ------------------- \n"
-//   );
-//   return NextResponse.rewrite(new URL("/", req.url));
-// }
