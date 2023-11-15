@@ -22,7 +22,7 @@ export async function createService({ input }: Props) {
   })
 
   if (!res.ok) {
-    throw new Error(`Failed to create Service: ${res.statusText}`)
+    throw new Error(`Fallo en la creación de los servicios: ${res.statusText}`)
   }
 
   const Service: IService = await res.json()
@@ -36,36 +36,26 @@ export async function deleteService({ id }: { id: string }) {
     headers: { 'Content-Type': 'application/json' },
   })
   if (!res.ok) {
-    throw new Error(`Failed to Service deleted: ${res.statusText}`)
+    throw new Error(`Fallo en la eliminación de los servicios: ${res.statusText}`)
   }
 
   const ok: boolean = await res.json()
   return ok
 }
 
-// export async function updateService({ input }: Props) {
-//   validateService(input)
-//   const res = await fetch(`${siteConfig.url}/admin/services/update`, {
-//     body: JSON.stringify(input),
-//     headers: { 'Content-Type': 'application/json' },
-//   })
-//   if (!res.ok) {
-//     throw new Error(`Failed to create user: ${res.statusText}`)
-//   }
+export async function updateService({ input }: Props) {
+  validateService(input)
+  const res = await fetch(`${siteConfig.url}/api/admin/services/${input.id}`, {
+    method: 'PUT',
+    body: JSON.stringify(input),
+    headers: { 'Content-Type': 'application/json' },
+  })
 
-//   const Service: IService = await res.json()
-//   return Service
-// }
-// export async function deleteService({ id }: { id: string }) {
+  if (!res.ok) {
+    throw new Error(`Fallo en la actualización de los servicios: ${res.statusText}`)
+  }
 
-//   const res = await fetch(`${siteConfig.url}/admin/services/delete`, {
-//     body: JSON.stringify(input),
-//     headers: { 'Content-Type': 'application/json' },
-//   })
-//   if (!res.ok) {
-//     throw new Error(`Failed to create user: ${res.statusText}`)
-//   }
+  const Service: any = await res.json()
 
-//   const Service: IService = await res.json()
-//   return Service
-// }
+  return Service
+}

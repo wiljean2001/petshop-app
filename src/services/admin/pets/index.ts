@@ -22,7 +22,9 @@ export async function createPet({ input }: Props) {
   })
 
   if (!res.ok) {
-    throw new Error(`Failed to create pet: ${res.statusText}`)
+    throw new Error(
+      `Fallo en la actualización creación de la mascota: ${res.statusText}`
+    )
   }
 
   const pet: IPet = await res.json()
@@ -36,36 +38,30 @@ export async function deletePet({ id }: { id: string }) {
     headers: { 'Content-Type': 'application/json' },
   })
   if (!res.ok) {
-    throw new Error(`Failed to pet deleted: ${res.statusText}`)
+    throw new Error(
+      `Fallo en la actualización eliminación de la mascota: ${res.statusText}`
+    )
   }
 
   const ok: boolean = await res.json()
   return ok
 }
 
-// export async function updatePet({ input }: Props) {
-//   validatePet(input)
-//   const res = await fetch(`${siteConfig.url}/admin/pets/update`, {
-//     body: JSON.stringify(input),
-//     headers: { 'Content-Type': 'application/json' },
-//   })
-//   if (!res.ok) {
-//     throw new Error(`Failed to create user: ${res.statusText}`)
-//   }
+export async function updatePet({ input }: Props) {
+  validatePet(input)
+  const res = await fetch(`${siteConfig.url}/api/admin/pets/${input.id}`, {
+    method: 'PUT',
+    body: JSON.stringify(input),
+    headers: { 'Content-Type': 'application/json' },
+  })
 
-//   const pet: IPet = await res.json()
-//   return pet
-// }
-// export async function deletePet({ id }: { id: string }) {
+  if (!res.ok) {
+    throw new Error(
+      `Fallo en la actualización actualización de la mascota: ${res.statusText}`
+    )
+  }
 
-//   const res = await fetch(`${siteConfig.url}/admin/pets/delete`, {
-//     body: JSON.stringify(input),
-//     headers: { 'Content-Type': 'application/json' },
-//   })
-//   if (!res.ok) {
-//     throw new Error(`Failed to create user: ${res.statusText}`)
-//   }
+  const pet: IPet = await res.json()
 
-//   const pet: IPet = await res.json()
-//   return pet
-// }
+  return pet
+}

@@ -20,7 +20,9 @@ export async function getSpecies() {
   })
 
   if (!res.ok) {
-    throw new Error(`Failed to get species: ${res.statusText}`)
+    throw new Error(
+      `Fallo en la crreación|eliminación|actualización de la especie: ${res.statusText}`
+    )
   }
 
   const specie: ISpecie[] = await res.json()
@@ -36,7 +38,7 @@ export async function createSpecie({ input }: Props) {
   })
 
   if (!res.ok) {
-    throw new Error(`Failed to create specie: ${res.statusText}`)
+    throw new Error(`Fallo en la crreación de la especie: ${res.statusText}`)
   }
 
   const specie: ISpecie = await res.json()
@@ -50,36 +52,28 @@ export async function deleteSpecie({ id }: { id: string }) {
     headers: { 'Content-Type': 'application/json' },
   })
   if (!res.ok) {
-    throw new Error(`Failed to specie deleted: ${res.statusText}`)
+    throw new Error(`Fallo en la eliminación de la especie: ${res.statusText}`)
   }
 
   const ok: boolean = await res.json()
   return ok
 }
 
-// export async function updateSpecie({ input }: Props) {
-//   validateSpecie(input)
-//   const res = await fetch(`${siteConfig.url}/admin/species/update`, {
-//     body: JSON.stringify(input),
-//     headers: { 'Content-Type': 'application/json' },
-//   })
-//   if (!res.ok) {
-//     throw new Error(`Failed to create user: ${res.statusText}`)
-//   }
+export async function updateSpecie({ input }: Props) {
+  validateSpecie(input)
+  const res = await fetch(`${siteConfig.url}/api/admin/species/${input.id}`, {
+    method: 'PUT',
+    body: JSON.stringify(input),
+    headers: { 'Content-Type': 'application/json' },
+  })
 
-//   const specie: ISpecie = await res.json()
-//   return specie
-// }
-// export async function deleteSpecie({ id }: { id: string }) {
+  if (!res.ok) {
+    throw new Error(
+      `Fallo en la actualización de la especie: ${res.statusText}`
+    )
+  }
 
-//   const res = await fetch(`${siteConfig.url}/admin/species/delete`, {
-//     body: JSON.stringify(input),
-//     headers: { 'Content-Type': 'application/json' },
-//   })
-//   if (!res.ok) {
-//     throw new Error(`Failed to create user: ${res.statusText}`)
-//   }
+  const specie: ISpecie = await res.json()
 
-//   const specie: ISpecie = await res.json()
-//   return specie
-// }
+  return specie
+}

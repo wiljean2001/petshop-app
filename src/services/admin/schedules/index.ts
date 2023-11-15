@@ -22,7 +22,7 @@ export async function createSchedule({ input }: Props) {
   })
 
   if (!res.ok) {
-    throw new Error(`Failed to create Schedule: ${res.statusText}`)
+    throw new Error(`Fallo en la creación del horario: ${res.statusText}`)
   }
 
   const Schedule: ISchedule = await res.json()
@@ -36,36 +36,26 @@ export async function deleteSchedule({ id }: { id: string }) {
     headers: { 'Content-Type': 'application/json' },
   })
   if (!res.ok) {
-    throw new Error(`Failed to Schedule deleted: ${res.statusText}`)
+    throw new Error(`Fallo en la eliminación del horario: ${res.statusText}`)
   }
 
   const ok: boolean = await res.json()
   return ok
 }
 
-// export async function updateSchedule({ input }: Props) {
-//   validateSchedule(input)
-//   const res = await fetch(`${siteConfig.url}/admin/Schedules/update`, {
-//     body: JSON.stringify(input),
-//     headers: { 'Content-Type': 'application/json' },
-//   })
-//   if (!res.ok) {
-//     throw new Error(`Failed to create user: ${res.statusText}`)
-//   }
+export async function updateSchedule({ input }: Props) {
+  validateSchedule(input)
+  const res = await fetch(`${siteConfig.url}/api/admin/schedules/${input.id}`, {
+    method: 'PUT',
+    body: JSON.stringify(input),
+    headers: { 'Content-Type': 'application/json' },
+  })
 
-//   const Schedule: ISchedule = await res.json()
-//   return Schedule
-// }
-// export async function deleteSchedule({ id }: { id: string }) {
+  if (!res.ok) {
+    throw new Error(`Fallo en la actualización del horario: ${res.statusText}`)
+  }
 
-//   const res = await fetch(`${siteConfig.url}/admin/Schedules/delete`, {
-//     body: JSON.stringify(input),
-//     headers: { 'Content-Type': 'application/json' },
-//   })
-//   if (!res.ok) {
-//     throw new Error(`Failed to create user: ${res.statusText}`)
-//   }
+  const Schedule: ISchedule = await res.json()
 
-//   const Schedule: ISchedule = await res.json()
-//   return Schedule
-// }
+  return Schedule
+}

@@ -20,7 +20,7 @@ export async function getOwners() {
   })
 
   if (!res.ok) {
-    throw new Error(`Failed to get owners: ${res.statusText}`)
+    throw new Error(`Fallo en la _ del propietario: ${res.statusText}`)
   }
 
   const owners: IOwner[] = await res.json()
@@ -37,7 +37,7 @@ export async function createOwner({ input }: Props) {
   })
 
   if (!res.ok) {
-    throw new Error(`Failed to create owner: ${res.statusText}`)
+    throw new Error(`Fallo en la creación del propietario: ${res.statusText}`)
   }
 
   const owner: IOwner = await res.json()
@@ -51,36 +51,30 @@ export async function deleteOwner({ id }: { id: string }) {
     headers: { 'Content-Type': 'application/json' },
   })
   if (!res.ok) {
-    throw new Error(`Failed to owner deleted: ${res.statusText}`)
+    throw new Error(
+      `Fallo en la eliminación del propietario: ${res.statusText}`
+    )
   }
 
   const ok: boolean = await res.json()
   return ok
 }
 
-// export async function updateOwner({ input }: Props) {
-//   validateOwner(input)
-//   const res = await fetch(`${siteConfig.url}/admin/owners/update`, {
-//     body: JSON.stringify(input),
-//     headers: { 'Content-Type': 'application/json' },
-//   })
-//   if (!res.ok) {
-//     throw new Error(`Failed to create user: ${res.statusText}`)
-//   }
+export async function updateOwner({ input }: Props) {
+  validateOwner(input)
+  const res = await fetch(`${siteConfig.url}/api/admin/owners/${input.id}`, {
+    method: 'PUT',
+    body: JSON.stringify(input),
+    headers: { 'Content-Type': 'application/json' },
+  })
 
-//   const owner: IOwner = await res.json()
-//   return owner
-// }
-// export async function deleteOwner({ id }: { id: string }) {
+  if (!res.ok) {
+    throw new Error(
+      `Fallo en la actualización del propietario: ${res.statusText}`
+    )
+  }
 
-//   const res = await fetch(`${siteConfig.url}/admin/owners/delete`, {
-//     body: JSON.stringify(input),
-//     headers: { 'Content-Type': 'application/json' },
-//   })
-//   if (!res.ok) {
-//     throw new Error(`Failed to create user: ${res.statusText}`)
-//   }
+  const owner: IOwner = await res.json()
 
-//   const owner: IOwner = await res.json()
-//   return owner
-// }
+  return owner
+}

@@ -25,7 +25,7 @@ export async function createClinic({ input }: Props) {
     headers: { 'Content-Type': 'application/json' },
   })
   if (!res.ok) {
-    throw new Error(`Failed to create clinic: ${res.statusText}`)
+    throw new Error(`Fallo en la creación de la clinica: ${res.statusText}`)
   }
 
   const clinic: IClinic = await res.json()
@@ -37,36 +37,26 @@ export async function deleteClinic({ id }: { id: string }) {
     headers: { 'Content-Type': 'application/json' },
   })
   if (!res.ok) {
-    throw new Error(`Failed to clinic deleted: ${res.statusText}`)
+    throw new Error(`Fallo en la eliminación de la clinica: ${res.statusText}`)
   }
 
   const ok: boolean = await res.json()
   return ok
 }
 
-// export async function updateClinic({ input }: Props) {
-//   validateClinic(input)
-//   const res = await fetch(`${siteConfig.url}/admin/clinics/update`, {
-//     body: JSON.stringify(input),
-//     headers: { 'Content-Type': 'application/json' },
-//   })
-//   if (!res.ok) {
-//     throw new Error(`Failed to create user: ${res.statusText}`)
-//   }
+export async function updateClinic({ input }: Props) {
+  validateClinic(input)
+  const res = await fetch(`${siteConfig.url}/api/admin/clinics/${input.id}`, {
+    body: JSON.stringify(input),
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+  })
+  if (!res.ok) {
+    throw new Error(
+      `Fallo en la actualización de la clinica: ${res.statusText}`
+    )
+  }
 
-//   const clinic: IClinic = await res.json()
-//   return clinic
-// }
-// export async function deleteClinic({ id }: { id: string }) {
-
-//   const res = await fetch(`${siteConfig.url}/admin/clinics/delete`, {
-//     body: JSON.stringify(input),
-//     headers: { 'Content-Type': 'application/json' },
-//   })
-//   if (!res.ok) {
-//     throw new Error(`Failed to create user: ${res.statusText}`)
-//   }
-
-//   const clinic: IClinic = await res.json()
-//   return clinic
-// }
+  const clinic: IClinic = await res.json()
+  return clinic
+}
