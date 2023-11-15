@@ -26,7 +26,7 @@ const ErrorTypes = {
     errorStatus: 400,
   },
   INTERNAL_SERVER_ERROR: {
-    errorCode: "INTERNAL_SERVER_ERROR",
+    errorCode: 'INTERNAL_SERVER_ERROR',
     errorStatus: 500,
   },
 }
@@ -50,11 +50,12 @@ type Headers = {
  */
 export const ErrorResponse = (
   status: ErrorTypeKeys,
+  error?: string,
   headers: Headers = {}
 ) => {
-  const errorType = ErrorTypes[status];
+  const errorType = ErrorTypes[status]
   return NextResponse.json(
-    { error: errorType.errorCode },
+    { error: error && errorType.errorCode },
     {
       status: errorType.errorStatus,
       headers: {
@@ -82,7 +83,6 @@ export const SuccessResponse = <T>(
   status: number,
   headers: Headers = {}
 ) => {
-  
   return NextResponse.json(data, {
     status,
     headers: {

@@ -1,10 +1,13 @@
 // helper.js
-import { authOptions } from '@/lib/next-auth/options'
-import { getServerSession } from 'next-auth/next'
+
+import { auth } from '@/lib/next-auth/options'
+
 /**
  *
- * @returns getServerSession: get server session from next auth
+ * @returns getServerSession: get user signed from next auth
  */
-export async function getSSession() {
-  return await getServerSession(authOptions)
+export async function getCurrentUser() {
+  const session = await auth()
+
+  return session?.user
 }

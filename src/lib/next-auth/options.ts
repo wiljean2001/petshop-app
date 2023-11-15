@@ -1,57 +1,59 @@
-import GitHubProvider, { GithubProfile } from 'next-auth/providers/github'
+import GitHub, { GitHubProfile } from 'next-auth/providers/github'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { PrismaAdapter } from '@auth/prisma-adapter'
 import { db } from '@/lib/prisma'
-import { ROLES } from '@/config/auth'
-import { NextAuthOptions } from 'next-auth'
-import { Role, User } from '@prisma/client'
+import { User } from '@prisma/client'
+import NextAuth from 'next-auth'
 
-let userRoleId: Role // Variable para almacenar el roleId
+// let userRoleId: Role // Variable para almacenar el roleId
 
-async function getRoleId(roleName: string) {
-  if (!userRoleId) {
-    // Si userRoleId no está definido, realiza la consulta
-    const role = await db.role.findUnique({
-      where: { name: roleName },
-    })
-    if (!role) throw new Error('Role not found')
-    userRoleId = role // Almacena el roleId en userRoleId
-  }
-  return userRoleId // Retorna el roleId almacenado
-}
+// async function getRoleId(roleName: string) {
+//   if (!userRoleId) {
+//     // Si userRoleId no está definido, realiza la consulta
+//     const role = await db.role.findUnique({
+//       where: { name: roleName },
+//     })
+//     if (!role) throw new Error('Role not found')
+//     userRoleId = role // Almacena el roleId en userRoleId
+//   }
+//   return userRoleId // Retorna el roleId almacenado
+// }
 
-const authOptions: NextAuthOptions = {
+// export const {
+//   handlers: { GET, POST },
+// auth,
+
+export const {
+  handlers: { GET, POST },
+  auth,
+} = NextAuth({
   adapter: PrismaAdapter(db),
   providers: [
-    GitHubProvider({
-      async profile(profile: GithubProfile): Promise<User> {
-        const role = await getRoleId(ROLES.USER)
+    GitHub({
+      async profile(profile: GitHubProfile): Promise<User> {
+        // const role = await getRoleId(ROLES.USER)
         return {
           id: profile.id.toString(),
           name: profile.name || profile.login,
-          roleId: role.id,
-          image: profile.avatar_url || profile.image,
+          // ...profile as unknown as User,
+          role: profile.role === 'user' ? 'user' : 'admin',
+          // roleId: role.id,
+          image: profile.avatar_url || (profile.image as string),
           email: profile.email || profile.name || profile.login,
-          password: profile.password,
-          emailVerified: profile.emailVerified,
+          password: profile.password as string,
+          emailVerified: (profile.emailVerified as Date) || null,
           createdAt: new Date(profile.created_at),
           updatedAt: new Date(profile.updated_at),
         }
       },
-
       clientId: process.env.GITHUB_ID as string,
       clientSecret: process.env.GITHUB_SECRET as string,
     }),
-
     CredentialsProvider({
       type: 'credentials',
       // name: 'Credentials',
       credentials: {},
       async authorize(credentials, req) {
-        console.log(
-          '🚀 ~ file: options.ts:36 ~ authorize ~ credentials:',
-          credentials
-        )
         try {
           const { email, password } = credentials as {
             email: string
@@ -69,7 +71,6 @@ const authOptions: NextAuthOptions = {
             }
           )
           const user = await res.json()
-          console.log('🚀 ~ file: options.ts:57 ~ authorize ~ user:', user)
           if (res.ok && user) {
             return user
           } else {
@@ -108,42 +109,29 @@ const authOptions: NextAuthOptions = {
       //   session.user = { ...user, name: user.name || '' }
       // }
       if (session.user) {
-        const role = token.role || (token.role as any).name
         session.user.id = token.id as string
-        session.user.role = role
+        session.user.role = token.role as string
         session.user.accessToken = token.accessToken as string
       }
       return session
     },
     async jwt(params: any) {
-      const { user, account } = params
-      if (!user) return params.token // Retorna temprano si no hay user
-
-      const { roleId, role: userRole } = user
-      let role
-
-      if (roleId && !userRole) {
-        const _role = await getRoleId(ROLES.USER)
-        role = _role.name
-        console.log('🚀 ~ file: options.ts:134 ~ jwt ~ role:', role)
-      } else {
-        role = (userRole as Role).name || userRole
-      }
-      console.log('🚀 ~ file: options.ts:145 ~ jwt ~ {}:', {
-        ...params.token,
-        role,
-        id: user.id,
-        accessToken: account.access_token,
-      })
-
+      const { token, user, account } = params
+      if (!user) return token // Retorna temprano si no hay user
+      // if (roleId && !userRole) {
+      // const _role = await getRoleId(ROLES.USER)
+      // role = _role.name
+      //   console.log('🚀 ~ file: options.ts:134 ~ jwt ~ role:', role)
+      // } else {
+      //   role = (userRole as Role).name || userRole
+      // }
+      token.role = user.role
       return {
-        ...params.token,
-        role,
+        ...token,
+        // role,
         id: user.id,
         accessToken: account.access_token,
       }
     },
   },
-}
-
-export { authOptions }
+})

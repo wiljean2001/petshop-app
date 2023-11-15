@@ -22,7 +22,6 @@ export const SERVICES = [
       'Contamos con un equipo de profesionales que realiza cirugías seguras y efectivas.',
   },
 ]
-export const SERVICE_STATES = ['ACTIVO', 'INACTIVO', 'DESCONTINUADO']
 
 export const dateFormat: Intl.DateTimeFormatOptions = {
   weekday: 'short',
@@ -45,4 +44,23 @@ export enum OPTIONS_CRUD {
   CREATE,
   UPDATE,
   DELETE,
+}
+
+export const APPOINTMENTSTATUSTRANSLATIONS = {
+  PENDING: 'Pendiente',
+  CONFIRMED: 'Confirmada',
+  IN_PROCESS: 'En Proceso',
+  COMPLETED: 'Completada',
+  CANCELED: 'Cancelada',
+  NO_SHOW: 'No Presentado',
+}
+
+/**
+ * 
+ */
+export type ServiceStatusKey = 'ACTIVE' | 'INACTIVE' | 'UNCONTINUED'
+export const SERVICESTATUSTRANSLATIONS: Record<ServiceStatusKey, string> = {
+  ACTIVE: 'Activo',
+  INACTIVE: 'Inactivo',
+  UNCONTINUED: 'Descontinuado',
 }
