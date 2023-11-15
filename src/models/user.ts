@@ -10,6 +10,7 @@ import {
   nullable,
   boolean,
   number,
+  enumType,
 } from './valibot'
 
 // ! TODO: Add comments for all validations
@@ -22,34 +23,40 @@ export const LoginFormSchema = object({
 export type ILoginForm = Input<typeof LoginFormSchema>
 
 export const SignUpSchema = object({
+  id: optional(string()),
   email: string([email('Email invalido')]),
   password: string([minLength(8, 'Contraseña debe tener más de 8 caracteres')]),
   name: optional(string([minLength(2, 'Nombre invalido')])),
+  emailVerified: optional(date()),
+  image: optional(string()),
+  role: optional(enumType(['user', 'admin'])),
+  created_at: optional(date()),
+  updated_at: optional(date()),
 })
 /**
  *
  */
 export type ISingUpForm = Input<typeof SignUpSchema>
 
-export const PermissionSchema = object({
-  id: optional(string()),
-  name: string(),
-  created_at: optional(date()),
-  updated_at: optional(date()),
-})
+// export const PermissionSchema = object({
+//   id: optional(string()),
+//   name: string(),
+//   created_at: optional(date()),
+//   updated_at: optional(date()),
+// })
 
-export const RoleSchema = object({
-  id: optional(string()),
-  name: string(),
-  created_at: optional(date()),
-  updated_at: optional(date()),
-})
-export type IRole = Input<typeof RoleSchema>
+// export const RoleSchema = object({
+//   id: optional(string()),
+//   name: string(),
+//   created_at: optional(date()),
+//   updated_at: optional(date()),
+// })
+// export type IRole = Input<typeof RoleSchema>
 
-export const RolePermission = object({
-  roleId: string(),
-  permissionId: string(),
-})
+// export const RolePermission = object({
+//   roleId: string(),
+//   permissionId: string(),
+// })
 
 //
 
@@ -61,8 +68,7 @@ export const UserSchema = object({
   emailVerified: nullable(optional(string())),
   password: nullable(optional(string())),
   image: nullable(optional(string())),
-  roleId: string(),
-  role: RoleSchema,
+  role: enumType(['user', 'admin']),
   created_at: optional(date()),
   updated_at: optional(date()),
 })
@@ -71,7 +77,7 @@ export const UserRestrictSchema = object({
   id: optional(string()),
   name: string(),
   email: string(),
-  role: RoleSchema,
+  role: enumType(['user', 'admin']),
   createdAt: optional(date()),
   updatedAt: optional(date()),
 })

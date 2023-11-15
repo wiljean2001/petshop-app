@@ -2,7 +2,7 @@ export type IUserSession = {
   name: string
   email: string
   image?: string | null | undefined
-  id?: string | undefined
+  id?: string
   role?: string | undefined
   accessToken?: string | undefined
 }
@@ -68,17 +68,12 @@ export type DateFieldConfig = {
   description?: string
   withTime?: boolean
 }
-export type TimeFieldConfig = {
-  type: 'time'
-  name: string
-  label: string
-  description?: string
-}
 
 export type SelectFieldConfig = {
   type: 'select'
   name: string
   label: string
+  isMultiple: boolean
   options: { label: string; value: string }[]
   description?: string
 }

@@ -11,23 +11,12 @@ import {
   boolean,
   number,
   enumType,
+  recursive,
+  BaseSchema,
   isoTime,
   isoDate,
   isoDateTime,
 } from './valibot'
-
-export const idSchema = object({ id: string() })
-//
-export const ClinicSchema = object({
-  id: optional(string()),
-  name: string(),
-  location: string(),
-  image: nullable(string('Debes ingresar texto'), 'Campo Opcional'),
-  phone: nullable(string()),
-  createdAt: optional(date()),
-  updatedAt: optional(date()),
-})
-export type IClinic = Input<typeof ClinicSchema>
 
 //
 export const ScheduleSchema = object({
@@ -41,19 +30,29 @@ export const ScheduleSchema = object({
 export type ISchedule = Input<typeof ScheduleSchema>
 
 export const ClinicScheduleSchema = object({
-  clinicId: string(),
-  scheduleId: string(),
-  clinic: ClinicSchema,
   schedule: ScheduleSchema,
 })
-export type IClinicSchedule = Input<typeof ClinicScheduleSchema>
+export type IClinicScheduleSchema = Input<typeof ClinicScheduleSchema>
+//
+export const ClinicSchema = object({
+  id: optional(string()),
+  name: string(),
+  location: string(),
+  image: nullable(string('Debes ingresar texto'), 'Campo Opcional'),
+  phone: nullable(string()),
+  scheduleIds: optional(array(string())),
+  ClinicSchedule: optional(array(ClinicScheduleSchema)),
+  createdAt: optional(date()),
+  updatedAt: optional(date()),
+})
+export type IClinic = Input<typeof ClinicSchema>
 
 //
 export const VeterinarianSchema = object({
   id: optional(string()),
   name: string(),
   surname: string(),
-  clinicId: nullable(string()),
+  clinicId: string(),
   clinic: optional(nullable(ClinicSchema)),
   phone: string(),
   specialty: string(),
@@ -110,6 +109,9 @@ export const PetSchema = object({
   birthdate: nullable(date('Formato incorrecto')),
   // birthdate: nullable(string([isoDateTime('Formato incorrecto')])),
   gender: string(),
+  color: string(),
+  medicalNotes: optional(nullable(string())),
+  derivedFrom: optional(nullable(string())),
   ownerId: string(),
   breedId: string(),
   createdAt: optional(date()),
@@ -119,31 +121,36 @@ export const PetSchema = object({
 })
 export type IPet = Input<typeof PetSchema>
 
+export const ServiceDetailSchema = object({
+  id: optional(string()),
+  serviceId: optional(string()),
+  detailType: string(),
+  value: string(),
+  createdAt: optional(date()),
+  updatedAt: optional(date()),
+})
+
+export type IServiceDetail = Input<typeof ServiceDetailSchema>
+
 export const ServiceSchema = object({
   id: optional(string()),
   name: string(),
   description: string(),
   cost: number(),
   duration: number(),
-  state: enumType(['ACTIVO', 'INACTIVO', 'DESCONTINUADO']),
-  details: optional(
-    array(
-      object({
-        detailType: string(),
-        value: string(),
-      })
-    )
-  ),
+  state: enumType(['ACTIVE', 'INACTIVE', 'UNCONTINUED']),
+  ServiceDetails: optional(array(ServiceDetailSchema)),
   createdAt: optional(date()),
   updatedAt: optional(date()),
 })
+
 export type IService = Input<typeof ServiceSchema>
 
 export const AppointmentSchema = object({
   id: optional(string()),
-  petId: nullable(string()),
-  vetId: nullable(string()),
-  dateTime: optional(date()),
+  petId: string(),
+  vetId: string(),
+  dateTime: date(),
   status: enumType([
     'PENDING',
     'CONFIRMED',
@@ -154,27 +161,16 @@ export const AppointmentSchema = object({
   ]),
   createdAt: optional(date()),
   updatedAt: optional(date()),
-  pet: optional(nullable(PetSchema)),
-  veterinarian: optional(nullable(VeterinarianSchema)),
+  pet: optional(PetSchema),
+  veterinarian: optional(VeterinarianSchema),
 })
 export type IAppointment = Input<typeof AppointmentSchema>
-
-export const ServiceDetailSchema = object({
-  id: optional(string()),
-  serviceId: nullable(string()),
-  detailType: string(),
-  value: string(),
-  createdAt: optional(date()),
-  updatedAt: optional(date()),
-  service: optional(nullable(ServiceSchema)),
-})
-export type IServiceDetail = Input<typeof ServiceDetailSchema>
 
 // Asistencias
 export const AttendanceSchema = object({
   id: optional(string()),
-  appointmentId: nullable(string()),
-  date: optional(date()),
+  appointmentId: string(),
+  date: date(),
   createdAt: optional(date()),
   updatedAt: optional(date()),
   appointment: optional(nullable(AppointmentSchema)),
