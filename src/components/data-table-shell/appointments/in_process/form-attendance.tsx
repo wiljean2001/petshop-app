@@ -27,7 +27,6 @@ export default function FormAttendances({
   appointment,
   services,
 }: Props) {
-  console.log('🚀 ~ file: form-attendance.tsx:22 ~ appointment:', appointment)
   const form = useForm<IServiceAppointmentArray>({
     resolver: valibotResolver(ServiceAppointmentArraySchema),
     // defaultValues: {},
@@ -56,10 +55,6 @@ export default function FormAttendances({
           form.setValue(`services[${index}].id` as any, serviceAppointment.id)
           if (serviceAppointment.clinicalData) {
             const clinicalData = serviceAppointment.clinicalData
-            console.log(
-              '🚀 ~ file: form-attendance.tsx:59 ~ .forEach ~ clinicalData:',
-              clinicalData
-            )
 
             form.setValue(
               `services[${index}].clinicalData.id` as any,

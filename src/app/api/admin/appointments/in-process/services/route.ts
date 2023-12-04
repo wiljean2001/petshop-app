@@ -64,7 +64,6 @@ export async function PUT(req: NextRequest) {
     // const result = await db.$transaction([...serviceAppointmentUpdates])
     return SuccessResponse({}, 200)
   } catch (error) {
-    console.log('🚀 ~ file: route.ts:67 ~ PUT ~ error:', error)
     return ErrorResponse('BAD_USER_INPUT')
   }
 }

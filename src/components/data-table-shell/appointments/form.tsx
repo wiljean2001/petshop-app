@@ -78,8 +78,6 @@ export default function FormAppointment({
 
   useEffect(() => {
     const subscription = form.watch((value, { name, type }) => {
-      console.log('🚀 ~ file: form.tsx:81 ~ subscription ~ value:', value)
-
       // When input with name 'vetId' changed, update the state selectedClinic
       if (name === 'vetId') {
         const selectedVet = vets.find((vet) => vet.id === value.vetId)
@@ -159,7 +157,7 @@ export default function FormAppointment({
 
             // Si 'day' está en disabledDays, entonces verifica si 'day' es menor o igual a 'today'
             if (isDayInDisabledDays) {
-              return day <= today
+              return day < today
             }
 
             // Si 'day' no está en disabledDays, entonces no aplica la restricción

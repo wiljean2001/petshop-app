@@ -12,7 +12,7 @@ export async function PUT(req: NextRequest) {
   if (!attendanceId) return ErrorResponse('BAD_USER_INPUT')
 
   const input = await req.json()
-  console.log('🚀 ~ file: route.ts:15 ~ PUT ~ input:', input)
+  
 
   // Convert the props has dates
   if (input.emissionDate) {
@@ -39,10 +39,7 @@ export async function PUT(req: NextRequest) {
 
   // prescribedItem -> array of items
   const { instructions, emissionDate, id, prescribedItem } = validated.output
-  console.log(
-    '🚀 ~ file: route.ts:28 ~ PUT ~ validated.output:',
-    validated.output
-  )
+  
 
   try {
     if (id) {
@@ -108,7 +105,7 @@ export async function PUT(req: NextRequest) {
           },
         },
       })
-      console.log('🚀 ~ file: route.ts:52 ~ PUT ~ prescription:', prescription)
+     
       return SuccessResponse(prescription, 200)
     }
     // Create
@@ -135,11 +132,11 @@ export async function PUT(req: NextRequest) {
         },
       },
     })
-    console.log('🚀 ~ file: route.ts:80 ~ PUT ~ prescription:', prescription)
+    
 
     return SuccessResponse(prescription, 200)
   } catch (error) {
-    console.log('🚀 ~ file: route.ts:67 ~ PUT ~ error:', error)
+    
     return ErrorResponse('BAD_USER_INPUT')
   }
 }

@@ -67,10 +67,7 @@ export default function FormUpdateAppointment({
           disabled: (day: Date) => {
             // Crear una fecha para "hoy" que solo tenga año, mes y día (sin tiempo)
             const today = new Date()
-            console.log(
-              '🚀 ~ file: form-update.tsx:71 ~ inputs ~ today:',
-              today
-            )
+            
             today.setHours(0, 0, 0, 0)
 
             // Comprueba si 'day' está en disabledDays
@@ -79,7 +76,7 @@ export default function FormUpdateAppointment({
 
             // Si 'day' está en disabledDays, entonces verifica si 'day' es menor o igual a 'today'
             if (isDayInDisabledDays) {
-              return day <= today
+              return day < today
             }
 
             // Si 'day' no está en disabledDays, entonces no aplica la restricción

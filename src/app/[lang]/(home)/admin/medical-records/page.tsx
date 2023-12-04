@@ -69,10 +69,7 @@ export default async function MedicalRecordPage({ searchParams }: Props) {
 
   if (petId) {
     medicalRecord = (await getMedicalRecord(petId!)) as MedicalRecordType | null
-    console.log(
-      '🚀 ~ file: page.tsx:50 ~ MedicalRecordPage ~ medicalRecord:',
-      medicalRecord
-    )
+    
   }
 
   return (

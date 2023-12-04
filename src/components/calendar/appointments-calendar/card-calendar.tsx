@@ -96,10 +96,6 @@ export const CardCalendar = ({
     const date = getDateToString({
       date: appointment.scheduledDateTime,
     })
-    console.log(
-      '🚀 ~ file: card-calendar.tsx:99 ~ AppointmentCard ~ date:',
-      date
-    )
 
     const handleCancelAppointment = () => {
       showToast(
@@ -181,9 +177,7 @@ export const CardCalendar = ({
                 className={buttonVariants({
                   variant: 'default',
                 })}
-                href={
-                  `/es/admin/appointments/in_process?appointment=${appointment.id}`
-                }
+                href={`/es/admin/appointments/in_process?appointment=${appointment.id}`}
               >
                 Iniciar atención
               </Link>

@@ -11,7 +11,6 @@ interface Props {
 export const AddAppointment = ({ isOpen, onClose }: Props) => {
   const route = useRouter()
   const onSubmit = async (input: IAppointmentWithService) => {
-    console.log('🚀 ~ file: add.tsx:14 ~ onSubmit ~ input:', input)
     const res = await createAppointment({ input })
     if (res) {
       showToast(

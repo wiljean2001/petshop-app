@@ -137,9 +137,9 @@ export function DynamicForm<t extends FieldValues>({
   const allFields = watch() // Observa todos los campos
 
   // Puedes usar un efecto para mostrar los cambios en la consola
-  useEffect(() => {
-    console.log(allFields)
-  }, [allFields])
+  // useEffect(() => {
+  //   console.log(allFields)
+  // }, [allFields])
 
   const handleRemoveFieldSet = useCallback(
     (setId: string, fieldSetIndex: number) => {

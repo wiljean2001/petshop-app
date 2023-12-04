@@ -23,15 +23,6 @@ export default async function AppointmentPage({ searchParams }: Props) {
     owner,
   } = searchParams // filters, page and sorts
 
-  console.log(
-    '🚀 ~ file: page.tsx:16 ~ AppointmentPage ~ clinic, veterinarian, pet, date, appointmentStatus:',
-    clinic,
-    veterinarian,
-    pet,
-    date,
-    appointmentStatus,
-    owner
-  )
   // limit the number of pages to be returned
   const limit = typeof per_page === 'string' ? parseInt(per_page) : 10
   // Skip the first page if there are no more pages to return

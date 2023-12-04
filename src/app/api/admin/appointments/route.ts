@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
   }
 
   const { status, petId, vetId, scheduledDateTime, services } = validated.output
-  console.log('🚀 ~ file: route.ts:28 ~ POST ~ validated.output:', validated.output)
+  
 
   try {
     const appointments = await db.appointments.create({
@@ -54,7 +54,6 @@ export async function POST(req: NextRequest) {
     })
     return SuccessResponse(appointments, 200)
   } catch (error) {
-    console.log('🚀 ~ file: route.ts:57 ~ POST ~ error:', error)
     return ErrorResponse('BAD_REQUEST')
   }
 }

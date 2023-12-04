@@ -10,10 +10,10 @@ export async function PUT(req: NextRequest) {
   const attendanceId = searchParams.get('attendanceId')
 
   if (!attendanceId) return ErrorResponse('BAD_USER_INPUT')
-  console.log('🚀 ~ file: route.ts:13 ~ PUT ~ attendanceId:', attendanceId)
+
 
   const input = await req.json()
-  console.log('🚀 ~ file: route.ts:15 ~ PUT ~ input:', input)
+
   if (input.diagnosisDate) {
     input.diagnosisDate = new Date(input.diagnosisDate)
   }
@@ -25,10 +25,7 @@ export async function PUT(req: NextRequest) {
   }
 
   const { description, status, diagnosisDate, id } = validated.output
-  console.log(
-    '🚀 ~ file: route.ts:27 ~ PUT ~ validated.output:',
-    validated.output
-  )
+  
 
   try {
     const createdDiagnostic = await db.diagnostics.upsert({
@@ -45,14 +42,11 @@ export async function PUT(req: NextRequest) {
       },
       where: { attendanceId: attendanceId },
     })
-    console.log(
-      '🚀 ~ file: route.ts:44 ~ PUT ~ createdDiagnostic:',
-      createdDiagnostic
-    )
-    // console.log('🚀 ~ file: route.ts:64 ~ PUT ~ result:', result)
+    
+    
     return SuccessResponse(createdDiagnostic, 200)
   } catch (error) {
-    console.log('🚀 ~ file: route.ts:67 ~ PUT ~ error:', error)
+    
     return ErrorResponse('BAD_USER_INPUT')
   }
 }

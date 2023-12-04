@@ -33,10 +33,6 @@ export default function FormUpdateOnlyServices({
   })
 
   useEffect(() => {
-    console.log(
-      '🚀 ~ file: form.tsx:38 ~ useEffect ~ appointment:',
-      appointment
-    )
     if (
       appointment.ServiceAppointments &&
       Array.isArray(appointment.ServiceAppointments)
@@ -46,10 +42,6 @@ export default function FormUpdateOnlyServices({
           // Asegúrate de que el nombre del campo coincida con el patrón definido en tus inputs
           const fieldName = `service[${index}].name`
 
-          console.log(
-            '🚀 ~ file: form.tsx:44 ~ appointment.ServiceAppointments.forEach ~ fieldName:',
-            fieldName
-          )
           // Aquí, necesitas determinar qué valor asignar, por ejemplo, el ID del servicio o algún otro identificador único
           const fieldValue = serviceAppointment.someUniqueIdentifier
 

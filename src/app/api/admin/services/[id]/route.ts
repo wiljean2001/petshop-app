@@ -71,8 +71,6 @@ export async function PUT(
       requiresClinicalData,
     } = validated.output
 
-    console.log('🚀 ~ file: route.ts:66 ~ validated.output:', validated.output)
-
     // Inicia la transacción
     const transaction = []
 
@@ -106,7 +104,7 @@ export async function PUT(
       if (ServiceDetails) {
         CreateServiceDetails = {
           createMany: { data: ServiceDetails },
-        } 
+        }
       } else {
         transaction.push(
           db.service.update({
@@ -125,8 +123,6 @@ export async function PUT(
     // Si llegamos aquí, la transacción fue exitosa
     return SuccessResponse({ ...serviceUpdateData, ServiceDetails }, 200)
   } catch (error) {
-    console.log('🚀 ~ file: route.ts:127 ~ error:', error)
-    // Si algo falla, Prisma revertirá automáticamente cualquier cambio parcial
     return ErrorResponse('BAD_REQUEST')
   }
 }
