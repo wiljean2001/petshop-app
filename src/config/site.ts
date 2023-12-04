@@ -1,6 +1,6 @@
 export const siteConfig = {
   name: 'Petshop',
-  url: 'http://localhost:3000',
+  url: process.env.NEXT_PUBLIC_NEXTAUTH_URL,
   // url: 'https://l64j5pl9-3000.brs.devtunnels.ms',
   // urlDB: 'http://localhost:4321',
   // ogImage: 'https://ui.shadcn.com/og.jpg',
@@ -15,4 +15,3 @@ export const siteConfig = {
 }
 
 export type SiteConfig = typeof siteConfig
-

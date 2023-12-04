@@ -61,7 +61,7 @@ export const {
           }
 
           const res = await fetch(
-            `${process.env.NEXTAUTH_URL}/api/user/login`,
+            `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/api/user/login`,
             {
               method: 'POST',
               body: JSON.stringify({ email, password }),
