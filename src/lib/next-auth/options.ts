@@ -60,6 +60,7 @@ export const {
             password: string
           }
 
+          console.log(`${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/api/user/login`)
           const res = await fetch(
             `${process.env.NEXT_PUBLIC_NEXTAUTH_URL}/api/user/login`,
             {

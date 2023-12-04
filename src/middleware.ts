@@ -99,7 +99,9 @@ export default auth(
       ) {
         return NextResponse.rewrite(new URL('/', req.url))
       }
+      console.log('No public page - middleware')
     }
+    console.log('public page - middleware')
     // const regexAdmin = new RegExp('/api/admin/*')
     // const regexUser = new RegExp('/api/user/*')
     // if (regexAdmin.test(req.url) && req.token?.role !== 'admin') {
@@ -113,7 +115,7 @@ export default auth(
   //   callbacks: {
   //     authorized: ({ token }) => !!token,
   //   },
-  //   pages: {
+  //   pages: { 
   //     signIn: '/login',
   //     signOut: '/login',
   //     // error: '/login',
