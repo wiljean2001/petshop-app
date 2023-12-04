@@ -59,19 +59,19 @@ export default async function AdminPage() {
   ])
 
   // Transforming data for charts
-  const transformAppointmentTrends = appointmentTrendsData.map((data) => ({
+  const transformAppointmentTrends = appointmentTrendsData.map((data: any) => ({
     label: data.scheduledDateTime.toLocaleDateString(), // Format date as needed
     value: data._count.scheduledDateTime,
   }))
 
-  const transformServiceUsage = serviceUsageData.map((data) => ({
+  const transformServiceUsage = serviceUsageData.map((data: any) => ({
     label:
       serviceNames.find((s) => s.id === data.serviceId)?.name ||
       'Unknown Service',
     value: data._count.serviceId,
   }))
 
-  const transformPetDemographics = petDemographicsData.map((data) => ({
+  const transformPetDemographics = petDemographicsData.map((data: any) => ({
     label:
       breedNames.find((b) => b.id === data.breedId)?.name || 'Unknown Breed',
     value: data._count.breedId,
