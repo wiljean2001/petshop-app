@@ -1,5 +1,5 @@
 import { siteConfig } from '@/config/site'
-import { ISchedule } from '@/models/schemas'
+import { ISchedule } from '@/models/schemas.d'
 
 export async function getSchedules() {
   const res = await fetch(`${siteConfig.url}/api/admin/schedules/`, {

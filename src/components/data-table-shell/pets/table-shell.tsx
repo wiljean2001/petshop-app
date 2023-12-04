@@ -7,7 +7,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header'
 import { MillionDataTable } from '@/components/data-table/million-data-table'
-import { IPet, IBreed, IOwner } from '@/models/schemas'
+import { IPet, IBreed, IOwner } from '@/models/schemas.d'
 import { DropdownMenuShell } from '../drop-down-menu-shell'
 import { OPTIONS_CRUD } from '@/config/const'
 import { ConfirmDeleteDialog } from '../config'
@@ -22,7 +22,7 @@ interface PetsTableShellProps {
   pageCount: number
 }
 
-export function PetsTableShell({ data, pageCount }: PetsTableShellProps) {
+export default function PetsTableShell({ data, pageCount }: PetsTableShellProps) {
   const route = useRouter()
 
   const [isPending, startTransition] = React.useTransition()
@@ -140,11 +140,13 @@ export function PetsTableShell({ data, pageCount }: PetsTableShellProps) {
         header: ({ column }) => (
           <DataTableColumnHeader column={column} title='F. nacimiento' />
         ),
-        cell: ({ row }) => (
+        cell: ({ row }) => {
+          const date = getDateToString({ date: row.getValue('birthdate') })
+          return (
           <div className='min-w-[150px] max-w-[200px]'>
-            {getDateToString({ date: row.getValue('birthdate') })}
+            {!date.error && date.formattedDate}
           </div>
-        ),
+        )},
       },
       {
         accessorKey: 'color',
@@ -175,18 +177,20 @@ export function PetsTableShell({ data, pageCount }: PetsTableShellProps) {
       },
       {
         accessorKey: 'owner',
+        enableSorting: false,
         header: ({ column }) => (
           <DataTableColumnHeader column={column} title='Dueño' />
         ),
         cell: ({ row }) => (
           <div className='min-w-[200px] max-w-[200px]'>
-            {(row.getValue('owner') as IOwner).name}{' '}
-            {(row.getValue('owner') as IOwner).surname}
+            {(row.getValue('owner') as IOwner).surname}{' '}
+            {(row.getValue('owner') as IOwner).name}
           </div>
         ),
       },
       {
         accessorKey: 'breed',
+        enableSorting: false,
         header: ({ column }) => (
           <DataTableColumnHeader column={column} title='Raza' />
         ),
@@ -205,12 +209,12 @@ export function PetsTableShell({ data, pageCount }: PetsTableShellProps) {
           // const label = tasks.label.enumValues.find(
           //   (label) => label === row.original.label
           // )
-
+          const date = getDateToString({ date: row.getValue('createdAt') })
           return (
             <div className='flex space-x-2'>
               {/* {label && <Badge variant="outline">{label}</Badge>} */}
               <span className='max-w-[500px] truncate font-medium'>
-                {getDateToString({ date: row.getValue('createdAt') })}
+                {!date.error && date.formattedDate}
               </span>
             </div>
           )
@@ -225,12 +229,12 @@ export function PetsTableShell({ data, pageCount }: PetsTableShellProps) {
           // const label = tasks.label.enumValues.find(
           //   (label) => label === row.original.label
           // )
-
+          const date = getDateToString({ date: row.getValue('updatedAt') })
           return (
             <div className='flex space-x-2'>
               {/* {label && <Badge variant="outline">{label}</Badge>} */}
               <span className='max-w-[500px] truncate font-medium'>
-                {getDateToString({ date: row.getValue('updatedAt') })}
+                {!date.error && date.formattedDate}
               </span>
             </div>
           )
@@ -291,7 +295,7 @@ export function PetsTableShell({ data, pageCount }: PetsTableShellProps) {
         searchableColumns={[
           {
             id: 'name',
-            title: 'raza',
+            title: 'mascota',
           },
         ]}
       />

@@ -1,6 +1,8 @@
-import { UserTableShell } from '@/components/data-table-shell/users/table-shell'
+import { HeaderUser } from '@/components/data-table-shell/users/header'
+import LoadUserTableShell from '@/components/data-table-shell/users/load-table-shell'
 import { DashboardHeader } from '@/components/layout/auth/header'
 import { db } from '@/lib/prisma'
+import { parseSortParameter } from '@/lib/utils'
 import { ISingUpForm } from '@/models/user'
 
 interface MillionPageProps {
@@ -11,11 +13,6 @@ interface MillionPageProps {
 
 export default async function UsersPage({ searchParams }: MillionPageProps) {
   const { page, per_page, sort, name, email, role } = searchParams
-  console.log({
-    name,
-    email,
-    role,
-  })
 
   const limit = typeof per_page === 'string' ? parseInt(per_page) : 10
 
@@ -27,6 +24,11 @@ export default async function UsersPage({ searchParams }: MillionPageProps) {
   const where = {
     name: typeof name === 'string' ? { contains: name } : undefined,
   }
+
+  const orderBy =
+    sort && typeof sort === 'string'
+      ? parseSortParameter(sort)
+      : { createdAt: 'desc' }
 
   const allUser = db.user.findMany({
     select: {
@@ -42,10 +44,7 @@ export default async function UsersPage({ searchParams }: MillionPageProps) {
     },
     skip,
     take,
-    orderBy:
-      typeof sort === 'string'
-        ? { [sort.split('.')[0]]: sort.split('.')[1] }
-        : { id: 'desc' },
+    orderBy,
     where,
   })
 
@@ -54,7 +53,6 @@ export default async function UsersPage({ searchParams }: MillionPageProps) {
   const result = await db.$transaction([allUser, totalUsers])
 
   const pageCount = Math.ceil(result[1] / limit)
-  console.log('🚀 ~ file: page.tsx:43 ~ UsersPage ~ result:', result)
 
   return (
     <>
@@ -64,7 +62,10 @@ export default async function UsersPage({ searchParams }: MillionPageProps) {
 
       {/* Buttons for add, edit, delete a clinic */}
       {/* <HeaderClinics /> */}
-      <UserTableShell data={result[0] as ISingUpForm[]} pageCount={pageCount} />
+      <LoadUserTableShell
+        data={result[0] as ISingUpForm[]}
+        pageCount={pageCount}
+      />
     </>
   )
 }

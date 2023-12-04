@@ -47,10 +47,12 @@ export const WithFormDialog = ({
         {
           title: 'Cerrar',
           onClick: () => onClose(),
+          type: 'button',
           // className: 'col-start-1 col-span-1',
         },
         {
           title: 'Guardar',
+          type: 'submit',
           className: `${cn(
             // 'col-start-4 col-span-1',
             buttonVariants({ variant: 'destructive' })

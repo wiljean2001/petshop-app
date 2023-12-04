@@ -1,5 +1,5 @@
 import { siteConfig } from '@/config/site'
-import { ScheduleSchema, ISchedule } from '@/models/schemas'
+import { ScheduleSchema, ISchedule } from '@/models/schemas.d'
 import { safeParse } from 'valibot'
 
 interface Props {
@@ -11,6 +11,23 @@ function validateSchedule(Schedule: ISchedule) {
   if (!isValid.success) {
     throw isValid.issues
   }
+}
+
+export async function getSchedulesByClinic({ clinic }: { clinic: string }) {
+  const res = await fetch(
+    `${siteConfig.url}/api/admin/schedules${clinic ? `?clinic=${clinic}` : ''}`,
+    {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    }
+  )
+
+  if (!res.ok) {
+    throw new Error(`Error: ${res.statusText}`)
+  }
+
+  const schedules: ISchedule[] = await res.json()
+  return schedules
 }
 
 export async function createSchedule({ input }: Props) {

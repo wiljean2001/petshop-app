@@ -1,4 +1,4 @@
-import { IPet } from '@/models/schemas'
+import { IPet } from '@/models/schemas.d'
 import { createPet } from '@/services/admin/pets'
 import { showToast } from '@/helpers/toast'
 import { FormPet } from './form'
@@ -11,7 +11,6 @@ interface Props {
 export const AddPet = ({ isOpen, onClose }: Props) => {
   const route = useRouter()
   const onHandle = async (input: IPet) => {
-    console.log('🚀 ~ file: add.tsx:14 ~ onHandle ~ input:', input)
     const res = await createPet({ input })
     if (res) {
       showToast(

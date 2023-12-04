@@ -1,5 +1,5 @@
 import { siteConfig } from '@/config/site'
-import { OwnerSchema, IOwner } from '@/models/schemas'
+import { OwnerSchema, IOwner } from '@/models/schemas.d'
 import { safeParse } from 'valibot'
 
 interface Props {

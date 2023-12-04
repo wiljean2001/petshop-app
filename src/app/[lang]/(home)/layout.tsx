@@ -28,7 +28,7 @@ export default async function HomeLayout({
               <DocsSidebarNav items={sidebarNav} />
             </ScrollArea>
           </aside>
-          <main className='py-8'>{children}</main>
+          <main className='md:py-8'>{children}</main>
         </div>
       )}
       {/* <Footer /> */}

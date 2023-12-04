@@ -59,6 +59,7 @@ export const DialogShell: React.FC<DialogShellProps> = (props) => {
                 variant='destructive'
                 onClick={() => props.handleSubmit()}
                 size='lg'
+                type='submit'
               >
                 Confirmar
               </Button>

@@ -1,15 +1,9 @@
-import { db } from '@/lib/prisma'
-import { HeaderAppointment } from '@/components/data-table-shell/appointments/header'
-// import { AppointmentTableShell } from '@/components/data-table-shell/appointments/table-shell'
-import { Suspense } from 'react'
-import { DataTableLoading } from '@/components/data-table/data-table-loading'
+import { CardCalendarAppointments } from '@/components/calendar/appointments-calendar/card-calendar-appointments'
+import FilterAppointment from '@/components/filters/filter-appointment'
 import { DashboardHeader } from '@/components/layout/auth/header'
-import { MyCalendar } from '@/components/big-calendar'
-export interface Event {
-  title: string
-  start: Date
-  end: Date
-}
+import { HeaderAppointment } from '@/components/data-table-shell/appointments/header'
+import { db } from '@/lib/prisma'
+import { AppointmentStatusKey } from '@/config/const'
 
 interface Props {
   searchParams: {
@@ -18,51 +12,101 @@ interface Props {
 }
 
 export default async function AppointmentPage({ searchParams }: Props) {
-  const { page, per_page, sort, dateTime } = searchParams
-  console.log({
-    dateTime,
-  })
+  const {
+    page,
+    per_page,
+    clinic,
+    veterinarian,
+    pet,
+    date,
+    appointmentStatus,
+    owner,
+  } = searchParams // filters, page and sorts
 
+  console.log(
+    '🚀 ~ file: page.tsx:16 ~ AppointmentPage ~ clinic, veterinarian, pet, date, appointmentStatus:',
+    clinic,
+    veterinarian,
+    pet,
+    date,
+    appointmentStatus,
+    owner
+  )
   // limit the number of pages to be returned
   const limit = typeof per_page === 'string' ? parseInt(per_page) : 10
   // Skip the first page if there are no more pages to return
   const skip = (typeof page === 'string' ? parseInt(page) - 1 : 0) * limit
   const take = typeof per_page === 'string' ? parseInt(per_page) : 10
 
-  const where = {
-    dateTime: typeof dateTime === 'string' ? { contains: dateTime } : undefined,
+  const twoDaysAgo = () => {
+    var d = new Date()
+    d.setDate(d.getDate() - 2)
+    return d
   }
 
-  const allAppointment = db.appointments.findMany({
+  const where = {
+    veterinarian: {
+      clinic: {
+        id: typeof clinic === 'string' ? clinic : undefined,
+      },
+      id: typeof veterinarian === 'string' ? veterinarian : undefined,
+    },
+    pet: {
+      owner: {
+        id: typeof owner === 'string' ? owner : undefined,
+      },
+      id: typeof pet === 'string' ? pet : undefined,
+    },
+    scheduledDateTime:
+      typeof date === 'string'
+        ? {
+            gte: new Date(date.split(',')[0]), // Fecha inicio
+            lte: new Date(date.split(',')[1]), // Fecha inicio
+          }
+        : {
+            gte: twoDaysAgo(), // Fecha inicio
+          },
+    status:
+      typeof appointmentStatus === 'string'
+        ? (appointmentStatus as AppointmentStatusKey)
+        : undefined,
+  }
+
+  const allAppointments = db.appointments.findMany({
     select: {
       id: true,
-      dateTime: true,
-      createdAt: true,
-      updatedAt: true,
+      status: true,
+      scheduledDateTime: true,
+      pet: {
+        select: {
+          name: true, // name pet
+          breed: {
+            select: {
+              name: true, // breed
+              specie: {
+                select: { name: true },
+              },
+            },
+          },
+          owner: {
+            select: {
+              name: true, // name owner
+              surname: true, // surname owner
+            },
+          },
+        },
+      },
     },
     skip,
     take,
-    orderBy:
-      typeof sort === 'string'
-        ? { [sort.split('.')[0]]: sort.split('.')[1] }
-        : { id: 'desc' },
-    // where,
+    where,
   })
 
-  // const totalClinics = db.appointments.count({ where })
+  const totalAppointments = db.appointments.count({ where })
 
-  // const result = await db.$transaction([allAppointment, totalClinics])
+  const result = await db.$transaction([allAppointments, totalAppointments])
 
-  // const pageCount = Math.ceil(result[1] / limit)
-
-  const events: Event[] = [
-    {
-      title: 'Cita con Charlie',
-      start: new Date(2023, 11, 0, 10, 0), // Año, Mes (0-index), Día, Hora, Minutos
-      end: new Date(2023, 11, 0, 11, 0),
-    },
-    // ... más eventos
-  ]
+  const pageCount = Math.ceil(result[1] / limit)
 
   return (
     <>
@@ -70,12 +114,15 @@ export default async function AppointmentPage({ searchParams }: Props) {
       <DashboardHeader heading='Citas'>
         <HeaderAppointment />
       </DashboardHeader>
+      {/* <AppointmentHeader /> */}
+      {/* advance filter for show appointments / For default the appointment dates range is one mouth */}
+      <FilterAppointment />
 
-      {/* Table for show the clinics */}
-      <MyCalendar events={events} />
-      {/* <AppointmentTableShell data={result[0]} pageCount={pageCount} /> */}
+      {/* List alt appointments */}
+      <CardCalendarAppointments
+        appointments={result[0]}
+        pageCount={pageCount}
+      />
     </>
   )
 }
-
-// toolkit.fymconsulting

@@ -1,5 +1,5 @@
 import { siteConfig } from '@/config/site'
-import { IClinic } from '@/models/schemas'
+import { IClinic } from '@/models/schemas.d'
 
 interface Props {
   input: IClinic

@@ -2,13 +2,13 @@ import { createBreed } from '@/services/admin/breeds'
 import { useRouter } from 'next/navigation'
 import { showToast } from '@/helpers/toast'
 import { FormBreed } from './form'
-import { IBreed } from '@/models/schemas'
+import { IBreed } from '@/models/schemas.d'
 
 interface Props {
   isOpen: boolean
   onClose: () => void
 }
-export const AddBreed = ({ isOpen, onClose }: Props) => {
+export default function AddBreed({ isOpen, onClose }: Props) {
   const route = useRouter()
   const handleCreateBreed = async (input: IBreed) => {
     const res = await createBreed({ input })

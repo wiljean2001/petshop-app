@@ -1,4 +1,4 @@
-import { IOwner } from '@/models/schemas'
+import { IOwner } from '@/models/schemas.d'
 import { createOwner } from '@/services/admin/owners'
 import { showToast } from '@/helpers/toast'
 import { FormOwner } from './form'

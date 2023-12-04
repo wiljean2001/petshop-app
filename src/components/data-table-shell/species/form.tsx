@@ -1,5 +1,5 @@
 import { useForm } from 'react-hook-form'
-import { SpecieSchema, ISpecie } from '@/models/schemas'
+import { SpecieSchema, ISpecie } from '@/models/schemas.d'
 import valibotResolver from '@/lib/valibotResolver'
 import { createSpecie } from '@/services/admin/species'
 import { useRouter } from 'next/navigation'

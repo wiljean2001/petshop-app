@@ -1,7 +1,8 @@
 import { HeaderService } from '@/components/data-table-shell/services/header'
-import { ServicesTableShell } from '@/components/data-table-shell/services/table-shell'
+import LoadServiceTableShell from '@/components/data-table-shell/services/load-table-shell'
 import { DashboardHeader } from '@/components/layout/auth/header'
 import { db } from '@/lib/prisma'
+import { parseSortParameter } from '@/lib/utils'
 import { States_services } from '@prisma/client'
 
 interface Props {
@@ -12,11 +13,6 @@ interface Props {
 
 export default async function ServicePage({ searchParams }: Props) {
   const { page, per_page, sort, name, state } = searchParams
-  console.log({
-    name,
-    state,
-  })
-
   // limit the number of pages to be returned
   const limit = typeof per_page === 'string' ? parseInt(per_page) : 10
   // Skip the first page if there are no more pages to return
@@ -32,6 +28,10 @@ export default async function ServicePage({ searchParams }: Props) {
     name: typeof name === 'string' ? { contains: name } : undefined,
     state: typeof state === 'string' ? { in: statuses } : undefined,
   }
+  const orderBy =
+    sort && typeof sort === 'string'
+      ? parseSortParameter(sort)
+      : { createdAt: 'desc' }
 
   const allService = db.service.findMany({
     select: {
@@ -43,16 +43,14 @@ export default async function ServicePage({ searchParams }: Props) {
       // image: true,
       state: true,
       ServiceDetails: true,
-      ServiceAttentions: true,
+      ServiceAppointments: true,
+      requiresClinicalData: true,
       createdAt: true,
       updatedAt: true,
     },
     skip,
     take,
-    orderBy:
-      typeof sort === 'string'
-        ? { [sort.split('.')[0]]: sort.split('.')[1] }
-        : { id: 'desc' },
+    orderBy,
     where,
   })
 
@@ -69,7 +67,7 @@ export default async function ServicePage({ searchParams }: Props) {
         <HeaderService />
       </DashboardHeader>
       {/* Table for show the service */}
-      <ServicesTableShell data={result[0]} pageCount={pageCount} />
+      <LoadServiceTableShell data={result[0]} pageCount={pageCount} />
     </>
   )
 }

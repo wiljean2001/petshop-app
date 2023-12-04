@@ -25,10 +25,14 @@ export default function AreaForm({
       control={control}
       name={fieldConfig.name}
       render={({ field }) => (
-        <FormItem>
+        <FormItem className='flex flex-col w-full'>
           <FormLabel>{fieldConfig.label}</FormLabel>
           <FormControl>
-            <Textarea placeholder={fieldConfig.placeholder} {...field} />
+            <Textarea
+              placeholder={fieldConfig.placeholder}
+              {...field}
+              autoFocus={fieldConfig.isAutoFocus ?? undefined}
+            />
           </FormControl>
           {fieldConfig.description && (
             <FormDescription>{fieldConfig.description}</FormDescription>

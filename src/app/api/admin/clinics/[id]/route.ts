@@ -1,12 +1,13 @@
 import { ErrorResponse, SuccessResponse } from '@/helpers/ResponseError'
 import { exclude } from '@/lib/exclude'
 import { db } from '@/lib/prisma'
-import { ClinicSchema } from '@/models/schemas'
+import { ClinicSchema } from '@/models/schemas.d'
+import { NextRequest } from 'next/server'
 import { safeParse } from 'valibot'
 
 // Delete a clinic
 export async function DELETE(
-  req: Request,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
@@ -32,7 +33,7 @@ export async function DELETE(
 
 // Find a clinic
 export async function GET(
-  request: Request,
+  request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
@@ -51,7 +52,7 @@ export async function GET(
 
 // Update a clinic
 export async function PUT(
-  request: Request,
+  request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {

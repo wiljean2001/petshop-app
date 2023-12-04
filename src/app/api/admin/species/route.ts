@@ -1,6 +1,7 @@
 import { ErrorResponse, SuccessResponse } from '@/helpers/ResponseError'
 import { db } from '@/lib/prisma'
-import { SpecieSchema } from '@/models/schemas'
+import { SpecieSchema } from '@/models/schemas.d'
+import { NextRequest } from 'next/server'
 import { safeParse } from 'valibot'
 
 // List all clinics
@@ -10,7 +11,7 @@ export async function GET() {
 }
 
 // Create a nuew specie
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   const input = await req.json()
   const validated = safeParse(SpecieSchema, input)
   if (!validated.success) {

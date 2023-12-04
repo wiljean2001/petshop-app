@@ -1,5 +1,5 @@
 import { siteConfig } from '@/config/site'
-import { PetSchema, IPet } from '@/models/schemas'
+import { PetSchema, IPet } from '@/models/schemas.d'
 import { safeParse } from 'valibot'
 
 interface Props {
@@ -11,6 +11,23 @@ function validatePet(pet: IPet) {
   if (!isValid.success) {
     throw isValid.issues
   }
+}
+
+export async function getPets({ owner }: { owner?: string }) {
+  const res = await fetch(
+    `${siteConfig.url}/api/admin/pets${owner ? `?owner=${owner}` : ''}`,
+    {
+      method: 'GET',
+      headers: { 'Content-Type': 'application/json' },
+    }
+  )
+
+  if (!res.ok) {
+    throw new Error(`Error: ${res.statusText}`)
+  }
+
+  const pets: IPet[] = await res.json()
+  return pets
 }
 
 export async function createPet({ input }: Props) {

@@ -241,6 +241,7 @@ export function MillionDataTable<TData, TValue>({
         table={table}
         filterableColumns={filterableColumns}
         searchableColumns={searchableColumns}
+        // advancedFilter
       />
       <div className="rounded-md border">
         <Table>

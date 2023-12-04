@@ -1,7 +1,8 @@
 import { HeaderSpecie } from '@/components/data-table-shell/species/header'
-import { SpeciesTableShell } from '@/components/data-table-shell/species/table-shell'
+import LoadSpecieTableShell from '@/components/data-table-shell/species/load-table-shell'
 import { DashboardHeader } from '@/components/layout/auth/header'
 import { db } from '@/lib/prisma'
+import { parseSortParameter } from '@/lib/utils'
 
 interface Props {
   searchParams: {
@@ -11,9 +12,6 @@ interface Props {
 
 export default async function Specie({ searchParams }: Props) {
   const { page, per_page, sort, name } = searchParams
-  console.log({
-    name,
-  })
 
   // limit the number of pages to be returned
   const limit = typeof per_page === 'string' ? parseInt(per_page) : 10
@@ -25,6 +23,11 @@ export default async function Specie({ searchParams }: Props) {
     name: typeof name === 'string' ? { contains: name } : undefined,
   }
 
+  const orderBy =
+    sort && typeof sort === 'string'
+      ? parseSortParameter(sort)
+      : { createdAt: 'desc' }
+
   const allSpecie = db.specie.findMany({
     select: {
       id: true,
@@ -34,10 +37,7 @@ export default async function Specie({ searchParams }: Props) {
     },
     skip,
     take,
-    orderBy:
-      typeof sort === 'string'
-        ? { [sort.split('.')[0]]: sort.split('.')[1] }
-        : { id: 'desc' },
+    orderBy,
     where,
   })
 
@@ -51,10 +51,10 @@ export default async function Specie({ searchParams }: Props) {
     <>
       {/* Title and Buttons for add*/}
       <DashboardHeader heading='Especies'>
-      <HeaderSpecie />
+        <HeaderSpecie />
       </DashboardHeader>
       {/* Table for show the Specie */}
-      <SpeciesTableShell data={result[0]} pageCount={pageCount} />
+      <LoadSpecieTableShell data={result[0]} pageCount={pageCount} />
     </>
   )
 }

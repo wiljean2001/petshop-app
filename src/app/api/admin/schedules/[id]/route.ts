@@ -1,12 +1,13 @@
 import { ErrorResponse, SuccessResponse } from '@/helpers/ResponseError'
 import { exclude } from '@/lib/exclude'
 import { db } from '@/lib/prisma'
-import { ScheduleSchema } from '@/models/schemas'
+import { ScheduleSchema } from '@/models/schemas.d'
+import { NextRequest } from 'next/server'
 import { safeParse } from 'valibot'
 
 // Delete a schedule
 export async function DELETE(
-  req: Request,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
@@ -25,7 +26,7 @@ export async function DELETE(
 
 // Find a schedule
 export async function GET(
-  request: Request,
+  request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
@@ -44,7 +45,7 @@ export async function GET(
 
 // Update a schedule
 export async function PUT(
-  request: Request,
+  request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
@@ -56,11 +57,11 @@ export async function PUT(
       return ErrorResponse('BAD_USER_INPUT')
     }
 
-    const { day_week, closingHour, openingHour } = validated.output
+    const { dayWeek, closingHour, openingHour } = validated.output
 
     const schedule = await db.schedule.update({
       where: { id: params.id },
-      data: { day_week, closingHour, openingHour },
+      data: { dayWeek, closingHour, openingHour },
     })
 
     return SuccessResponse(schedule, 200)

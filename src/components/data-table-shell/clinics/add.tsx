@@ -1,4 +1,4 @@
-import { IClinic } from '@/models/schemas'
+import { IClinic } from '@/models/schemas.d'
 import { createClinic } from '@/services/admin/clinics'
 import { showToast } from '@/helpers/toast'
 import { FormClinic } from './form'

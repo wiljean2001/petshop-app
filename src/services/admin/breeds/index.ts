@@ -1,5 +1,5 @@
 import { siteConfig } from '@/config/site'
-import { BreedSchema, IBreed } from '@/models/schemas'
+import { BreedSchema, IBreed } from '@/models/schemas.d'
 import { safeParse } from 'valibot'
 
 interface Props {

@@ -1,7 +1,8 @@
 import { HeaderClinics } from '@/components/data-table-shell/clinics/header'
-import { ClinicsTableShell } from '@/components/data-table-shell/clinics/table-shell'
+import LoadClinicTableShell from '@/components/data-table-shell/clinics/load-table-shell'
 import { DashboardHeader } from '@/components/layout/auth/header'
 import { db } from '@/lib/prisma'
+import { parseSortParameter } from '@/lib/utils'
 
 interface Props {
   searchParams: {
@@ -11,10 +12,6 @@ interface Props {
 
 export default async function ClinicsPage({ searchParams }: Props) {
   const { page, per_page, sort, name, location } = searchParams
-  console.log({
-    name,
-    location,
-  })
 
   // limit the number of pages to be returned
   const limit = typeof per_page === 'string' ? parseInt(per_page) : 10
@@ -26,6 +23,11 @@ export default async function ClinicsPage({ searchParams }: Props) {
     name: typeof name === 'string' ? { contains: name } : undefined,
     location: typeof location === 'string' ? { contains: location } : undefined,
   }
+
+  const orderBy =
+    sort && typeof sort === 'string'
+      ? parseSortParameter(sort)
+      : { createdAt: 'desc' }
 
   const allClinic = db.clinic.findMany({
     select: {
@@ -42,10 +44,7 @@ export default async function ClinicsPage({ searchParams }: Props) {
     },
     skip,
     take,
-    orderBy:
-      typeof sort === 'string'
-        ? { [sort.split('.')[0]]: sort.split('.')[1] }
-        : { id: 'desc' },
+    orderBy,
     where,
   })
 
@@ -63,9 +62,7 @@ export default async function ClinicsPage({ searchParams }: Props) {
       </DashboardHeader>
 
       {/* Table for show the clinics */}
-      <ClinicsTableShell data={result[0]} pageCount={pageCount} />
+      <LoadClinicTableShell data={result[0]} pageCount={pageCount} />
     </>
   )
 }
-
-// toolkit.fymconsulting

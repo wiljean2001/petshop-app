@@ -7,6 +7,7 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
+import { useMounted } from '@/hooks/use-mounted'
 import { NumberFieldConfig, TextFieldConfig } from '@/types'
 import { Control, UseFormSetValue } from 'react-hook-form'
 
@@ -35,11 +36,11 @@ export default function InputForm({
       control={control}
       name={fieldConfig.name}
       render={({ field }) => (
-        <FormItem>
+        <FormItem className='flex flex-col w-full'>
           <FormLabel>{fieldConfig.label}</FormLabel>
           <FormControl>
             <Input
-              type={fieldConfig.type}
+              type={fieldConfig.type || 'text'}
               placeholder={
                 fieldConfig.placeholder ? fieldConfig!.placeholder : undefined
               }
@@ -48,9 +49,11 @@ export default function InputForm({
               step={
                 fieldConfig.type === 'number' ? fieldConfig.step : undefined
               }
-              autoSave={fieldConfig.name + '_' + fieldConfig.type}
+              autoFocus={fieldConfig.isAutoFocus ?? undefined}
+              autoComplete={fieldConfig.name + '_' + fieldConfig.type}
               {...field}
               onChange={(e) => field.onChange(parseValue(e.target.value))}
+              disabled={fieldConfig.isDisabled}
             />
           </FormControl>
           {fieldConfig.description && (

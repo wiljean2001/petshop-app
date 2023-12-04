@@ -1,4 +1,4 @@
-import { ISpecie } from '@/models/schemas'
+import { ISpecie } from '@/models/schemas.d'
 import { createSpecie } from '@/services/admin/species'
 import { useRouter } from 'next/navigation'
 import { showToast } from '@/helpers/toast'

@@ -1,10 +1,11 @@
 import { ErrorResponse, SuccessResponse } from '@/helpers/ResponseError'
 import { db } from '@/lib/prisma'
+import { NextRequest } from 'next/server'
 
-export async function POST(req: Request) {}
+export async function POST(req: NextRequest) {}
 
 // Delete many
-export async function DELETE(req: Request) {
+export async function DELETE(req: NextRequest) {
   try {
     const { ids } = await req.json()
 

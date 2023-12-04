@@ -1,5 +1,5 @@
 import { siteConfig } from '@/config/site'
-import { ServiceSchema, IService } from '@/models/schemas'
+import { ServiceSchema, IService } from '@/models/schemas.d'
 import { safeParse } from 'valibot'
 
 interface Props {

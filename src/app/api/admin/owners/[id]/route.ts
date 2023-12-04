@@ -1,12 +1,13 @@
 import { ErrorResponse, SuccessResponse } from '@/helpers/ResponseError'
 import { exclude } from '@/lib/exclude'
 import { db } from '@/lib/prisma'
-import { OwnerSchema } from '@/models/schemas'
+import { OwnerSchema } from '@/models/schemas.d'
+import { NextRequest } from 'next/server'
 import { safeParse } from 'valibot'
 
 // Delete a owner
 export async function DELETE(
-  req: Request,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
@@ -25,7 +26,7 @@ export async function DELETE(
 
 // Find a owner
 export async function GET(
-  request: Request,
+  request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
@@ -44,7 +45,7 @@ export async function GET(
 
 // Update a owner
 export async function PUT(
-  request: Request,
+  request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
@@ -56,7 +57,8 @@ export async function PUT(
       return ErrorResponse('BAD_USER_INPUT')
     }
 
-    const { name, surname, email, phone, city, address } = validated.output
+    const { name, surname, email, phone, city, address, userId } =
+      validated.output
 
     const owner = await db.owner.update({
       where: { id: params.id },
@@ -67,6 +69,7 @@ export async function PUT(
         phone,
         city,
         address,
+        user: { connect: { id: userId } },
       },
     })
 

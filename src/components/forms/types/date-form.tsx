@@ -35,84 +35,100 @@ export default function DateForm({
     <FormField
       control={control}
       name={fieldConfig.name}
-      render={({ field }) => (
-        <FormItem className='flex flex-col'>
-          <FormLabel>{fieldConfig.label}</FormLabel>
-          <Popover>
-            <PopoverTrigger asChild>
-              <FormControl>
-                <Button
-                  variant={'outline'}
-                  className={cn(
-                    'w-[240px] pl-3 text-left font-normal',
-                    !field.value && 'text-muted-foreground'
-                  )}
-                >
-                  {field.value ? (
-                    format(field.value, 'PPPp', { locale: es })
-                  ) : (
-                    <span>Elija una fecha</span>
-                  )}
-                  <Icons.calendarDays className='ml-auto h-4 w-4 opacity-50' />
-                </Button>
-              </FormControl>
-            </PopoverTrigger>
-            <PopoverContent className='w-auto p-0' align='start'>
-              <Calendar
-                mode='single'
-                selected={field.value}
-                // onSelect={field.onChange}
-                // selected={field.value ? new Date(field.value) : null}
-                onSelect={(date) => {
-                  const updatedDate = setHours(
-                    setMinutes(
-                      new Date(date!),
-                      new Date(field.value).getMinutes() || 0
-                    ),
-                    new Date(field.value).getHours() || 0
-                  )
-                  field.onChange(updatedDate)
-                }}
-                disabled={(date) =>
-                  date > new Date() || date < new Date('1900-01-01')
-                }
-                lang='es'
-                locale={es}
-                footer={
-                  fieldConfig.withTime && (
-                    <Input
-                      type='time'
-                      className='mt-2'
-                      value={
-                        field.value
-                          ? format(new Date(field.value), 'HH:mm', {
-                              locale: es,
-                            })
-                          : ''
-                      }
-                      onChange={(e) => {
-                        const [hours, minutes] = e.target.value
-                          .split(':')
-                          .map(Number)
-                        const updatedDate = setHours(
-                          setMinutes(new Date(field.value), minutes),
-                          hours
-                        )
-                        field.onChange(updatedDate)
-                      }}
-                    />
-                  )
-                }
-                initialFocus
-              />
-            </PopoverContent>
-          </Popover>
-          {fieldConfig.description && (
-            <FormDescription>{fieldConfig.description}</FormDescription>
-          )}
-          <FormMessage />
-        </FormItem>
-      )}
+      render={({ field }) => {
+        return (
+          <FormItem className='flex flex-col'>
+            <FormLabel>{fieldConfig.label}</FormLabel>
+            <Popover>
+              <PopoverTrigger asChild>
+                <FormControl>
+                  <Button
+                    variant={'outline'}
+                    className={cn(
+                      'w-full pl-3 text-left font-normal',
+                      !field.value && 'text-muted-foreground'
+                    )}
+                  >
+                    {field.value ? (
+                      format(field.value, 'PPPp', { locale: es })
+                    ) : (
+                      <span>Elija una fecha</span>
+                    )}
+                    <Icons.calendarDays className='ml-auto h-4 w-4 opacity-50' />
+                  </Button>
+                </FormControl>
+              </PopoverTrigger>
+              <PopoverContent className='w-auto p-0' align='start'>
+                <Calendar
+                  mode='single'
+                  // selected={field.value}
+                  // onSelect={field.onChange}
+                  selected={field.value ? new Date(field.value) : undefined}
+                  onSelect={(date) => {
+                    if (date) {
+                      const updatedDate = setHours(
+                        setMinutes(
+                          new Date(date!),
+                          new Date(field.value).getMinutes() || 0
+                        ),
+                        new Date(field.value).getHours() || 0
+                      )
+
+                      field.onChange(updatedDate)
+                    }
+                  }}
+                  disabled={(date) =>
+                    date > new Date() || date < new Date('1900-01-01')
+                  }
+                  lang='es'
+                  locale={es}
+                  modifiers={fieldConfig.modifiers || undefined}
+                  footer={
+                    fieldConfig.withTime && (
+                      <Input
+                        type='time'
+                        className='mt-2'
+                        value={
+                          field.value
+                            ? format(new Date(field.value), 'HH:mm', {
+                                locale: es,
+                              })
+                            : ''
+                        }
+                        min={
+                          fieldConfig.modifiersTimes
+                            ? fieldConfig.modifiersTimes.minTime
+                            : undefined
+                        }
+                        max={
+                          fieldConfig.modifiersTimes
+                            ? fieldConfig.modifiersTimes.maxTime
+                            : undefined
+                        }
+                        onChange={(e) => {
+                          const [hours, minutes] = e.target.value
+                            .split(':')
+                            .map(Number)
+                          const updatedDate = setHours(
+                            setMinutes(new Date(field.value), minutes),
+                            hours
+                          )
+                          field.onChange(updatedDate)
+                        }}
+                      />
+                    )
+                  }
+                  initialFocus={fieldConfig.isAutoFocus ?? undefined}
+                />
+              </PopoverContent>
+            </Popover>
+            {fieldConfig.description && (
+              <FormDescription>{fieldConfig.description}</FormDescription>
+            )}
+            <FormMessage />
+          </FormItem>
+        )
+      }}
     />
   )
 }

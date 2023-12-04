@@ -1,7 +1,8 @@
 import { HeaderOwner } from '@/components/data-table-shell/owners/header'
-import { OwnersTableShell } from '@/components/data-table-shell/owners/table-shell'
+import LoadOwnerTableShell from '@/components/data-table-shell/owners/load-table-shell'
 import { DashboardHeader } from '@/components/layout/auth/header'
 import { db } from '@/lib/prisma'
+import { parseSortParameter } from '@/lib/utils'
 
 interface Props {
   searchParams: {
@@ -11,9 +12,6 @@ interface Props {
 
 export default async function OwnerPage({ searchParams }: Props) {
   const { page, per_page, sort, name } = searchParams
-  console.log({
-    name,
-  })
 
   // limit the number of pages to be returned
   const limit = typeof per_page === 'string' ? parseInt(per_page) : 10
@@ -24,6 +22,11 @@ export default async function OwnerPage({ searchParams }: Props) {
   const where = {
     name: typeof name === 'string' ? { contains: name } : undefined,
   }
+
+  const orderBy =
+    sort && typeof sort === 'string'
+      ? parseSortParameter(sort)
+      : { createdAt: 'desc' }
 
   const allOwner = db.owner.findMany({
     select: {
@@ -40,10 +43,7 @@ export default async function OwnerPage({ searchParams }: Props) {
     },
     skip,
     take,
-    orderBy:
-      typeof sort === 'string'
-        ? { [sort.split('.')[0]]: sort.split('.')[1] }
-        : { id: 'desc' },
+    orderBy,
     where,
   })
 
@@ -61,7 +61,7 @@ export default async function OwnerPage({ searchParams }: Props) {
       </DashboardHeader>
 
       {/* Table for show the Owner */}
-      <OwnersTableShell data={result[0]} pageCount={pageCount} />
+      <LoadOwnerTableShell data={result[0]} pageCount={pageCount} />
     </>
   )
 }

@@ -1,5 +1,5 @@
 import { useForm } from 'react-hook-form'
-import { ScheduleSchema, ISchedule } from '@/models/schemas'
+import { ScheduleSchema, ISchedule } from '@/models/schemas.d'
 import valibotResolver from '@/lib/valibotResolver'
 import { createSchedule } from '@/services/admin/schedules'
 import { useRouter } from 'next/navigation'
@@ -42,7 +42,7 @@ export const FormSchedule = ({
     return [
       {
         type: 'text',
-        name: 'day_week',
+        name: 'dayWeek',
         label: 'Días:',
         placeholder: 'Días',
       },

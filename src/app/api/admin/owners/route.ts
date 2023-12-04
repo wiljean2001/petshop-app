@@ -1,6 +1,7 @@
 import { ErrorResponse, SuccessResponse } from '@/helpers/ResponseError'
 import { db } from '@/lib/prisma'
-import { OwnerSchema } from '@/models/schemas'
+import { OwnerSchema } from '@/models/schemas.d'
+import { NextRequest } from 'next/server'
 import { safeParse } from 'valibot'
 
 // List all owners
@@ -10,14 +11,15 @@ export async function GET() {
 }
 
 // Create a new owner
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   const input = await req.json()
   const validated = safeParse(OwnerSchema, input)
   if (!validated.success) {
     return ErrorResponse('BAD_USER_INPUT')
   }
 
-  const { name, surname, email, phone, city, address } = validated.output
+  const { name, surname, email, phone, city, address, userId } =
+    validated.output
 
   try {
     const owner = await db.owner.create({
@@ -28,6 +30,7 @@ export async function POST(req: Request) {
         phone,
         city,
         address,
+        user: { connect: { id: userId } },
       },
     })
 

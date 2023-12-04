@@ -7,7 +7,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header'
 import { MillionDataTable } from '@/components/data-table/million-data-table'
-import { ISchedule } from '@/models/schemas'
+import { ISchedule } from '@/models/schemas.d'
 import { DropdownMenuShell } from '../drop-down-menu-shell'
 import { OPTIONS_CRUD } from '@/config/const'
 import { ConfirmDeleteDialog } from '../config'
@@ -22,7 +22,7 @@ interface ScheduleTableShellProps {
   pageCount: number
 }
 
-export function ScheduleTableShell({
+export default function ScheduleTableShell({
   data,
   pageCount,
 }: ScheduleTableShellProps) {
@@ -122,13 +122,13 @@ export function ScheduleTableShell({
         enableHiding: false,
       },
       {
-        accessorKey: 'day_week',
+        accessorKey: 'dayWeek',
         header: ({ column }) => (
           <DataTableColumnHeader column={column} title='Días' />
         ),
         cell: ({ row }) => (
           <div className='min-w-[200px] max-w-[200px]'>
-            {row.getValue('day_week')}
+            {row.getValue('dayWeek')}
           </div>
         ),
         enableSorting: false,
@@ -149,10 +149,6 @@ export function ScheduleTableShell({
               {/* {label && <Badge variant="outline">{label}</Badge>} */}
               <span className='max-w-[500px] truncate font-medium'>
                 {row.getValue('openingHour')}
-                {/* {getDateToString({
-                  date: row.getValue('openingHour'),
-                  dateFormate: hourFormat,
-                })} */}
               </span>
             </div>
           )
@@ -173,10 +169,6 @@ export function ScheduleTableShell({
               {/* {label && <Badge variant="outline">{label}</Badge>} */}
               <span className='max-w-[500px] truncate font-medium'>
                 {row.getValue('closingHour')}
-                {/* {getDateToString({
-                  date: row.getValue('closingHour'),
-                  dateFormate: hourFormat,
-                })} */}
               </span>
             </div>
           )
@@ -191,12 +183,12 @@ export function ScheduleTableShell({
           // const label = tasks.label.enumValues.find(
           //   (label) => label === row.original.label
           // )
-
+          const date = getDateToString({ date: row.getValue('createdAt') })
           return (
             <div className='flex space-x-2'>
               {/* {label && <Badge variant="outline">{label}</Badge>} */}
               <span className='max-w-[500px] truncate font-medium'>
-                {getDateToString({ date: row.getValue('createdAt') })}
+                {!date.error && date.formattedDate}
               </span>
             </div>
           )
@@ -211,12 +203,12 @@ export function ScheduleTableShell({
           // const label = tasks.label.enumValues.find(
           //   (label) => label === row.original.label
           // )
-
+          const date = getDateToString({ date: row.getValue('updatedAt') })
           return (
             <div className='flex space-x-2'>
               {/* {label && <Badge variant="outline">{label}</Badge>} */}
               <span className='max-w-[500px] truncate font-medium'>
-                {getDateToString({ date: row.getValue('updatedAt') })}
+              {!date.error && date.formattedDate}
               </span>
             </div>
           )
@@ -273,7 +265,7 @@ export function ScheduleTableShell({
         filterableColumns={[]}
         searchableColumns={[
           {
-            id: 'day_week',
+            id: 'dayWeek',
             title: 'día',
           },
         ]}

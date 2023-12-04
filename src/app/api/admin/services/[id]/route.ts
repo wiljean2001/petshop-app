@@ -1,7 +1,7 @@
 import { ErrorResponse, SuccessResponse } from '@/helpers/ResponseError'
 import { exclude } from '@/lib/exclude'
 import { db } from '@/lib/prisma'
-import { ServiceSchema } from '@/models/schemas'
+import { ServiceSchema } from '@/models/schemas.d'
 import { safeParse } from 'valibot'
 
 // Delete a service
@@ -55,18 +55,23 @@ export async function PUT(
       'ServiceDetails[].updatedAt',
       'ServiceDetails[].createdAt',
     ])
-    console.log('🚀 ~ file: route.ts:58 ~ newInput:', newInput)
+
     const validated = safeParse(ServiceSchema, newInput)
     if (!validated.success) {
-      console.log(
-        '🚀 ~ file: route.ts:61 ~ validated.success:',
-        validated.success
-      )
       return ErrorResponse('BAD_USER_INPUT')
     }
 
-    const { name, cost, description, duration, state, ServiceDetails } =
-      validated.output
+    const {
+      name,
+      cost,
+      description,
+      duration,
+      state,
+      ServiceDetails,
+      requiresClinicalData,
+    } = validated.output
+
+    console.log('🚀 ~ file: route.ts:66 ~ validated.output:', validated.output)
 
     // Inicia la transacción
     const transaction = []
@@ -77,6 +82,7 @@ export async function PUT(
       cost,
       description,
       duration,
+      requiresClinicalData,
       state,
     }
 
@@ -100,16 +106,17 @@ export async function PUT(
       if (ServiceDetails) {
         CreateServiceDetails = {
           createMany: { data: ServiceDetails },
-        }
+        } 
+      } else {
+        transaction.push(
+          db.service.update({
+            where: { id: params.id },
+            data: {
+              ServiceDetails: CreateServiceDetails,
+            },
+          })
+        )
       }
-      transaction.push(
-        db.service.update({
-          where: { id: params.id },
-          data: {
-            ServiceDetails: CreateServiceDetails,
-          },
-        })
-      )
     }
 
     // Ejecutar todas las operaciones como parte de una transacción
@@ -118,6 +125,7 @@ export async function PUT(
     // Si llegamos aquí, la transacción fue exitosa
     return SuccessResponse({ ...serviceUpdateData, ServiceDetails }, 200)
   } catch (error) {
+    console.log('🚀 ~ file: route.ts:127 ~ error:', error)
     // Si algo falla, Prisma revertirá automáticamente cualquier cambio parcial
     return ErrorResponse('BAD_REQUEST')
   }

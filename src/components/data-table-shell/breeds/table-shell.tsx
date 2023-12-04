@@ -5,7 +5,7 @@ import { type ColumnDef } from '@tanstack/react-table'
 import { Checkbox } from '@/components/ui/checkbox'
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header'
 import { MillionDataTable } from '@/components/data-table/million-data-table'
-import { IBreed, ISpecie } from '@/models/schemas'
+import { IBreed, ISpecie } from '@/models/schemas.d'
 import { DropdownMenuShell } from '../drop-down-menu-shell'
 import { OPTIONS_CRUD } from '@/config/const'
 import { ConfirmDeleteDialog } from '../config'
@@ -20,7 +20,10 @@ interface BreedsTableShellProps {
   pageCount: number
 }
 
-export function BreedsTableShell({ data, pageCount }: BreedsTableShellProps) {
+export default function BreedsTableShell({
+  data,
+  pageCount,
+}: BreedsTableShellProps) {
   const route = useRouter()
   const [isPending, startTransition] = React.useTransition()
   const [dialog, setDialog] = React.useState<{
@@ -128,15 +131,19 @@ export function BreedsTableShell({ data, pageCount }: BreedsTableShellProps) {
         ),
       },
       {
-        accessorKey: 'specie',
+        id: 'specie',
+        accessorFn: (row) => row.specie?.name,
         header: ({ column }) => (
           <DataTableColumnHeader column={column} title='Especie' />
         ),
-        cell: ({ row }) => (
-          <div className='min-w-[200px] max-w-[200px]'>
-            {(row.getValue('specie') as ISpecie).name}
-          </div>
-        ),
+        cell: ({ row }) => {
+          return (
+            <div className='min-w-[200px] max-w-[200px]'>
+              {row.getValue('specie')}
+            </div>
+          )
+        },
+        enableSorting: false,
       },
       {
         accessorKey: 'createdAt',
@@ -147,12 +154,12 @@ export function BreedsTableShell({ data, pageCount }: BreedsTableShellProps) {
           // const label = tasks.label.enumValues.find(
           //   (label) => label === row.original.label
           // )
-
+          const date = getDateToString({ date: row.getValue('createdAt') })
           return (
             <div className='flex space-x-2'>
               {/* {label && <Badge variant="outline">{label}</Badge>} */}
               <span className='max-w-[500px] truncate font-medium'>
-                {getDateToString({ date: row.getValue('createdAt') })}
+                {!date.error && date.formattedDate}
               </span>
             </div>
           )
@@ -167,12 +174,12 @@ export function BreedsTableShell({ data, pageCount }: BreedsTableShellProps) {
           // const label = tasks.label.enumValues.find(
           //   (label) => label === row.original.label
           // )
-
+          const date = getDateToString({ date: row.getValue('updatedAt') })
           return (
             <div className='flex space-x-2'>
               {/* {label && <Badge variant="outline">{label}</Badge>} */}
               <span className='max-w-[500px] truncate font-medium'>
-                {getDateToString({ date: row.getValue('updatedAt') })}
+                {!date.error && date.formattedDate}
               </span>
             </div>
           )

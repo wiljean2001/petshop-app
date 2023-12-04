@@ -1,7 +1,8 @@
 import { HeaderPet } from '@/components/data-table-shell/pets/header'
-import { PetsTableShell } from '@/components/data-table-shell/pets/table-shell'
+import LoadPetTableShell from '@/components/data-table-shell/pets/load-table-shell'
 import { DashboardHeader } from '@/components/layout/auth/header'
 import { db } from '@/lib/prisma'
+import { parseSortParameter } from '@/lib/utils'
 
 interface Props {
   searchParams: {
@@ -11,9 +12,6 @@ interface Props {
 
 export default async function PetPage({ searchParams }: Props) {
   const { page, per_page, sort, name } = searchParams
-  console.log({
-    name,
-  })
 
   // limit the number of pages to be returned
   const limit = typeof per_page === 'string' ? parseInt(per_page) : 10
@@ -24,6 +22,11 @@ export default async function PetPage({ searchParams }: Props) {
   const where = {
     name: typeof name === 'string' ? { contains: name } : undefined,
   }
+
+  const orderBy =
+    sort && typeof sort === 'string'
+      ? parseSortParameter(sort)
+      : { createdAt: 'desc' }
 
   const allPet = db.pet.findMany({
     select: {
@@ -44,10 +47,7 @@ export default async function PetPage({ searchParams }: Props) {
     },
     skip,
     take,
-    orderBy:
-      typeof sort === 'string'
-        ? { [sort.split('.')[0]]: sort.split('.')[1] }
-        : { id: 'desc' },
+    orderBy,
     where,
   })
 
@@ -64,7 +64,7 @@ export default async function PetPage({ searchParams }: Props) {
         <HeaderPet />
       </DashboardHeader>
       {/* Table for show the pet */}
-      <PetsTableShell data={result[0]} pageCount={pageCount} />
+      <LoadPetTableShell data={result[0]} pageCount={pageCount} />
     </>
   )
 }

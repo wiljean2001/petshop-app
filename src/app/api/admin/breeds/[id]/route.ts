@@ -1,12 +1,13 @@
 import { ErrorResponse, SuccessResponse } from '@/helpers/ResponseError'
 import { exclude } from '@/lib/exclude'
 import { db } from '@/lib/prisma'
-import { BreedSchema } from '@/models/schemas'
+import { BreedSchema } from '@/models/schemas.d'
+import { NextRequest } from 'next/server'
 import { safeParse } from 'valibot'
 
 // Delete a breed
 export async function DELETE(
-  req: Request,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
@@ -25,7 +26,7 @@ export async function DELETE(
 
 // Find a breed
 export async function GET(
-  request: Request,
+  request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
@@ -44,7 +45,7 @@ export async function GET(
 
 // Update a breed
 export async function PUT(
-  request: Request,
+  request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
@@ -55,7 +56,6 @@ export async function PUT(
       'createdAt',
       'updatedAt',
     ])
-    console.log('🚀 ~ file: route.ts:58 ~ newInput:', newInput)
     const validated = safeParse(BreedSchema, newInput)
 
     if (!validated.success) {

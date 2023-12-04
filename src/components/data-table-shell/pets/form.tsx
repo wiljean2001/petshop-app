@@ -1,5 +1,5 @@
 import { useForm } from 'react-hook-form'
-import { PetSchema, IPet, IBreed, IOwner } from '@/models/schemas'
+import { PetSchema, IPet, IBreed, IOwner } from '@/models/schemas.d'
 import valibotResolver from '@/lib/valibotResolver'
 import { useEffect, useMemo, useState } from 'react'
 import { WithFormDialog } from '../config'

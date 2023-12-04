@@ -13,6 +13,7 @@ interface Props {
   title: string
   initialValues?: Partial<ISingUpForm>
 }
+
 export const FormUser = ({
   isOpen,
   onClose,

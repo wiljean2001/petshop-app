@@ -5,7 +5,7 @@ import { type ColumnDef } from '@tanstack/react-table'
 import { Checkbox } from '@/components/ui/checkbox'
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header'
 import { MillionDataTable } from '@/components/data-table/million-data-table'
-import { IOwner } from '@/models/schemas'
+import { IOwner } from '@/models/schemas.d'
 import { DropdownMenuShell } from '../drop-down-menu-shell'
 import { OPTIONS_CRUD } from '@/config/const'
 import { ConfirmDeleteDialog } from '../config'
@@ -20,7 +20,7 @@ interface OwnersTableShellProps {
   pageCount: number
 }
 
-export function OwnersTableShell({ data, pageCount }: OwnersTableShellProps) {
+export default function OwnersTableShell({ data, pageCount }: OwnersTableShellProps) {
   const route = useRouter()
   const [isPending, startTransition] = React.useTransition()
   const [dialog, setDialog] = React.useState<{
@@ -187,12 +187,12 @@ export function OwnersTableShell({ data, pageCount }: OwnersTableShellProps) {
           // const label = tasks.label.enumValues.find(
           //   (label) => label === row.original.label
           // )
-
+          const date = getDateToString({ date: row.getValue('createdAt') })
           return (
             <div className='flex space-x-2'>
               {/* {label && <Badge variant="outline">{label}</Badge>} */}
               <span className='max-w-[500px] truncate font-medium'>
-                {getDateToString({ date: row.getValue('createdAt') })}
+                {!date.error && date.formattedDate}
               </span>
             </div>
           )
@@ -207,12 +207,12 @@ export function OwnersTableShell({ data, pageCount }: OwnersTableShellProps) {
           // const label = tasks.label.enumValues.find(
           //   (label) => label === row.original.label
           // )
-
+          const date = getDateToString({ date: row.getValue('updatedAt') })
           return (
             <div className='flex space-x-2'>
               {/* {label && <Badge variant="outline">{label}</Badge>} */}
               <span className='max-w-[500px] truncate font-medium'>
-                {getDateToString({ date: row.getValue('updatedAt') })}
+                {!date.error && date.formattedDate}
               </span>
             </div>
           )

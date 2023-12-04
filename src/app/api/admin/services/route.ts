@@ -1,16 +1,27 @@
+import { ServiceStatusKey } from '@/config/const'
 import { ErrorResponse, SuccessResponse } from '@/helpers/ResponseError'
 import { db } from '@/lib/prisma'
-import { ServiceSchema } from '@/models/schemas'
+import { ServiceSchema } from '@/models/schemas.d'
+import { NextRequest } from 'next/server'
 import { safeParse } from 'valibot'
 
 // List all owners
-export async function GET() {
-  const owners = await db.service.findMany()
+export async function GET(req: NextRequest) {
+  const searchParams = req.nextUrl.searchParams
+  const state = (searchParams.get('state') as ServiceStatusKey) || undefined
+
+  let where: {} | undefined
+  if (state) {
+    where = {
+      state: state,
+    }
+  }
+  const owners = await db.service.findMany({ where })
   return SuccessResponse(owners, 200)
 }
 
 // Create a new service
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
     const input = await req.json()
 
@@ -19,12 +30,8 @@ export async function POST(req: Request) {
       return ErrorResponse('BAD_USER_INPUT')
     }
 
-    const { name, cost, description, duration, state, ServiceDetails } =
+    const { name, cost, description, duration, requiresClinicalData, state, ServiceDetails } =
       validated.output
-    console.log(
-      '🚀 ~ file: route.ts:23 ~ POST ~ ServiceDetails:',
-      ServiceDetails
-    )
 
     let CreateServiceDetails: {} | undefined
 
@@ -33,10 +40,6 @@ export async function POST(req: Request) {
         createMany: { data: ServiceDetails },
       }
     }
-    console.log(
-      '🚀 ~ file: route.ts:27 ~ POST ~ CreateServiceDetails:',
-      CreateServiceDetails
-    )
 
     const service = await db.service.create({
       data: {
@@ -46,12 +49,12 @@ export async function POST(req: Request) {
         duration,
         image: '',
         state,
+        requiresClinicalData: requiresClinicalData,
         ServiceDetails: CreateServiceDetails,
       },
     })
     return SuccessResponse(service, 200)
   } catch (error) {
-    console.log('🚀 ~ file: route.ts:55 ~ POST ~ error:', error)
     return ErrorResponse('BAD_REQUEST')
   }
 }

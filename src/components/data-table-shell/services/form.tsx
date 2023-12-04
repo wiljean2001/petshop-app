@@ -1,5 +1,5 @@
 import { useForm } from 'react-hook-form'
-import { ServiceSchema, IService, IServiceDetail } from '@/models/schemas'
+import { ServiceSchema, IService, IServiceDetail } from '@/models/schemas.d'
 import valibotResolver from '@/lib/valibotResolver'
 import { useEffect, useMemo } from 'react'
 import { WithFormDialog } from '../config'
@@ -7,6 +7,7 @@ import { FieldConfig } from '@/types'
 import {
   SERVICESTATUSTRANSLATIONS,
   ServiceStatusKey,
+  ServiceStatusOptions,
 } from '../../../config/const'
 import { showToast } from '@/helpers/toast'
 
@@ -77,28 +78,35 @@ export const FormService = ({
         name: 'state',
         isMultiple: false,
         label: 'Estado:',
-        options: (
-          Object.keys(SERVICESTATUSTRANSLATIONS) as ServiceStatusKey[]
-        ).map((key) => ({
-          value: key,
-          label: SERVICESTATUSTRANSLATIONS[key] as string,
-        })),
+        options: ServiceStatusOptions,
+      },
+      {
+        type: 'radio',
+        label: 'Datos Generales',
+        name: 'requiresClinicalData',
+        description: '¿Este servicio requerirá registro de datos generales?',
       },
       {
         type: 'dynamic',
         name: 'ServiceDetails',
+        withButtons: true,
         options: [
           {
-            type: 'area',
-            name: 'value',
-            label: 'Detalle:',
-            placeholder: 'Detalle:',
-          },
-          {
-            type: 'text',
-            name: 'detailType',
-            label: 'Tipo de Detalle:',
-            placeholder: 'Tipo de Detalle:',
+            id: 'ServiceDetails',
+            config: [
+              {
+                type: 'area',
+                name: 'value',
+                label: 'Detalle:',
+                placeholder: 'Detalle:',
+              },
+              {
+                type: 'text',
+                name: 'detailType',
+                label: 'Tipo de Detalle:',
+                placeholder: 'Tipo de Detalle:',
+              },
+            ],
           },
         ],
       },

@@ -30,7 +30,7 @@ const AddItem = ({ title, options }: AddItemProps) => {
           className='ml-auto h-8'
         >
           <Icons.add />
-          {title}
+          <span className='hidden md:block'>{title}</span>
         </Button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align='end' className='w-[150px]'>
@@ -63,7 +63,7 @@ export const DashboardOptions = ({
 }: DashboardOptionsProps) => {
   return (
     <>
-      <div className='flex gap-2'>
+      <div className='flex flex-wrap gap-2'>
         {/* Dropdown for select options: "add clinic", "import clinics" */}
         {options && <AddItem options={options} title={options[0].title} />}
         <Link

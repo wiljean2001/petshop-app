@@ -1,6 +1,7 @@
 import { ErrorResponse, SuccessResponse } from '@/helpers/ResponseError'
 import { db } from '@/lib/prisma'
-import { ClinicSchema } from '@/models/schemas'
+import { ClinicSchema } from '@/models/schemas.d'
+import { NextRequest } from 'next/server'
 import { safeParse } from 'valibot'
 
 // List all clinics
@@ -10,7 +11,7 @@ export async function GET() {
 }
 
 // Create a new clinic
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
     const input = await req.json()
     const validated = safeParse(ClinicSchema, input)
@@ -43,23 +44,6 @@ export async function POST(req: Request) {
       return newClinic
     })
 
-    // const clinic = await db.clinic.create({
-    //   data: {
-    //     name,
-    //     location,
-    //     image,
-    //     phone,
-    //   },
-    // })
-
-    // if (scheduleIds) {
-    //   await db.clinicSchedule.createMany({
-    //     data: scheduleIds.map((scheduleId) => ({
-    //       clinicId: clinic.id,
-    //       scheduleId: scheduleId,
-    //     })),
-    //   })
-    // }
 
     return SuccessResponse(clinic, 200)
   } catch (error) {

@@ -21,7 +21,10 @@ interface UserTableShellProps {
   data: ISingUpForm[]
   pageCount: number
 }
-export function UserTableShell({ data, pageCount }: UserTableShellProps) {
+export default function UserTableShell({
+  data,
+  pageCount,
+}: UserTableShellProps) {
   const route = useRouter()
   const [isPending, startTransition] = React.useTransition()
   const [dialog, setDialog] = React.useState<{
@@ -133,7 +136,15 @@ export function UserTableShell({ data, pageCount }: UserTableShellProps) {
           <div className='w-[200px] max-w-[200px]'>{row.getValue('email')}</div>
         ),
       },
-
+      {
+        accessorKey: 'role',
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title='Rol' />
+        ),
+        cell: ({ row }) => (
+          <div className='w-[200px] max-w-[200px]'>{row.getValue('role')}</div>
+        ),
+      },
       {
         accessorKey: 'createdAt',
         header: ({ column }) => (
@@ -143,12 +154,12 @@ export function UserTableShell({ data, pageCount }: UserTableShellProps) {
           // const label = tasks.label.enumValues.find(
           //   (label) => label === row.original.label
           // )
-
+          const date = getDateToString({ date: row.getValue('createdAt') })
           return (
             <div className='flex space-x-2'>
               {/* {label && <Badge variant="outline">{label}</Badge>} */}
               <span className='max-w-[500px] truncate font-medium'>
-                {getDateToString({ date: row.getValue('updatedAt') })}
+                {!date.error && date.formattedDate}
               </span>
             </div>
           )
@@ -163,12 +174,12 @@ export function UserTableShell({ data, pageCount }: UserTableShellProps) {
           // const label = tasks.label.enumValues.find(
           //   (label) => label === row.original.label
           // )
-
+          const date = getDateToString({ date: row.getValue('createdAt') })
           return (
             <div className='flex space-x-2'>
               {/* {label && <Badge variant="outline">{label}</Badge>} */}
               <span className='max-w-[500px] truncate font-medium'>
-                {getDateToString({ date: row.getValue('updatedAt') })}
+                {!date.error && date.formattedDate}
               </span>
             </div>
           )

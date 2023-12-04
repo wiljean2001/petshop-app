@@ -1,12 +1,13 @@
 import { ErrorResponse, SuccessResponse } from '@/helpers/ResponseError'
 import { exclude } from '@/lib/exclude'
 import { db } from '@/lib/prisma'
-import { PetSchema } from '@/models/schemas'
+import { PetSchema } from '@/models/schemas.d'
+import { NextRequest } from 'next/server'
 import { safeParse } from 'valibot'
 
 // Delete a pet
 export async function DELETE(
-  req: Request,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
@@ -25,7 +26,7 @@ export async function DELETE(
 
 // Find a pet
 export async function GET(
-  request: Request,
+  request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
@@ -44,7 +45,7 @@ export async function GET(
 
 // Update a pet
 export async function PUT(
-  request: Request,
+  request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
@@ -64,7 +65,16 @@ export async function PUT(
       return ErrorResponse('BAD_USER_INPUT')
     }
 
-    const { name, gender, ownerId, birthdate, breedId } = validated.output
+    const {
+      name,
+      gender,
+      ownerId,
+      birthdate,
+      breedId,
+      color,
+      derivedFrom,
+      medicalNotes,
+    } = validated.output
 
     const pet = await db.pet.update({
       where: { id: params.id },
@@ -72,6 +82,9 @@ export async function PUT(
         name,
         gender,
         birthdate,
+        color,
+        derivedFrom,
+        medicalNotes,
         owner: {
           connect: { id: ownerId },
         },

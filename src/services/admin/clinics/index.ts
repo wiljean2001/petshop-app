@@ -1,5 +1,5 @@
 import { siteConfig } from '@/config/site'
-import { ClinicSchema, IClinic } from '@/models/schemas'
+import { ClinicSchema, IClinic } from '@/models/schemas.d'
 import { safeParse } from 'valibot'
 
 interface Props {
@@ -9,10 +9,7 @@ interface Props {
 function validateClinic(clinic: IClinic) {
   const isValid = safeParse(ClinicSchema, clinic)
   if (!isValid.success) {
-    console.log(
-      '🚀 ~ file: index.ts:12 ~ validateClinic ~ !isValid.success:',
-      isValid.success
-    )
+    
     throw isValid.issues
   }
 }

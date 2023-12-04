@@ -1,7 +1,8 @@
-import { HeaderVeterinarian } from '@/components/data-table-shell/veterinarias/header'
-import { VeterinariansTableShell } from '@/components/data-table-shell/veterinarias/table-shell'
+import { HeaderVeterinarian } from '@/components/data-table-shell/veterinarians/header'
+import LoadVeterinarianTableShell from '@/components/data-table-shell/veterinarians/load-table-shell'
 import { DashboardHeader } from '@/components/layout/auth/header'
 import { db } from '@/lib/prisma'
+import { parseSortParameter } from '@/lib/utils'
 
 interface Props {
   searchParams: {
@@ -10,11 +11,6 @@ interface Props {
 }
 export default async function VeterinariansPage({ searchParams }: Props) {
   const { page, per_page, sort, title, status, priority } = searchParams
-  console.log({
-    title,
-    status,
-    priority,
-  })
 
   // limit the number of pages to be returned
   const limit = typeof per_page === 'string' ? parseInt(per_page) : 10
@@ -25,6 +21,11 @@ export default async function VeterinariansPage({ searchParams }: Props) {
   const where = {
     name: typeof title === 'string' ? { contains: title } : undefined,
   }
+
+  const orderBy =
+    sort && typeof sort === 'string'
+      ? parseSortParameter(sort)
+      : { createdAt: 'desc' }
 
   const allClinic = db.veterinarian.findMany({
     select: {
@@ -41,10 +42,7 @@ export default async function VeterinariansPage({ searchParams }: Props) {
     },
     skip,
     take,
-    orderBy:
-      typeof sort === 'string'
-        ? { [sort.split('.')[0]]: sort.split('.')[1] }
-        : { id: 'desc' },
+    orderBy,
     where,
   })
 
@@ -62,7 +60,7 @@ export default async function VeterinariansPage({ searchParams }: Props) {
       </DashboardHeader>
 
       {/* Table for show the clinics */}
-      <VeterinariansTableShell data={result[0]} pageCount={pageCount} />
+      <LoadVeterinarianTableShell data={result[0]} pageCount={pageCount} />
     </>
   )
 }

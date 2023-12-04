@@ -35,13 +35,13 @@ export const shadcnPlugin = plugin(
         '--accent-foreground': '240 5.9% 10%',
 
         '--success': '162 48% 49%',
-        '--success-foreground': '210 40% 98%',
+        '--success-foreground': '162 48% 29%',
 
         '--warning': '47.9 95.8% 53.1%',
-        '--warning-foreground': '26 83.3% 14.1%',
+        '--warning-foreground': '47.9 65.8% 3.1%',
 
         '--destructive': '0 84.2% 60.2%',
-        '--destructive-foreground': '0 0% 98%',
+        '--destructive-foreground': '0 0% 95%',
 
         '--radius': '0.5rem',
 
@@ -80,13 +80,13 @@ export const shadcnPlugin = plugin(
         '--accent-foreground': '0 0% 98%',
 
         '--success': '162 48% 49%',
-        '--success-foreground': '210 40% 98%',
+        '--success-foreground': '162 48% 49%',
 
         '--warning': '47.9 95.8% 53.1%',
-        '--warning-foreground': '26 83.3% 14.1%',
+        '--warning-foreground': '47.9 95.8% 53.1%',
 
         '--destructive': '0 62.8% 55.6%',
-        '--destructive-foreground': '0 85.7% 97.3%',
+        '--destructive-foreground': '0 0% 95%',
 
         '--border': '240 3.7% 15.9%',
         // '--input': '183 100% 96%' // spray - 50
@@ -110,7 +110,7 @@ export const shadcnPlugin = plugin(
     theme: {
       container: {
         center: true,
-        padding: '2rem',
+        padding: '1rem',
         screens: {
           '2xl': '1400px',
         },

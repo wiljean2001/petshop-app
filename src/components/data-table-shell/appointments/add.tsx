@@ -1,39 +1,40 @@
-import { createBreed } from '@/services/admin/breeds'
 import { useRouter } from 'next/navigation'
 import { showToast } from '@/helpers/toast'
-import { FormBreed } from './form'
-import { IBreed } from '@/models/schemas'
+import FormAppointment from './form'
+import { IAppointmentWithService } from '@/models/schemas.d'
+import { createAppointment } from '@/services/admin/appointments'
 
 interface Props {
   isOpen: boolean
   onClose: () => void
 }
-export const AddBreed = ({ isOpen, onClose }: Props) => {
+export const AddAppointment = ({ isOpen, onClose }: Props) => {
   const route = useRouter()
-  const handleCreateBreed = async (input: IBreed) => {
-    const res = await createBreed({ input })
+  const onSubmit = async (input: IAppointmentWithService) => {
+    console.log('🚀 ~ file: add.tsx:14 ~ onSubmit ~ input:', input)
+    const res = await createAppointment({ input })
     if (res) {
       showToast(
-        '¡Éxito! La raza ha sido registrada satisfactoriamente.',
+        '¡Éxito! La cita ha sido registrada satisfactoriamente.',
         'success'
       )
       route.refresh()
       return true
     }
     showToast(
-      'Advertencia: La raza no se ha registrada completamente. Por favor, completa todos los campos requeridos.',
+      'Advertencia: La cita no se ha registrada completamente. ' +
+        'Por favor, completa todos los campos requeridos.',
       'warning'
     )
     return false
   }
-
   return (
     <>
-      <FormBreed
-        title='Registar raza:'
+      <FormAppointment
+        title='Registar cita:'
         isOpen={isOpen}
         onClose={onClose}
-        onConfirm={handleCreateBreed}
+        onConfirm={onSubmit}
       />
     </>
   )

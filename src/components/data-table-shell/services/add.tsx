@@ -1,4 +1,4 @@
-import { IService } from '@/models/schemas'
+import { IService } from '@/models/schemas.d'
 import { useRouter } from 'next/navigation'
 import { FormService } from './form'
 import { createService } from '@/services/admin/services'

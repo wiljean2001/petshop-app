@@ -31,7 +31,6 @@ const localizer = dateFnsLocalizer({
   getDay,
   locales,
 })
-console.log('🚀 ~ file: big-calendar.tsx:19 ~ localizer:', localizer)
 
 interface MyCalendarProps {
   events: Event[]

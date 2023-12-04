@@ -1,4 +1,4 @@
-import { ISchedule } from '@/models/schemas'
+import { ISchedule } from '@/models/schemas.d'
 import { createSchedule } from '@/services/admin/schedules'
 import { useRouter } from 'next/navigation'
 import { FormSchedule } from './form'

@@ -1,4 +1,4 @@
-import React, { memo, useState } from 'react'
+import React, { memo, useCallback, useEffect, useState } from 'react'
 import {
   UseFormReturn,
   FieldValues,
@@ -17,16 +17,20 @@ import InputForm from './types/input-form'
 import AreaForm from './types/area-form'
 import DateForm from './types/date-form'
 import SelectForm from './types/select-form'
+import RadioForm from './types/radio-form'
+import { showToast } from '@/helpers/toast'
 
 function DynamicFormField<t extends FieldValues>({
   fieldConfig,
   control,
   setValue,
+  fieldSetIndex,
 }: {
   fieldConfig: FieldConfig
   nameCompuest?: string
   control: Control<any>
   setValue: UseFormSetValue<any>
+  fieldSetIndex?: number
 }) {
   if (
     fieldConfig.type === 'text' ||
@@ -75,6 +79,16 @@ function DynamicFormField<t extends FieldValues>({
     )
   }
 
+  if (fieldConfig.type === 'radio') {
+    return (
+      <RadioForm
+        control={control}
+        fieldConfig={fieldConfig}
+        setValue={setValue}
+      />
+    )
+  }
+
   return null
 }
 
@@ -93,41 +107,85 @@ export function DynamicForm<t extends FieldValues>({
   buttons: ButtonConfig[]
   className?: string
 }) {
-  const mouted = useMounted()
-  const { control, handleSubmit, setValue, unregister } = form
+  const { control, handleSubmit, setValue, unregister, watch } = form
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const dynamicFieldConfig = formConfig.find((fc) => fc.type === 'dynamic') as
     | DynamicFieldConfig
     | undefined
 
+  // Inicializa dynamicFieldSets como un array vacío
   const [dynamicFieldSets, setDynamicFieldSets] = useState(
-    dynamicFieldConfig ? [dynamicFieldConfig.options] : []
+    dynamicFieldConfig ? dynamicFieldConfig.options : []
   )
 
-  const handleAddFieldSet = () => {
-    if (dynamicFieldConfig) {
-      setDynamicFieldSets([...dynamicFieldSets, dynamicFieldConfig.options])
-    }
-  }
+  const handleAddFieldSet = useCallback(() => {
+    setDynamicFieldSets((prevSets) => [
+      ...prevSets,
+      {
+        id: `dynamic-${Date.now()}`,
+        config: dynamicFieldConfig?.options[0].config || [],
+      },
+    ])
+  }, [dynamicFieldConfig])
 
-  const handleRemoveFieldSet = (index: number) => {
-    const newDynamicFieldSets = [...dynamicFieldSets]
-    newDynamicFieldSets.splice(index, 1)
-    setDynamicFieldSets(newDynamicFieldSets)
-  }
+  // const handleRemoveFieldSet = useCallback((setId: string) => {
+  //   setDynamicFieldSets((prevSets) =>
+  //     prevSets.filter((set) => set.id !== setId)
+  //   )
+  // }, [])
+  const allFields = watch() // Observa todos los campos
 
-  const handleSubmitForm = async (input: t) => {
-    setIsSubmitting(true)
-    try {
-      await onSubmit(input)
-    } catch (error) {
-      console.error(error)
-    } finally {
-      setIsSubmitting(false)
+  // Puedes usar un efecto para mostrar los cambios en la consola
+  useEffect(() => {
+    console.log(allFields)
+  }, [allFields])
+
+  const handleRemoveFieldSet = useCallback(
+    (setId: string, fieldSetIndex: number) => {
+      setDynamicFieldSets((prevSets) => {
+        dynamicFieldSets
+        // Encuentra el conjunto de campos a eliminar
+        const setToRemove = prevSets.find((set) => set.id === setId)
+
+        if (dynamicFieldConfig && setToRemove && setToRemove.config) {
+          // Desregistra cada campo del conjunto
+          try {
+            setToRemove.config.forEach((fieldConfig) => {
+              const fieldName = `${dynamicFieldConfig.name}[${fieldSetIndex}].${fieldConfig.name}`
+              unregister(fieldName as any)
+            })
+          } catch (error) {
+            showToast('Eliminación fallita de compos', 'warning')
+          }
+        }
+
+        // Filtra el conjunto de campos del estado
+        return prevSets.filter((set) => set.id !== setId)
+      })
+    },
+    [dynamicFieldConfig, dynamicFieldSets, unregister]
+  )
+
+  const handleSubmitForm = useCallback(
+    async (input: t) => {
+      setIsSubmitting(true)
+      try {
+        await onSubmit(input)
+      } catch (error) {
+        console.error(error)
+      } finally {
+        setIsSubmitting(false)
+      }
+    },
+    [onSubmit]
+  )
+
+  useEffect(() => {
+    if (dynamicFieldConfig && dynamicFieldConfig.options) {
+      setDynamicFieldSets(dynamicFieldConfig.options)
     }
-  }
-  if (!mouted) return
+  }, [dynamicFieldConfig])
 
   return (
     <Form {...form}>
@@ -138,73 +196,52 @@ export function DynamicForm<t extends FieldValues>({
         {formConfig.map((fieldConfig, index) => {
           if (fieldConfig.type === 'dynamic') {
             return (
-              <div key={index}>
-                {dynamicFieldSets.map((fieldSet, fieldSetIndex) => {
-                  return (
-                    <div
-                      key={fieldSetIndex}
-                      className='flex justify-between px-2 py-4 shadow-sm' // Alineación y margen
-                    >
-                      {fieldSet.map((dynamicFieldConfig, dynamicFieldIndex) => {
-                        // The name is dynamically built here
+              <div key={index + fieldConfig.type}>
+                {dynamicFieldSets.map(({ id, config }, fieldSetIndex) => (
+                  <div
+                    key={id}
+                    className='relative flex items-start flex-wrap gap-1 px-2 py-4 my-2'
+                  >
+                    {config &&
+                      config.length > 0 &&
+                      config.map((dynamicFieldConfig, dynamicFieldIndex) => {
                         const fieldName = `${fieldConfig.name}[${fieldSetIndex}].${dynamicFieldConfig.name}`
-
                         return (
-                          <div
-                            className='flex flex-col mr-2'
-                            key={dynamicFieldIndex}
-                          >
-                            <DynamicFormFieldMemo
-                              fieldConfig={{
-                                ...dynamicFieldConfig,
-                                name: fieldName,
-                              }}
-                              control={control}
-                              setValue={setValue}
-                              // index={fieldSetIndex} // Se pasa el índice para construir el nombre dinámicamente
-                            />
-                          </div>
+                          <DynamicFormFieldMemo
+                            key={dynamicFieldIndex + dynamicFieldConfig.name}
+                            fieldConfig={{
+                              ...dynamicFieldConfig,
+                              name: fieldName,
+                            }}
+                            control={control}
+                            setValue={setValue}
+                            fieldSetIndex={fieldSetIndex}
+                          />
                         )
                       })}
-                      <div className='flex justify-end'>
+                    {config && config.length > 0 && fieldConfig.withButtons && (
+                      <div className='absolute top-0 right-0 m-2'>
                         <Button
                           type='button'
                           variant='destructive'
                           size='icon'
-                          onClick={() => {
-                            // Desregistra los campos antes de eliminar el conjunto de campos
-                            try {
-                              dynamicFieldSets[fieldSetIndex].forEach(
-                                (field) => {
-                                  const fieldName = `${fieldConfig.name}[${fieldSetIndex}].${field.name}`
-                                  unregister(fieldName as any)
-                                }
-                              )
-                              handleRemoveFieldSet(fieldSetIndex)
-                            } catch (error) {
-                              console.log(
-                                '🚀 ~ file: dynamic-form.tsx:379 ~ {dynamicFieldSets.map ~ error:',
-                                error
-                              )
-                            }
-                          }}
+                          onClick={() =>
+                            handleRemoveFieldSet(id, fieldSetIndex)
+                          }
                         >
-                          <Icons.trash className='w-4' />
+                          <Icons.trash className='w-3' />
                         </Button>
                       </div>
-                    </div>
-                  )
-                })}
-                <div className='flex justify-end'>
-                  <Button
-                    type='button'
-                    onClick={() => {
-                      handleAddFieldSet()
-                    }}
-                  >
-                    <Icons.add className='w-4' />
-                  </Button>
-                </div>
+                    )}
+                  </div>
+                ))}
+                {fieldConfig.withButtons && (
+                  <div className='flex justify-end'>
+                    <Button type='button' onClick={handleAddFieldSet}>
+                      <Icons.add className='w-4' />
+                    </Button>
+                  </div>
+                )}
               </div>
             )
           }
@@ -229,6 +266,7 @@ export function DynamicForm<t extends FieldValues>({
               className={button.className}
               onClick={button.onClick}
               disabled={isSubmitting}
+              type={button.type}
             >
               {button.title}
             </Button>

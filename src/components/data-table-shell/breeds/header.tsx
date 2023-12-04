@@ -1,8 +1,10 @@
 'use client'
 
 import { DashboardOptions } from '../header-for-tables'
-import { Suspense, useMemo, useState } from 'react'
-import { AddBreed } from './add'
+import { Suspense, lazy, useMemo, useState } from 'react'
+// import { AddBreed } from './add'
+
+const AddBreed = lazy(() => import('./add'))
 
 export const HeaderBreed = () => {
   const [isDialogOpen, setDialogOpen] = useState(false)
@@ -22,7 +24,12 @@ export const HeaderBreed = () => {
   return (
     <>
       <DashboardOptions options={options} onHandledDownload=''>
-        <AddBreed isOpen={isDialogOpen} onClose={() => setDialogOpen(false)} />
+        <Suspense fallback={<></>}>
+          <AddBreed
+            isOpen={isDialogOpen}
+            onClose={() => setDialogOpen(false)}
+          />
+        </Suspense>
       </DashboardOptions>
     </>
   )

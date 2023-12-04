@@ -7,13 +7,10 @@ import { Checkbox } from '@/components/ui/checkbox'
 
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header'
 import { MillionDataTable } from '@/components/data-table/million-data-table'
-import { SpecieSchema, ISpecie } from '@/models/schemas'
+import { ISpecie } from '@/models/schemas.d'
 import { DropdownMenuShell } from '../drop-down-menu-shell'
-import { OPTIONS_CRUD, hourFormat } from '@/config/const'
-import { ConfirmDeleteDialog, WithFormDialog } from '../config'
-import { useForm } from 'react-hook-form'
-import valibotResolver from '@/lib/valibotResolver'
-import { FieldConfig } from '@/types'
+import { OPTIONS_CRUD } from '@/config/const'
+import { ConfirmDeleteDialog } from '../config'
 import { deleteSpecie, updateSpecie } from '@/services/admin/species'
 import { showToast } from '@/helpers/toast'
 import { useRouter } from 'next/navigation'
@@ -25,7 +22,7 @@ interface SpeciesTableShellProps {
   pageCount: number
 }
 
-export function SpeciesTableShell({ data, pageCount }: SpeciesTableShellProps) {
+export default function SpeciesTableShell({ data, pageCount }: SpeciesTableShellProps) {
   const route = useRouter()
   const [isPending, startTransition] = React.useTransition()
   const [dialog, setDialog] = React.useState<{
@@ -138,12 +135,12 @@ export function SpeciesTableShell({ data, pageCount }: SpeciesTableShellProps) {
           // const label = tasks.label.enumValues.find(
           //   (label) => label === row.original.label
           // )
-
+          const date = getDateToString({ date: row.getValue('createdAt') })
           return (
             <div className='flex space-x-2'>
               {/* {label && <Badge variant="outline">{label}</Badge>} */}
               <span className='max-w-[500px] truncate font-medium'>
-                {getDateToString({ date: row.getValue('updatedAt') })}
+                {!date.error && date.formattedDate}
               </span>
             </div>
           )
@@ -158,12 +155,12 @@ export function SpeciesTableShell({ data, pageCount }: SpeciesTableShellProps) {
           // const label = tasks.label.enumValues.find(
           //   (label) => label === row.original.label
           // )
-
+          const date = getDateToString({ date: row.getValue('updatedAt') })
           return (
             <div className='flex space-x-2'>
               {/* {label && <Badge variant="outline">{label}</Badge>} */}
               <span className='max-w-[500px] truncate font-medium'>
-                {getDateToString({ date: row.getValue('updatedAt') })}
+              {!date.error && date.formattedDate}
               </span>
             </div>
           )
@@ -221,7 +218,7 @@ export function SpeciesTableShell({ data, pageCount }: SpeciesTableShellProps) {
         searchableColumns={[
           {
             id: 'name',
-            title: 'raza',
+            title: 'especie',
           },
         ]}
       />

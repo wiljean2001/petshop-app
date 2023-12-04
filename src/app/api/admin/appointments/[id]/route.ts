@@ -1,12 +1,17 @@
+import { AppointmentStatusKey } from '@/config/const'
 import { ErrorResponse, SuccessResponse } from '@/helpers/ResponseError'
 import { exclude } from '@/lib/exclude'
 import { db } from '@/lib/prisma'
-import { AppointmentSchema } from '@/models/schemas'
+import {
+  AppointmentOnlyUpdateSchema,
+  IAppointmentOnlyUpdate,
+} from '@/models/schemas.d'
+import { NextRequest } from 'next/server'
 import { safeParse } from 'valibot'
 
 // Delete a appointments
 export async function DELETE(
-  req: Request,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
@@ -25,15 +30,42 @@ export async function DELETE(
 
 // Find a appointments
 export async function GET(
-  request: Request,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const searchParams = req.nextUrl.searchParams
+  const withClinic = searchParams.get('withClinic') || undefined
   try {
-    const appointments = await db.appointments.findFirst({
+    const appointment = await db.appointments.findFirst({
       where: { id: params.id },
+      select: {
+        id: true,
+        scheduledDateTime: true,
+        status: true,
+        veterinarian: {
+          select: {
+            clinicId: true,
+          },
+        },
+      },
     })
 
-    if (!appointments) return ErrorResponse('NOT_FOUND')
+    if (!appointment) return ErrorResponse('NOT_FOUND')
+
+    if (withClinic && appointment.veterinarian) {
+      const clinicId = await db.clinic.findUnique({
+        where: { id: appointment.veterinarian.clinicId },
+      })
+      return SuccessResponse(
+        {
+          clinicId: clinicId?.id,
+          status: appointment.status,
+          scheduledDateTime: appointment.scheduledDateTime,
+          id: appointment.id,
+        } as IAppointmentOnlyUpdate,
+        200
+      )
+    }
 
     return SuccessResponse(appointments, 200)
   } catch (error) {
@@ -44,39 +76,46 @@ export async function GET(
 
 // Update a appointments
 export async function PUT(
-  request: Request,
+  req: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const input = await request.json()
-    const newInput = exclude(input, [
-      'pet',
-      'veterinarian',
-      'createdAt',
-      'updatedAt',
-    ])
-    if(newInput.dateTime){
-      newInput.dateTime = new Date(newInput.dateTime)
+    const input = await req.json()
+    // const newInput = exclude(input, [
+    //   'pet',
+    //   'veterinarian',
+    //   'createdAt',
+    //   'updatedAt',
+    // ])
+
+    // When update only the state of appointment
+    if (typeof input === 'string') {
+      const appointments = await db.appointments.update({
+        where: { id: params.id },
+        data: {
+          status: input as AppointmentStatusKey,
+        },
+      })
+      return SuccessResponse(appointments, 200)
     }
-    const validated = safeParse(AppointmentSchema, newInput)
+
+    // When update the state and date of appointment
+    if (input.scheduledDateTime) {
+      input.scheduledDateTime = new Date(input.scheduledDateTime)
+    }
+    const validated = safeParse(AppointmentOnlyUpdateSchema, input)
 
     if (!validated.success) {
       return ErrorResponse('BAD_USER_INPUT')
     }
 
-    const { status, petId, vetId, dateTime } = validated.output
+    const { status, scheduledDateTime } = validated.output
 
     const appointments = await db.appointments.update({
       where: { id: params.id },
       data: {
         status,
-        dateTime,
-        veterinarian: {
-          connect: { id: vetId },
-        },
-        pet: {
-          connect: { id: petId },
-        },
+        scheduledDateTime,
       },
     })
 

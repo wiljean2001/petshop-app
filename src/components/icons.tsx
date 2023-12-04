@@ -53,6 +53,7 @@ import {
   SunIcon,
   PawPrint,
   CalendarDays,
+  PlayIcon,
   PlusCircleIcon,
   CheckIcon,
   ChevronLeftIcon,
@@ -77,6 +78,7 @@ import {
   Building2,
   Activity,
   Minus,
+  PencilIcon,
   type XIcon as LucideIcon,
 } from 'lucide-react'
 
@@ -103,6 +105,7 @@ export const Icons = {
   arrowRight: ArrowRight,
   help: HelpCircle,
   pizza: Pizza,
+  pencilIcon: PencilIcon,
   sun: SunMedium,
   moon: Moon,
   laptop: Laptop,
@@ -138,6 +141,7 @@ export const Icons = {
   arrowUpDown: ArrowUpDown,
   arrowDownUp: ArrowDownUp,
   arrowLeftIcon: ArrowLeftIcon,
+  playIcon: PlayIcon,
   alertCircle: AlertCircle,
   circleIcon: CircleIcon,
   fileIcon: FileIcon,

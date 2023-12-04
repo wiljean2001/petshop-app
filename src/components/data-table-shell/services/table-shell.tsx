@@ -7,7 +7,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header'
 import { MillionDataTable } from '@/components/data-table/million-data-table'
-import { IService, IServiceDetail } from '@/models/schemas'
+import { IService, IServiceDetail } from '@/models/schemas.d'
 import { DropdownMenuShell } from '../drop-down-menu-shell'
 import {
   OPTIONS_CRUD,
@@ -27,7 +27,7 @@ interface ServicesTableShellProps {
   pageCount: number
 }
 
-export function ServicesTableShell({
+export default function ServicesTableShell({
   data,
   pageCount,
 }: ServicesTableShellProps) {
@@ -182,12 +182,12 @@ export function ServicesTableShell({
       },
       {
         accessorKey: 'ServiceDetails',
+        enableSorting: false,
         header: ({ column }) => (
           <DataTableColumnHeader column={column} title='Detalles' />
         ),
         cell: ({ row }) => {
           const details = row.getValue('ServiceDetails') as IServiceDetail[]
-          console.log('🚀 ~ file: table-shell.tsx:179 ~ details:', details)
 
           // Crear un objeto para agrupar los detalles por tipo
           const groupedDetails = details.reduce((acc, detail) => {
@@ -228,12 +228,12 @@ export function ServicesTableShell({
           // const label = tasks.label.enumValues.find(
           //   (label) => label === row.original.label
           // )
-
+          const date = getDateToString({ date: row.getValue('createdAt') })
           return (
             <div className='flex space-x-2'>
               {/* {label && <Badge variant="outline">{label}</Badge>} */}
               <span className='max-w-[500px] truncate font-medium'>
-                {getDateToString({ date: row.getValue('createdAt') })}
+                {!date.error && date.formattedDate}
               </span>
             </div>
           )
@@ -248,12 +248,12 @@ export function ServicesTableShell({
           // const label = tasks.label.enumValues.find(
           //   (label) => label === row.original.label
           // )
-
+          const date = getDateToString({ date: row.getValue('updatedAt') })
           return (
             <div className='flex space-x-2'>
               {/* {label && <Badge variant="outline">{label}</Badge>} */}
               <span className='max-w-[500px] truncate font-medium'>
-                {getDateToString({ date: row.getValue('updatedAt') })}
+                {!date.error && date.formattedDate}
               </span>
             </div>
           )

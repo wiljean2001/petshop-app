@@ -7,7 +7,7 @@ import { Checkbox } from '@/components/ui/checkbox'
 
 import { DataTableColumnHeader } from '@/components/data-table/data-table-column-header'
 import { MillionDataTable } from '@/components/data-table/million-data-table'
-import { IClinic, IClinicScheduleSchema, ISchedule } from '@/models/schemas'
+import { IClinic, IClinicScheduleSchema, ISchedule } from '@/models/schemas.d'
 import { DropdownMenuShell } from '../drop-down-menu-shell'
 import { OPTIONS_CRUD } from '@/config/const'
 import { ConfirmDeleteDialog } from '../config'
@@ -22,7 +22,7 @@ interface ClinicsTableShellProps {
   pageCount: number
 }
 
-export function ClinicsTableShell({ data, pageCount }: ClinicsTableShellProps) {
+export default function ClinicsTableShell({ data, pageCount }: ClinicsTableShellProps) {
   const route = useRouter()
 
   const [isPending, startTransition] = React.useTransition()
@@ -188,11 +188,11 @@ export function ClinicsTableShell({ data, pageCount }: ClinicsTableShellProps) {
               <div className='max-w-[500px] truncate font-medium'>
                 {ClinicSchedule.length > 0 ? (
                   ClinicSchedule.map((schedule, index) => {
-                    const { day_week, openingHour, closingHour } =
+                    const { dayWeek, openingHour, closingHour } =
                       schedule.schedule
                     return (
                       <span key={index}>
-                        {`${day_week} | ${openingHour} - ${closingHour}`}
+                        {`${dayWeek} | ${openingHour} - ${closingHour}`}
                         <br />
                       </span>
                     )
@@ -204,6 +204,7 @@ export function ClinicsTableShell({ data, pageCount }: ClinicsTableShellProps) {
             </div>
           )
         },
+        enableSorting: false,
       },
       {
         accessorKey: 'createdAt',
@@ -214,12 +215,12 @@ export function ClinicsTableShell({ data, pageCount }: ClinicsTableShellProps) {
           // const label = tasks.label.enumValues.find(
           //   (label) => label === row.original.label
           // )
-
+          const date = getDateToString({ date: row.getValue('createdAt') })
           return (
             <div className='flex space-x-2'>
               {/* {label && <Badge variant="outline">{label}</Badge>} */}
               <span className='max-w-[500px] truncate font-medium'>
-                {getDateToString({ date: row.getValue('createdAt') })}
+                {!date.error && date.formattedDate}
               </span>
             </div>
           )
@@ -234,12 +235,12 @@ export function ClinicsTableShell({ data, pageCount }: ClinicsTableShellProps) {
           // const label = tasks.label.enumValues.find(
           //   (label) => label === row.original.label
           // )
-
+          const date = getDateToString({ date: row.getValue('updatedAt') })
           return (
             <div className='flex space-x-2'>
               {/* {label && <Badge variant="outline">{label}</Badge>} */}
               <span className='max-w-[500px] truncate font-medium'>
-                {getDateToString({ date: row.getValue('updatedAt') })}
+                {!date.error && date.formattedDate}
               </span>
             </div>
           )

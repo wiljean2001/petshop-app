@@ -8,9 +8,9 @@ interface DocsConfig {
 }
 
 export const enum ERoutingPath {
-  HOME = '',
-  SERVICES = '#services',
-  CONTACT = '#contact',
+  HOME = '/',
+  SERVICES = '/#services',
+  CONTACT = '/#contact',
 
   LOGIN = '/login',
   REGISTER = '/register',
@@ -23,7 +23,7 @@ export const enum ERoutingPath {
 export const enum EUserRoutingPath {
   USER_PETS = '/user/pets',
   USER_OWNERS = '/user/owners',
-  USER_ATTENTIONS = '/user/attentions',
+  // USER_ATTENTIONS = '/user/attentions',
   USER_APPOINTMENTS = '/user/appointments', // appointments - citas
   // USER_INVOICES = '/user/invoices',
   // USER_PAYMENTS = '/user/payments',
@@ -31,7 +31,7 @@ export const enum EUserRoutingPath {
 }
 
 export const enum EAdminRoutingPath {
-  ADMIN_ATTENTIONS = '/user/attentions',
+  ADMIN_ATTENTIONS = '/admin/attentions',
   ADMIN_APPOINTMENTS = '/admin/appointments',
   ADMIN_MEDICAL_RECORDS = '/admin/medical-records',
   ADMIN_SERVICES = '/admin/services',
@@ -97,17 +97,17 @@ const userOptions: SidebarNavItem[] = [
       },
     ],
   },
-  {
-    title: 'Mis atenciones',
-    items: [
-      {
-        title: 'Atenciones',
-        href: EUserRoutingPath.USER_ATTENTIONS,
-        iconClass: 'bx bxs-capsule',
-        items: [],
-      },
-    ],
-  },
+  // {
+  //   title: 'Mis atenciones',
+  //   items: [
+  //     {
+  //       title: 'Atenciones',
+  //       href: EUserRoutingPath.USER_ATTENTIONS,
+  //       iconClass: 'bx bxs-capsule',
+  //       items: [],
+  //     },
+  //   ],
+  // },
   {
     title: 'Propietarios',
     items: [

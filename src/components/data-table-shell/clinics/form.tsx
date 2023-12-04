@@ -1,5 +1,5 @@
 import { useForm } from 'react-hook-form'
-import { ClinicSchema, IClinic, ISchedule } from '@/models/schemas'
+import { ClinicSchema, IClinic, ISchedule } from '@/models/schemas.d'
 import valibotResolver from '@/lib/valibotResolver'
 import { createClinic } from '@/services/admin/clinics'
 import { useRouter } from 'next/navigation'
@@ -97,7 +97,7 @@ export const FormClinic = ({
         isMultiple: true,
         options: schedules.map((s) => ({
           value: s.id!,
-          label: s.day_week + ' | ' + s.openingHour + ' - ' + s.closingHour,
+          label: s.dayWeek + ' | ' + s.openingHour + ' - ' + s.closingHour,
         })),
       },
       // {

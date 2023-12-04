@@ -1,12 +1,21 @@
 import { ErrorResponse, SuccessResponse } from '@/helpers/ResponseError'
 import { db } from '@/lib/prisma'
-import { VeterinarianSchema } from '@/models/schemas'
+import { VeterinarianSchema } from '@/models/schemas.d'
+import { NextRequest } from 'next/server'
 import { safeParse } from 'valibot'
 
 // Get all veterinarians
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
-    const permissions = await db.veterinarian.findMany()
+    const searchParams = req.nextUrl.searchParams
+    const clinic = searchParams.get('clinic') || undefined
+    const permissions = await db.veterinarian.findMany({
+      where: {
+        clinic: {
+          id: clinic,
+        },
+      },
+    })
     return SuccessResponse(permissions, 200)
   } catch (error: any) {
     return ErrorResponse('BAD_REQUEST')
@@ -14,7 +23,7 @@ export async function GET() {
 }
 
 // Create a new veterinarian
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
     const input = await req.json()
     const validated = safeParse(VeterinarianSchema, input)
