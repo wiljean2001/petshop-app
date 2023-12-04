@@ -123,7 +123,7 @@ export async function PUT(req: NextRequest) {
         },
         prescribedItem: {
           createMany: {
-            data: prescribedItem.map((item) => ({
+            data: prescribedItem.map((item: any) => ({
               description: item.description,
               instructions: item.instructions,
               dosage: item.dosage,
