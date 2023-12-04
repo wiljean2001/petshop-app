@@ -1,9 +1,9 @@
 import { HeaderService } from '@/components/data-table-shell/services/header'
 import LoadServiceTableShell from '@/components/data-table-shell/services/load-table-shell'
 import { DashboardHeader } from '@/components/layout/auth/header'
+import { ServiceStatusKey } from '@/config/const'
 import { db } from '@/lib/prisma'
 import { parseSortParameter } from '@/lib/utils'
-import { States_services } from '@prisma/client'
 
 interface Props {
   searchParams: {
@@ -19,9 +19,9 @@ export default async function ServicePage({ searchParams }: Props) {
   const skip = (typeof page === 'string' ? parseInt(page) - 1 : 0) * limit
   const take = typeof per_page === 'string' ? parseInt(per_page) : 10
 
-  const statuses =
+  const statuses = 
     typeof state === 'string'
-      ? (state?.split('.') as States_services[]) ?? []
+      ? (state?.split('.') as ServiceStatusKey[]) ?? []
       : undefined
 
   const where = {

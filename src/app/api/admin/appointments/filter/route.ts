@@ -1,6 +1,6 @@
 import { ErrorResponse, SuccessResponse } from '@/helpers/ResponseError'
 import { db } from '@/lib/prisma'
-import { AppointmentStatus } from '@prisma/client'
+// import { AppointmentStatus } from '@prisma/client'
 import { NextResponse, NextRequest } from 'next/server'
 
 // Here is the endpoint for filter all appointments with the next restrictions:
@@ -31,26 +31,6 @@ export async function POST(req: NextRequest) {
         gte: new Date(startDate),
         lte: new Date(endDate),
       },
-      // ...(!ownerId &&
-      //   vetIds &&
-      //   vetIds?.length > 0 && { veterinarian: { id: { in: vetIds } } }),
-      // ...(!vetIds && vetId && { vetId }),
-      // ...(!ownerId &&
-      //   ownerIds &&
-      //   ownerIds?.length > 0 && { pet: { ownerId: { in: ownerIds } } }),
-      // ...(!ownerIds && ownerId && { ownerId }),
-      // ...(!petId && petIds && petIds?.length > 0 && { petId: { in: petIds } }),
-      // ...(!petIds && petId && { petId }),
-      // ...(!clinicId &&
-      //   clinicIds &&
-      //   clinicIds?.length > 0 && {
-      //     veterinarian: { clinicId: { in: clinicIds } },
-      //   }),
-      // ...(!clinicIds && clinicId && { clinicId }),
-      // ...(status &&
-      //   status?.length > 0 && {
-      //     status: { in: status.map((status) => status as AppointmentStatus) },
-      //   }),
       ...(vetId && { vetId }),
       ...(vetIds && { vetId: { in: vetIds } }),
       ...(ownerId && { pet: { ownerId } }),

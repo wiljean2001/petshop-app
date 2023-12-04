@@ -2,7 +2,7 @@ import GitHub, { GitHubProfile } from 'next-auth/providers/github'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import { PrismaAdapter } from '@auth/prisma-adapter'
 import { db } from '@/lib/prisma'
-import { User } from '@prisma/client'
+import { type User } from '@prisma/client'
 import NextAuth from 'next-auth'
 
 // let userRoleId: Role // Variable para almacenar el roleId
