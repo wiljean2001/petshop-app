@@ -43,12 +43,12 @@ export default async function AdminPage() {
 
   // Enriching data with additional details
   const serviceNames = await db.service.findMany({
-    where: { id: { in: serviceUsageData.map((s) => s.serviceId) } },
+    where: { id: { in: serviceUsageData.map((s: any) => s.serviceId) } },
     select: { id: true, name: true },
   })
 
   const breedNames = await db.breed.findMany({
-    where: { id: { in: petDemographicsData.map((p) => p.breedId) } },
+    where: { id: { in: petDemographicsData.map((p: any) => p.breedId) } },
     select: { id: true, name: true },
   })
 
