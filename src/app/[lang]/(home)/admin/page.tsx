@@ -66,14 +66,14 @@ export default async function AdminPage() {
 
   const transformServiceUsage = serviceUsageData.map((data: any) => ({
     label:
-      serviceNames.find((s) => s.id === data.serviceId)?.name ||
+      serviceNames.find((s: any) => s.id === data.serviceId)?.name ||
       'Unknown Service',
     value: data._count.serviceId,
   }))
 
   const transformPetDemographics = petDemographicsData.map((data: any) => ({
     label:
-      breedNames.find((b) => b.id === data.breedId)?.name || 'Unknown Breed',
+      breedNames.find((b: any) => b.id === data.breedId)?.name || 'Unknown Breed',
     value: data._count.breedId,
   }))
 
