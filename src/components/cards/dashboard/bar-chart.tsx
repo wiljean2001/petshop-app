@@ -18,7 +18,7 @@ export const BarChart: React.FC<Props> = ({ data, title }) => {
     ],
   }
   return (
-    <div className='bg-white shadow rounded-lg p-4 w-full md:w-1/3'>
+    <div className='shadow rounded-lg p-4 w-full md:w-1/3'>
       <Bar data={chartData} />
     </div>
   )

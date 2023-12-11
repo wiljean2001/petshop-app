@@ -22,7 +22,7 @@ export const LineChart: React.FC<Props> = ({ data, title }) => {
   }
   // Setup chart data and options here
   return (
-    <div className='bg-white shadow rounded-lg p-4 w-full md:w-1/3'>
+    <div className='shadow rounded-lg p-4 w-full md:w-1/3'>
       <Line data={chartData} options={{}} />
     </div>
   )
