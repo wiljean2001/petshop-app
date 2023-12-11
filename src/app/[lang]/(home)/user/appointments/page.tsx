@@ -31,6 +31,17 @@ export default async function AppointmentsUserPage() {
                   scheduledDateTime: true,
                   beginningDateTime: true,
                   status: true,
+                  Attendances: {
+                    select: {
+                      Prescription: {
+                        select: {
+                          instructions: true,
+                          prescribedItem: true,
+                          id: true,
+                        },
+                      },
+                    },
+                  },
                 },
               },
             },
@@ -67,14 +78,58 @@ export default async function AppointmentsUserPage() {
                         <h5 className='font-bold'>{pet?.name}</h5>
                         {pet.Appointments.map((appointment) => (
                           <div key={appointment.id} className='mt-2'>
-                            <p>{`Fecha programada: ${getDateToString({
-                              date: appointment.scheduledDateTime,
-                            })}`}</p>
+                            <p>{`Fecha programada: ${
+                              getDateToString({
+                                date: appointment.scheduledDateTime,
+                              }).formattedDate
+                            }`}</p>
                             <p>{`Estado: ${appointment.status}`}</p>
                             {appointment.beginningDateTime && (
-                              <p>{`Fecha de inicio: ${getDateToString({
-                                date: appointment.beginningDateTime,
-                              })}`}</p>
+                              <p>{`Fecha de realización: ${
+                                getDateToString({
+                                  date: appointment.beginningDateTime,
+                                }).formattedDate
+                              }`}</p>
+                            )}
+
+                            {appointment.Attendances && (
+                              <>
+                                <h5 className='font-bold'>Receta:</h5>
+                                {appointment.Attendances.Prescription && (
+                                  <p>{`Instrucciones: ${appointment.Attendances.Prescription.instructions}`}</p>
+                                )}
+                                {appointment.Attendances.Prescription &&
+                                  appointment.Attendances.Prescription
+                                    .prescribedItem &&
+                                  appointment.Attendances.Prescription.prescribedItem.map(
+                                    (item) => (
+                                      <>
+                                        <h5 className='font-bold'>Detalles:</h5>
+                                        <p
+                                          key={item.id}
+                                        >{`Instrucción: ${item.instructions}`}</p>
+                                        <p
+                                          key={item.id}
+                                        >{`Descripción: ${item.description}`}</p>
+                                        {item.dosage && (
+                                          <p
+                                            key={item.id}
+                                          >{`dosis: ${item.dosage}`}</p>
+                                        )}
+                                        <p>{`Iniciar en: ${
+                                          getDateToString({
+                                            date: item.startDate,
+                                          }).formattedDate
+                                        }`}</p>
+                                        <p>{`Finalizar en: ${
+                                          getDateToString({
+                                            date: item.endDate,
+                                          }).formattedDate
+                                        }`}</p>
+                                      </>
+                                    )
+                                  )}
+                              </>
                             )}
                           </div>
                         ))}
