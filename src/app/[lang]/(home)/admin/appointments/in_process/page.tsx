@@ -49,9 +49,9 @@ export default async function AppointmentInProcessPage({
               id: true,
               instructions: true,
               prescribedItem: true,
-            }
+            },
           },
-        }
+        },
       },
       petId: true,
       pet: {
@@ -85,14 +85,15 @@ export default async function AppointmentInProcessPage({
     redirect('/admin/appointments/')
   }
 
-  // Time Zone medicated for initialize the appointment
-  const timeZone = '-10:00'
-  const nowInLima = utcToZonedTime(new Date(), timeZone)
-
-  let attendance
+  let attendance: any
   if (result[0].beginningDateTime === null) {
+    // Time Zone medicated for initialize the appointment
+    const timeZone = '-10:00'
+    const nowInLima = utcToZonedTime(new Date(), timeZone)
+    console.log('🚀 ~ file: page.tsx:91 ~ nowInLima:', nowInLima)
+
     // update the start datetime of appointment
-    await db.appointments.update({
+    await prisma.appointments.update({
       where: {
         id: result[0].id,
       },
@@ -100,7 +101,7 @@ export default async function AppointmentInProcessPage({
         beginningDateTime: nowInLima,
       },
     })
-    // And create a attendance ->
+    // And create an attendance
     attendance = await db.attendances.create({
       data: {
         date: nowInLima,
@@ -118,7 +119,7 @@ export default async function AppointmentInProcessPage({
     })
   }
 
-  if(!attendance){
+  if (attendance === null || attendance === undefined) {
     redirect('/admin/appointments/')
   }
 
@@ -129,7 +130,7 @@ export default async function AppointmentInProcessPage({
         <TabsTrigger value='diagnostics'>Diagnóstico</TabsTrigger>
         <TabsTrigger value='prescription'>Receta</TabsTrigger>
         <div className='col-span-2'></div>
-        <ButtonEndAttendance apointmentId={appointment}/>
+        <ButtonEndAttendance apointmentId={appointment} />
       </TabsList>
       <TabsContent value='attendance'>
         <FirstContentPage
@@ -138,10 +139,16 @@ export default async function AppointmentInProcessPage({
         />
       </TabsContent>
       <TabsContent value='diagnostics'>
-        <SecondContentPage appointment={result[0] as any} attendance={attendance}/>
+        <SecondContentPage
+          appointment={result[0] as any}
+          attendance={attendance}
+        />
       </TabsContent>
       <TabsContent value='prescription'>
-        <ThirdContentPage appointment={result[0] as any} attendance={attendance}/>
+        <ThirdContentPage
+          appointment={result[0] as any}
+          attendance={attendance}
+        />
       </TabsContent>
     </Tabs>
   )
