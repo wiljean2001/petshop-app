@@ -93,7 +93,7 @@ export default async function AppointmentInProcessPage({
     console.log('🚀 ~ file: page.tsx:91 ~ nowInLima:', nowInLima)
 
     // update the start datetime of appointment
-    await prisma.appointments.update({
+    await db.appointments.update({
       where: {
         id: result[0].id,
       },
