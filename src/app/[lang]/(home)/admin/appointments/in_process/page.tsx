@@ -138,6 +138,8 @@ export default async function AppointmentInProcessPage({
           appointment={result[0] as any}
         />
       </TabsContent>
+      {attendance && (
+      <>
       <TabsContent value='diagnostics'>
         <SecondContentPage
           appointment={result[0] as any}
@@ -150,6 +152,8 @@ export default async function AppointmentInProcessPage({
           attendance={attendance}
         />
       </TabsContent>
+      </>
+      )}
     </Tabs>
   )
 }
