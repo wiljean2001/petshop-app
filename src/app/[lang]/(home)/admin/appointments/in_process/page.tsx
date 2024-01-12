@@ -139,16 +139,20 @@ export default async function AppointmentInProcessPage({
         />
       </TabsContent>
       <TabsContent value='diagnostics'>
-        <SecondContentPage
-          appointment={result[0] as any}
-          attendance={attendance}
-        />
+        {attendance && (
+          <SecondContentPage
+            appointment={result[0] as any}
+            attendance={attendance}
+          />
+        )}
       </TabsContent>
       <TabsContent value='prescription'>
-        <ThirdContentPage
-          appointment={result[0] as any}
-          attendance={attendance}
-        />
+        {attendance && (
+          <ThirdContentPage
+            appointment={result[0] as any}
+            attendance={attendance}
+          />
+        )}
       </TabsContent>
     </Tabs>
   )
