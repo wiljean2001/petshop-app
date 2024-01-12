@@ -42,7 +42,7 @@ export default async function ServicePage({ searchParams }: Props) {
       duration: true,
       // image: true,
       state: true,
-      ServiceDetails: true,
+      // ServiceDetails: true,
       ServiceAppointments: true,
       requiresClinicalData: true,
       createdAt: true,
