@@ -17,24 +17,22 @@ import { DiagnosticStatusOptions } from '@/config/const'
 
 interface Props {
   onConfirm: (input: any) => Promise<boolean>
-  appointment: IAppointment
+  diagnostic: IDiagnostic
 }
 
-export default function FormDiagnostic({ onConfirm, appointment }: Props) {
+export default function FormDiagnostic({ onConfirm, diagnostic }: Props) {
   const form = useForm<IDiagnostic>({
     resolver: valibotResolver(DiagnosticSchema),
     // defaultValues: {},
   })
 
   useEffect(() => {
-    if (appointment.Attendances && appointment.Attendances.Diagnostics) {
-      const diagnostic = appointment.Attendances.Diagnostics
-
+    if (diagnostic) {
       form.setValue('description', diagnostic.description)
       form.setValue('status', diagnostic.status)
       form.setValue('id', diagnostic.id)
     }
-  }, [appointment, form])
+  }, [diagnostic, form])
 
   const inputs = useMemo(
     (): FieldConfig[] => [
@@ -53,7 +51,7 @@ export default function FormDiagnostic({ onConfirm, appointment }: Props) {
         isMultiple: false,
       },
     ],
-    []
+    [DiagnosticStatusOptions]
   )
 
   const onHandle = async (input: IDiagnostic) => {

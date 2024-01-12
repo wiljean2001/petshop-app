@@ -21,17 +21,16 @@ import {
 
 interface Props {
   onConfirm: (input: IPrescription) => Promise<boolean>
-  appointment: IAppointment
+  prescription: IPrescription
 }
 
-export default function FormPrescription({ onConfirm, appointment }: Props) {
+export default function FormPrescription({ onConfirm, prescription }: Props) {
   const form = useForm<IPrescription>({
     resolver: valibotResolver(PrescriptionSchema),
     // defaultValues: {},
   })
   useEffect(() => {
-    if (appointment.Attendances && appointment.Attendances.Prescription) {
-      const prescription = appointment.Attendances.Prescription
+    if (prescription) {
       const prescriptionItems = prescription.prescribedItem
 
       form.setValue('instructions', prescription.instructions)
@@ -61,7 +60,7 @@ export default function FormPrescription({ onConfirm, appointment }: Props) {
         })
       }
     }
-  }, [appointment, form])
+  }, [prescription, form])
 
   const inputs = useMemo((): FieldConfig[] => {
     const prescribedItemConfig: optionsForDynamicField = {
@@ -112,14 +111,13 @@ export default function FormPrescription({ onConfirm, appointment }: Props) {
         },
       ],
     }
-    const prescription = appointment.Attendances.Prescription
+
     // Crear opciones dinámicas basadas en la longitud de Prescription
     const dynamicOptions =
       prescription && prescription.prescribedItem.length > 0
         ? Array.from(
             {
-              length:
-                appointment.Attendances.Prescription.prescribedItem.length,
+              length: prescription.prescribedItem.length,
             },
             () => ({
               ...prescribedItemConfig,
@@ -143,7 +141,7 @@ export default function FormPrescription({ onConfirm, appointment }: Props) {
         options: dynamicOptions,
       },
     ]
-  }, [appointment])
+  }, [prescription])
 
   const onHandle = async (input: IPrescription) => {
     try {

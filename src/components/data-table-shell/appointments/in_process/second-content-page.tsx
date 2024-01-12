@@ -44,6 +44,9 @@ export default function SecondContentPage({ appointment, attendance }: Props) {
   }
   return (
     // Here register the diagnostic of veterinarian for the pet
-    <FormDiagnostic appointment={appointment} onConfirm={onHandleConfirm} />
+    <FormDiagnostic
+      diagnostic={appointment.Attendances.Diagnostics}
+      onConfirm={onHandleConfirm}
+    />
   )
 }

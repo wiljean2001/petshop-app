@@ -45,6 +45,9 @@ export default function ThirdContentPage({ appointment, attendance }: Props) {
 
   return (
     // Here register the prescription generated for veterinarian and all items for specificated details
-    <FormPrescription appointment={appointment} onConfirm={onHandleConfirm} />
+    <FormPrescription
+      prescription={appointment.Attendances.Prescription}
+      onConfirm={onHandleConfirm}
+    />
   )
 }
