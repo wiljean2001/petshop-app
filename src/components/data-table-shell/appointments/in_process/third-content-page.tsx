@@ -11,6 +11,7 @@ interface Props {
   attendance: IAttendance
 }
 export default function ThirdContentPage({ appointment, attendance }: Props) {
+  console.log('🚀 ~ ThirdContentPage ~ appointment:', appointment)
   const onHandleConfirm = async (data: IPrescription) => {
     showToast(
       '¿Está seguro de querer guardar estos detalles?. Confirmar acción.',

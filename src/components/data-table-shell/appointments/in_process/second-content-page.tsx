@@ -11,6 +11,7 @@ interface Props {
   attendance: IAttendance
 }
 export default function SecondContentPage({ appointment, attendance }: Props) {
+  console.log('🚀 ~ SecondContentPage ~ appointment:', appointment)
   const onHandleConfirm = async (data: IDiagnostic) => {
     showToast(
       '¿Está seguro de querer guardar estos detalles?. Confirmar acción.',
