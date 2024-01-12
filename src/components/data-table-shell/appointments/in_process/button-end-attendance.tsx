@@ -24,11 +24,13 @@ export default function ButtonEndAttendance({
               'success'
             )
             route.refresh()
+            return
           }
           showToast(
             'Advertencia: Algo surgió durante la finalización de la atención.',
             'warning'
           )
+          return
         } catch (error) {
           showToast(
             'Error: Algo surgió durante la finalización de la atención.',
