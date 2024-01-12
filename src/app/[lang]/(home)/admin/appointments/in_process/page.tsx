@@ -8,6 +8,7 @@ import { db } from '@/lib/prisma'
 import { redirect } from 'next/navigation'
 import moment from 'moment-timezone'
 import { getTimezoneOffset, utcToZonedTime, toDate, format } from 'date-fns-tz'
+import { IAttendance } from '@/models/schemas'
 
 interface Props {
   searchParams: {
@@ -85,7 +86,7 @@ export default async function AppointmentInProcessPage({
     redirect('/admin/appointments/')
   }
 
-  let attendance: any
+  let attendance = null
   if (result[0].beginningDateTime === null) {
     // Time Zone medicated for initialize the appointment
     const timeZone = '-10:00'
@@ -102,7 +103,7 @@ export default async function AppointmentInProcessPage({
       },
     })
     // And create an attendance
-    attendance = await db.attendances.create({
+    attendance = (await db.attendances.create({
       data: {
         date: nowInLima,
         appointment: {
@@ -111,16 +112,18 @@ export default async function AppointmentInProcessPage({
           },
         },
       },
-    })
+    })) as IAttendance
+    console.log('🚀 ~ attendance -> if:', attendance)
   } else {
     // Get attendance when appointmentId === appointment
-    attendance = await db.attendances.findFirst({
+    attendance = (await db.attendances.findFirst({
       where: { appointmentId: appointment },
-    })
+    })) as IAttendance
+    console.log('🚀 ~ attendance -> else:', attendance)
   }
 
   if (attendance === null || attendance === undefined) {
-    redirect('/admin/appointments/')
+    redirect('/admin/appointments/in_process?' + appointment) // refresh the page
   }
 
   return (
@@ -139,7 +142,7 @@ export default async function AppointmentInProcessPage({
         />
       </TabsContent>
       <TabsContent value='diagnostics'>
-        {attendance && (
+        {attendance !== null && (
           <SecondContentPage
             appointment={result[0] as any}
             attendance={attendance}
@@ -147,7 +150,7 @@ export default async function AppointmentInProcessPage({
         )}
       </TabsContent>
       <TabsContent value='prescription'>
-        {attendance && (
+        {attendance !== null && (
           <ThirdContentPage
             appointment={result[0] as any}
             attendance={attendance}
