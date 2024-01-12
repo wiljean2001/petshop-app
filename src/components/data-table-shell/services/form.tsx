@@ -86,30 +86,31 @@ export const FormService = ({
         name: 'requiresClinicalData',
         description: '¿Este servicio requerirá registro de datos generales?',
       },
-      {
-        type: 'dynamic',
-        name: 'ServiceDetails',
-        withButtons: true,
-        options: [
-          {
-            id: 'ServiceDetails',
-            config: [
-              {
-                type: 'area',
-                name: 'value',
-                label: 'Detalle:',
-                placeholder: 'Detalle:',
-              },
-              {
-                type: 'text',
-                name: 'detailType',
-                label: 'Tipo de Detalle:',
-                placeholder: 'Tipo de Detalle:',
-              },
-            ],
-          },
-        ],
-      },
+      // Services details not available
+      // {
+      //   type: 'dynamic',
+      //   name: 'ServiceDetails',
+      //   withButtons: true,
+      //   options: [
+      //     {
+      //       id: 'ServiceDetails',
+      //       config: [
+      //         {
+      //           type: 'area',
+      //           name: 'value',
+      //           label: 'Detalle:',
+      //           placeholder: 'Detalle:',
+      //         },
+      //         {
+      //           type: 'text',
+      //           name: 'detailType',
+      //           label: 'Tipo de Detalle:',
+      //           placeholder: 'Tipo de Detalle:',
+      //         },
+      //       ],
+      //     },
+      //   ],
+      // },
     ]
   }, [])
 

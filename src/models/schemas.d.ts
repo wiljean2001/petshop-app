@@ -149,7 +149,7 @@ export const ServiceSchema = object({
   duration: number('Duración requerida'), // Duration required
   state: enumType(['ACTIVE', 'INACTIVE', 'UNCONTINUED']), // Service state enumeration
   requiresClinicalData: optional(boolean('Dato clínico requerido')), // Optional clinical data requirement boolean
-  ServiceDetails: optional(array(ServiceDetailSchema)), // Optional array of ServiceDetails
+  // ServiceDetails: optional(array(ServiceDetailSchema)), // Optional array of ServiceDetails
   createdAt: optional(date('Fecha de creación inválida')), // Optional creation date
   updatedAt: optional(date('Fecha de actualización inválida')), // Optional update date
 })

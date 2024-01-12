@@ -52,8 +52,8 @@ export async function PUT(
     const newInput = exclude(input, [
       'createdAt',
       'updatedAt',
-      'ServiceDetails[].updatedAt',
-      'ServiceDetails[].createdAt',
+      // 'ServiceDetails[].updatedAt',
+      // 'ServiceDetails[].createdAt',
     ])
 
     const validated = safeParse(ServiceSchema, newInput)
@@ -67,12 +67,12 @@ export async function PUT(
       description,
       duration,
       state,
-      ServiceDetails,
+      // ServiceDetails,
       requiresClinicalData,
     } = validated.output
 
     // Inicia la transacción
-    const transaction = []
+    // const transaction = []
 
     // Actualizar el servicio
     const serviceUpdateData = {
@@ -84,44 +84,44 @@ export async function PUT(
       state,
     }
 
-    transaction.push(
-      db.service.update({
-        where: { id: params.id },
-        data: serviceUpdateData,
-      })
-    )
+    // transaction.push(
+    // )
+    const serviceUpdated = await db.service.update({
+      where: { id: params.id },
+      data: serviceUpdateData,
+    })
     // Primero, borrar todos los ServiceDetails existentes para este servicio
-    transaction.push(
-      db.serviceDetails.deleteMany({
-        where: { serviceId: params.id },
-      })
-    )
+    // transaction.push(
+    //   db.serviceDetails.deleteMany({
+    //     where: { serviceId: params.id },
+    //   })
+    // )
     // Si hay detalles para actualizar o crear
-    if (ServiceDetails) {
-      // Ahora, crear nuevos ServiceDetails con los datos proporcionados
-      let CreateServiceDetails: {} | undefined
+    // if (ServiceDetails) {
+    //   // Ahora, crear nuevos ServiceDetails con los datos proporcionados
+    //   let CreateServiceDetails: {} | undefined
 
-      if (ServiceDetails) {
-        CreateServiceDetails = {
-          createMany: { data: ServiceDetails },
-        }
-      } else {
-        transaction.push(
-          db.service.update({
-            where: { id: params.id },
-            data: {
-              ServiceDetails: CreateServiceDetails,
-            },
-          })
-        )
-      }
-    }
+    //   if (ServiceDetails) {
+    //     CreateServiceDetails = {
+    //       createMany: { data: ServiceDetails },
+    //     }
+    //   } else {
+    //     transaction.push(
+    //       db.service.update({
+    //         where: { id: params.id },
+    //         data: {
+    //           ServiceDetails: CreateServiceDetails,
+    //         },
+    //       })
+    //     )
+    //   }
+    // }
 
     // Ejecutar todas las operaciones como parte de una transacción
-    await db.$transaction(transaction)
+    // await db.$transaction(transaction)
 
     // Si llegamos aquí, la transacción fue exitosa
-    return SuccessResponse({ ...serviceUpdateData, ServiceDetails }, 200)
+    return SuccessResponse({ ...serviceUpdateData, serviceUpdated }, 200)
   } catch (error) {
     return ErrorResponse('BAD_REQUEST')
   }

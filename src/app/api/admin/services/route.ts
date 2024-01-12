@@ -30,16 +30,22 @@ export async function POST(req: NextRequest) {
       return ErrorResponse('BAD_USER_INPUT')
     }
 
-    const { name, cost, description, duration, requiresClinicalData, state, ServiceDetails } =
-      validated.output
+    const {
+      name,
+      cost,
+      description,
+      duration,
+      requiresClinicalData,
+      state, // , ServiceDetails
+    } = validated.output
 
-    let CreateServiceDetails: {} | undefined
+    // let CreateServiceDetails: {} | undefined
 
-    if (ServiceDetails) {
-      CreateServiceDetails = {
-        createMany: { data: ServiceDetails },
-      }
-    }
+    // if (ServiceDetails) {
+    //   CreateServiceDetails = {
+    //     createMany: { data: ServiceDetails },
+    //   }
+    // }
 
     const service = await db.service.create({
       data: {
@@ -50,7 +56,7 @@ export async function POST(req: NextRequest) {
         image: '',
         state,
         requiresClinicalData: requiresClinicalData,
-        ServiceDetails: CreateServiceDetails,
+        // ServiceDetails: CreateServiceDetails,
       },
     })
     return SuccessResponse(service, 200)

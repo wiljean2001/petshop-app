@@ -180,45 +180,46 @@ export default function ServicesTableShell({
           </div>
         ),
       },
-      {
-        accessorKey: 'ServiceDetails',
-        enableSorting: false,
-        header: ({ column }) => (
-          <DataTableColumnHeader column={column} title='Detalles' />
-        ),
-        cell: ({ row }) => {
-          const details = row.getValue('ServiceDetails') as IServiceDetail[]
+      // Services details, not available
+      // {
+      //   accessorKey: 'ServiceDetails',
+      //   enableSorting: false,
+      //   header: ({ column }) => (
+      //     <DataTableColumnHeader column={column} title='Detalles' />
+      //   ),
+      //   cell: ({ row }) => {
+      //     const details = row.getValue('ServiceDetails') as IServiceDetail[]
 
-          // Crear un objeto para agrupar los detalles por tipo
-          const groupedDetails = details.reduce((acc, detail) => {
-            // Inicializa el grupo si aún no existe
-            if (!acc[detail.detailType]) {
-              acc[detail.detailType] = []
-            }
-            // Agrega el detalle al grupo correspondiente
-            acc[detail.detailType].push(detail)
-            return acc
-          }, {} as Record<string, IServiceDetail[]>)
+      //     // Crear un objeto para agrupar los detalles por tipo
+      //     const groupedDetails = details.reduce((acc, detail) => {
+      //       // Inicializa el grupo si aún no existe
+      //       if (!acc[detail.detailType]) {
+      //         acc[detail.detailType] = []
+      //       }
+      //       // Agrega el detalle al grupo correspondiente
+      //       acc[detail.detailType].push(detail)
+      //       return acc
+      //     }, {} as Record<string, IServiceDetail[]>)
 
-          return (
-            <div className='min-w-[300px] max-w-[200px]'>
-              {Object.entries(groupedDetails).map(([type, typeDetails]) => (
-                <div key={type}>
-                  {/* Muestra el tipo como un Badge */}
-                  <Badge variant='outline'>{type}</Badge>
+      //     return (
+      //       <div className='min-w-[300px] max-w-[200px]'>
+      //         {Object.entries(groupedDetails).map(([type, typeDetails]) => (
+      //           <div key={type}>
+      //             {/* Muestra el tipo como un Badge */}
+      //             <Badge variant='outline'>{type}</Badge>
 
-                  {/* Lista de detalles para este tipo */}
-                  {typeDetails.map((detail, index) => (
-                    <div key={index} className=''>
-                      {detail.value}
-                    </div>
-                  ))}
-                </div>
-              ))}
-            </div>
-          )
-        },
-      },
+      //             {/* Lista de detalles para este tipo */}
+      //             {typeDetails.map((detail, index) => (
+      //               <div key={index} className=''>
+      //                 {detail.value}
+      //               </div>
+      //             ))}
+      //           </div>
+      //         ))}
+      //       </div>
+      //     )
+      //   },
+      // },
       {
         accessorKey: 'createdAt',
         header: ({ column }) => (
