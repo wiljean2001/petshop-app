@@ -30,7 +30,7 @@ export default function FormPrescription({ onConfirm, appointment }: Props) {
     // defaultValues: {},
   })
   useEffect(() => {
-    if (appointment.Attendances.Prescription) {
+    if (appointment.Attendances && appointment.Attendances.Prescription) {
       const prescription = appointment.Attendances.Prescription
       const prescriptionItems = prescription.prescribedItem
 

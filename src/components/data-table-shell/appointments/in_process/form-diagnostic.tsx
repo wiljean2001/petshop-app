@@ -27,7 +27,7 @@ export default function FormDiagnostic({ onConfirm, appointment }: Props) {
   })
 
   useEffect(() => {
-    if (appointment.Attendances.Diagnostics) {
+    if (appointment.Attendances && appointment.Attendances.Diagnostics) {
       const diagnostic = appointment.Attendances.Diagnostics
 
       form.setValue('description', diagnostic.description)

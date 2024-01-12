@@ -122,8 +122,9 @@ export default async function AppointmentInProcessPage({
     console.log('🚀 ~ attendance -> else:', attendance)
   }
 
-  if (attendance === null || attendance === undefined) {
-    redirect('/admin/appointments/in_process?' + appointment) // refresh the page
+  if (!attendance || !result[0]) {
+    // redirect('/admin/appointments/in_process?' + appointment) // refresh the page
+    return
   }
 
   return (
@@ -142,20 +143,16 @@ export default async function AppointmentInProcessPage({
         />
       </TabsContent>
       <TabsContent value='diagnostics'>
-        {attendance !== null && (
-          <SecondContentPage
-            appointment={result[0] as any}
-            attendance={attendance}
-          />
-        )}
+        <SecondContentPage
+          appointment={result[0] as any}
+          attendance={attendance}
+        />
       </TabsContent>
       <TabsContent value='prescription'>
-        {attendance !== null && (
-          <ThirdContentPage
-            appointment={result[0] as any}
-            attendance={attendance}
-          />
-        )}
+        <ThirdContentPage
+          appointment={result[0] as any}
+          attendance={attendance}
+        />
       </TabsContent>
     </Tabs>
   )
