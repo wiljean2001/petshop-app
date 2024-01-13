@@ -20,9 +20,7 @@ export async function getSpecies() {
   })
 
   if (!res.ok) {
-    throw new Error(
-      `Fallo en la crreación|eliminación|actualización de la especie: ${res.statusText}`
-    )
+    throw new Error(`Fallo en la obtención de las especies: ${res.statusText}`)
   }
 
   const specie: ISpecie[] = await res.json()
@@ -38,7 +36,7 @@ export async function createSpecie({ input }: Props) {
   })
 
   if (!res.ok) {
-    throw new Error(`Fallo en la crreación de la especie: ${res.statusText}`)
+    throw new Error(`Fallo en la creación de la especie: ${res.statusText}`)
   }
 
   const specie: ISpecie = await res.json()
