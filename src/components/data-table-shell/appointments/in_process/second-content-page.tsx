@@ -1,17 +1,20 @@
 'use client'
 
-import { IAppointment, IAttendance, IDiagnostic } from '@/models/schemas.d'
-import FormAttendances from './form-attendance'
+import { IAttendance, IDiagnostic } from '@/models/schemas.d'
 import FormDiagnostic from './form-diagnostic'
 import { showToast } from '@/helpers/toast'
 import { saveDiagnostic } from '@/services/admin/appointments/in-process/diagnostics'
 
 interface Props {
-  appointment: IAppointment
+  diagnostic: IDiagnostic
   attendance: IAttendance
+  beginningDateTime: Date
 }
-export default function SecondContentPage({ appointment, attendance }: Props) {
-  console.log('🚀 ~ SecondContentPage ~ appointment:', appointment)
+export default function SecondContentPage({
+  diagnostic,
+  attendance,
+  beginningDateTime,
+}: Props) {
   const onHandleConfirm = async (data: IDiagnostic) => {
     showToast(
       '¿Está seguro de querer guardar estos detalles?. Confirmar acción.',
@@ -21,7 +24,7 @@ export default function SecondContentPage({ appointment, attendance }: Props) {
           const res = await saveDiagnostic(
             attendance.id!,
             data,
-            appointment.beginningDateTime!
+            beginningDateTime
           )
           if (res) {
             showToast(
@@ -45,9 +48,6 @@ export default function SecondContentPage({ appointment, attendance }: Props) {
   }
   return (
     // Here register the diagnostic of veterinarian for the pet
-    <FormDiagnostic
-      diagnostic={appointment.Attendances.Diagnostics}
-      onConfirm={onHandleConfirm}
-    />
+    <FormDiagnostic diagnostic={diagnostic} onConfirm={onHandleConfirm} />
   )
 }

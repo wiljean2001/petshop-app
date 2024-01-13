@@ -7,11 +7,15 @@ import { showToast } from '@/helpers/toast'
 import { savePrescription } from '@/services/admin/appointments/in-process/prescriptions'
 
 interface Props {
-  appointment: IAppointment
+  prescription: IAppointment
   attendance: IAttendance
+  beginningDateTime: Date
 }
-export default function ThirdContentPage({ appointment, attendance }: Props) {
-  console.log('🚀 ~ ThirdContentPage ~ appointment:', appointment)
+export default function ThirdContentPage({
+  prescription,
+  attendance,
+  beginningDateTime,
+}: Props) {
   const onHandleConfirm = async (data: IPrescription) => {
     showToast(
       '¿Está seguro de querer guardar estos detalles?. Confirmar acción.',
@@ -21,7 +25,7 @@ export default function ThirdContentPage({ appointment, attendance }: Props) {
           const res = await savePrescription(
             attendance.id!,
             data,
-            appointment.beginningDateTime!
+            beginningDateTime
           )
           if (res) {
             showToast(
@@ -46,9 +50,6 @@ export default function ThirdContentPage({ appointment, attendance }: Props) {
 
   return (
     // Here register the prescription generated for veterinarian and all items for specificated details
-    <FormPrescription
-      prescription={appointment.Attendances.Prescription}
-      onConfirm={onHandleConfirm}
-    />
+    <FormPrescription prescription={prescription} onConfirm={onHandleConfirm} />
   )
 }

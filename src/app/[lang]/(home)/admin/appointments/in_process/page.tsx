@@ -42,18 +42,18 @@ export default async function AppointmentInProcessPage({
           clinicalData: true,
         },
       },
-      Attendances: {
-        select: {
-          Diagnostics: true,
-          Prescription: {
-            select: {
-              id: true,
-              instructions: true,
-              prescribedItem: true,
-            },
-          },
-        },
-      },
+      // Attendances: {
+      //   select: {
+      //     Diagnostics: true,
+      //     Prescription: {
+      //       select: {
+      //         id: true,
+      //         instructions: true,
+      //         prescribedItem: true,
+      //       },
+      //     },
+      //   },
+      // },
       petId: true,
       pet: {
         select: {
@@ -103,7 +103,7 @@ export default async function AppointmentInProcessPage({
       },
     })
     // And create an attendance
-    attendance = (await db.attendances.create({
+    attendance = await db.attendances.create({
       data: {
         date: nowInLima,
         appointment: {
@@ -112,19 +112,40 @@ export default async function AppointmentInProcessPage({
           },
         },
       },
-    })) as IAttendance
+      select: {
+        id: true,
+        Diagnostics: true,
+        Prescription: {
+          select: {
+            id: true,
+            instructions: true,
+            prescribedItem: true,
+          },
+        },
+      },
+    })
     console.log('🚀 ~ attendance -> if:', attendance)
   } else {
     // Get attendance when appointmentId === appointment
-    attendance = (await db.attendances.findFirst({
+    attendance = await db.attendances.findFirst({
       where: { appointmentId: appointment },
-    })) as IAttendance
+      select: {
+        id: true,
+        Diagnostics: true,
+        Prescription: {
+          select: {
+            id: true,
+            instructions: true,
+            prescribedItem: true,
+          },
+        },
+      },
+    })
     console.log('🚀 ~ attendance -> else:', attendance)
   }
 
-  if (!attendance || !result[0]) {
-    // redirect('/admin/appointments/in_process?' + appointment) // refresh the page
-    return
+  if (!attendance) {
+    redirect('/admin/appointments/in_process?' + appointment) // refresh the page
   }
 
   return (
@@ -144,13 +165,15 @@ export default async function AppointmentInProcessPage({
       </TabsContent>
       <TabsContent value='diagnostics'>
         <SecondContentPage
-          appointment={result[0] as any}
+          diagnostic={attendance.Diagnostics}
+          beginningDateTime={result[0].scheduledDateTime}
           attendance={attendance}
         />
       </TabsContent>
       <TabsContent value='prescription'>
         <ThirdContentPage
-          appointment={result[0] as any}
+          prescription={attendance.Prescription}
+          beginningDateTime={result[0].scheduledDateTime}
           attendance={attendance}
         />
       </TabsContent>
