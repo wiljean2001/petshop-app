@@ -11,5 +11,6 @@ export async function GET() {
       role: true,
     },
   })
+  console.log('🚀 ~ GET ~ users:', users)
   return SuccessResponse(users, 200)
 }

@@ -38,6 +38,7 @@ export default async function OwnerPage({ searchParams }: Props) {
       address: true,
       email: true,
       // Pet: true,
+      userId: true,
       createdAt: true,
       updatedAt: true,
     },

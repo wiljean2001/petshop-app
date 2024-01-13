@@ -35,9 +35,10 @@ export const FormOwner = ({
         form.setValue(key as keyof IOwner, initialValues[key as keyof IOwner])
       })
     }
-    const loadSchedules = async () => {
+    const loadUsers = async () => {
       try {
-        const res = await getUsers() // Asume que getSchedule es una función que obtiene las eSchedule
+        const res = await getUsers()
+        console.log('🚀 ~ loadUsers ~ res:', res)
         setUsers(res)
       } catch (error) {
         console.error('Error al cargar los usuarios', error)
@@ -45,7 +46,7 @@ export const FormOwner = ({
     }
 
     if (isOpen) {
-      loadSchedules()
+      loadUsers()
     }
   }, [form, initialValues, isOpen])
 

@@ -150,7 +150,7 @@ export default async function AppointmentInProcessPage({
 
   return (
     <Tabs defaultValue='attendance' className='w-full'>
-      <TabsList className='grid w-full grid-cols-6'>
+      <TabsList className='grid w-full grid-cols-6' >
         <TabsTrigger value='attendance'>Atención</TabsTrigger>
         <TabsTrigger value='diagnostics'>Diagnóstico</TabsTrigger>
         <TabsTrigger value='prescription'>Receta</TabsTrigger>

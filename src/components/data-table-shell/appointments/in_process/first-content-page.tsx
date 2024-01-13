@@ -23,7 +23,6 @@ export default function FirstContentPage({
   totalServices,
   appointment,
 }: Props) {
-  console.log('🚀 ~ appointment:', appointment)
   const router = useRouter()
   const [services, setServices] = useState<IService[]>([]) // Asumiendo que ISpecies es tu tipo para especies
 
