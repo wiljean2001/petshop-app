@@ -10,6 +10,9 @@ export async function GET() {
       email: true,
       role: true,
     },
+    where: {
+      role: 'user',
+    },
   })
   console.log('🚀 ~ GET ~ users:', users)
   return SuccessResponse(users, 200)

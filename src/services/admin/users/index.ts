@@ -5,7 +5,7 @@ export async function getUsers() {
   const res = await fetch(`${siteConfig.url}/api/admin/users/`, {
     method: 'GET',
     headers: { 'Content-Type': 'application/json' },
-    cache: 'no-cache',
+    // cache: 'no-cache',
   })
 
   if (!res.ok) {
