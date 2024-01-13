@@ -14,13 +14,19 @@ import { showToast } from '@/helpers/toast'
 import { getDateToString } from '@/lib/times'
 import { FormOwner } from './form'
 import { useRouter } from 'next/navigation'
+import { IUserRestrict } from '@/models/user'
 
 interface OwnersTableShellProps {
   data: IOwner[]
   pageCount: number
+  users: IUserRestrict[]
 }
 
-export default function OwnersTableShell({ data, pageCount }: OwnersTableShellProps) {
+export default function OwnersTableShell({
+  data,
+  pageCount,
+  users,
+}: OwnersTableShellProps) {
   const route = useRouter()
   const [isPending, startTransition] = React.useTransition()
   const [dialog, setDialog] = React.useState<{
@@ -298,6 +304,7 @@ export default function OwnersTableShell({ data, pageCount }: OwnersTableShellPr
           onClose={handleDialogClose}
           onConfirm={handleUpdateOwner}
           initialValues={dialog.owner}
+          users={users}
         />
       )}
     </>

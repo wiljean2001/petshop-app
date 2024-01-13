@@ -3,12 +3,14 @@ import { createOwner } from '@/services/admin/owners'
 import { showToast } from '@/helpers/toast'
 import { FormOwner } from './form'
 import { useRouter } from 'next/navigation'
+import { IUserRestrict } from '@/models/user'
 
 interface Props {
   isOpen: boolean
   onClose: () => void
+  users: IUserRestrict[]
 }
-export const AddOwner = ({ isOpen, onClose }: Props) => {
+export const AddOwner = ({ isOpen, onClose, users }: Props) => {
   const route = useRouter()
 
   const handleCreateOwner = async (input: IOwner) => {
@@ -35,6 +37,7 @@ export const AddOwner = ({ isOpen, onClose }: Props) => {
         isOpen={isOpen}
         onClose={onClose}
         onConfirm={handleCreateOwner}
+        users={users}
       />
     </>
   )

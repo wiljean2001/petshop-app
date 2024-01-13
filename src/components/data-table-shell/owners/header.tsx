@@ -3,8 +3,9 @@
 import { DashboardOptions } from '../header-for-tables'
 import { useMemo, useState } from 'react'
 import { AddOwner } from './add'
+import { IUserRestrict } from '@/models/user'
 
-export const HeaderOwner = () => {
+export const HeaderOwner = ({ users }: { users: IUserRestrict[] }) => {
   const [isDialogOpen, setDialogOpen] = useState(false)
 
   const options = useMemo(() => {
@@ -22,7 +23,11 @@ export const HeaderOwner = () => {
   return (
     <>
       <DashboardOptions options={options} onHandledDownload=''>
-        <AddOwner isOpen={isDialogOpen} onClose={() => setDialogOpen(false)} />
+        <AddOwner
+          isOpen={isDialogOpen}
+          onClose={() => setDialogOpen(false)}
+          users={users}
+        />
       </DashboardOptions>
     </>
   )

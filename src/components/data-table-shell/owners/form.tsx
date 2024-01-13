@@ -7,7 +7,7 @@ import { WithFormDialog } from '../config'
 import { FieldConfig } from '@/types'
 import { showToast } from '@/helpers/toast'
 import { IUserRestrict } from '@/models/user'
-import { getUsers } from '@/services/admin/users'
+// import { getUsers } from '@/services/admin/users'
 
 interface Props {
   isOpen: boolean
@@ -15,6 +15,7 @@ interface Props {
   onConfirm: (input: IOwner) => Promise<boolean>
   title: string
   initialValues?: Partial<IOwner>
+  users: IUserRestrict[]
 }
 export const FormOwner = ({
   isOpen,
@@ -22,8 +23,9 @@ export const FormOwner = ({
   onConfirm,
   title,
   initialValues,
+  users,
 }: Props) => {
-  const [users, setUsers] = useState<IUserRestrict[]>([])
+  // const [users, setUsers] = useState<IUserRestrict[]>([])
   const form = useForm<IOwner>({
     resolver: valibotResolver(OwnerSchema),
     // defaultValues: {},
@@ -35,20 +37,20 @@ export const FormOwner = ({
         form.setValue(key as keyof IOwner, initialValues[key as keyof IOwner])
       })
     }
-    
-    const loadUsers = async () => {
-      try {
-        const res = await getUsers()
-        console.log('🚀 ~ loadUsers ~ res:', res)
-        setUsers(res)
-      } catch (error) {
-        console.error('Error al cargar los usuarios', error)
-      }
-    }
 
-    if (isOpen) {
-      loadUsers()
-    }
+    // const loadUsers = async () => {
+    //   try {
+    //     const res = await getUsers()
+    //     console.log('🚀 ~ loadUsers ~ res:', res)
+    //     setUsers(res)
+    //   } catch (error) {
+    //     console.error('Error al cargar los usuarios', error)
+    //   }
+    // }
+
+    // if (isOpen) {
+    //   loadUsers()
+    // }
   }, [form, initialValues, isOpen])
 
   const inputs = useMemo((): FieldConfig[] => {
